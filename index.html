@@ -8,56 +8,56 @@
 body {
   margin: 0;
   font-family: "Segoe UI", Arial;
-  background: #e9edf1;
+  background: #f3f4f6;
 }
 
-/* 🔥 CONTENEDOR PRINCIPAL */
-.container {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* 🔥 COLUMNA IZQUIERDA (BANNER) */
-.left {
-  width: 35%;
-  background: linear-gradient(180deg, #0b1d4d, #1c2f85);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 40px;
-}
-
-.left h1 {
-  margin: 0;
-  font-size: 28px;
-}
-
-.left p {
-  margin-top: 10px;
-  opacity: 0.8;
-}
-
-/* 🔥 COLUMNA DERECHA (FORMULARIO) */
-.right {
-  width: 65%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* CARD */
-.card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 25px;
+/* 🔥 BANNER SUPERIOR */
+.top-banner {
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  height: 110px;
+  background: linear-gradient(90deg, #0b3c8c, #0f6bdc);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  color: white;
+}
+
+.top-banner .left-text {
+  font-size: 16px;
+}
+
+.top-banner .essa {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* 🔥 CONTENIDO */
+.main {
+  display: flex;
+  padding: 30px;
+}
+
+/* IZQUIERDA FORM */
+.left {
+  width: 50%;
+}
+
+/* DERECHA INFO */
+.right {
+  width: 50%;
+  padding-left: 40px;
+}
+
+/* FORM CARD */
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
 }
 
 .title {
-  font-size: 17px;
   font-weight: 600;
   margin-bottom: 20px;
 }
@@ -75,7 +75,7 @@ body {
 .select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #ccc;
   border-radius: 8px;
   margin-top: 6px;
   cursor: pointer;
@@ -91,7 +91,7 @@ body {
   border-radius: 8px;
   margin-top: 5px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  z-index: 9999;
+  z-index: 999;
 }
 
 .option {
@@ -107,17 +107,21 @@ body {
 .input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #ccc;
   border-radius: 8px;
   margin-top: 6px;
 }
 
-/* TEXTO LEGAL */
+.info {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 10px;
+}
+
 .legal {
-  font-size: 14px;
+  font-size: 13px;
   color: #4fc3f7;
   margin-top: 15px;
-  line-height: 1.5;
 }
 
 .legal a {
@@ -127,30 +131,39 @@ body {
 }
 
 .btn {
-  width: 100%;
-  background: #6b9cff;
+  width: 200px;
+  background: #7aa6df;
   color: white;
   border: none;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 8px;
   margin-top: 20px;
   cursor: pointer;
 }
 
-/* 🔥 RESPONSIVE */
+/* TEXTO DERECHO */
+.right h2 {
+  margin-top: 0;
+}
+
+.right p {
+  color: #555;
+  line-height: 1.5;
+}
+
+/* RESPONSIVE */
 @media(max-width: 768px) {
-  .container {
+  .main {
     flex-direction: column;
   }
 
-  .left {
+  .left, .right {
     width: 100%;
-    text-align: center;
+    padding: 0;
   }
 
   .right {
-    width: 100%;
-    padding: 20px;
+    margin-top: 20px;
   }
 }
 </style>
@@ -158,16 +171,19 @@ body {
 
 <body>
 
-<div class="container">
-
-  <!-- 🔥 IZQUIERDA -->
-  <div class="left">
-    <h1>ESSA</h1>
-    <p>Grupo EPM</p>
+<!-- 🔥 BANNER -->
+<div class="top-banner">
+  <div class="left-text">
+    ¡Soy Luisa, tu asistente virtual! Escríbeme 📱
   </div>
+  <div class="essa">ESSA</div>
+</div>
 
-  <!-- 🔥 DERECHA -->
-  <div class="right">
+<!-- 🔥 CONTENIDO -->
+<div class="main">
+
+  <!-- FORMULARIO -->
+  <div class="left">
     <div class="card">
 
       <div class="title">
@@ -199,15 +215,22 @@ body {
 
           <div class="options" id="pagoOptions">
             <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+            <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
             <div class="option" onclick="selectOption('pago', this)">Abonos</div>
+            <div class="option" onclick="selectOption('pago', this)">Saldos</div>
           </div>
         </div>
       </div>
 
+      <!-- INPUT -->
       <div class="label" id="inputLabel">Número de cuenta</div>
       <input class="input" type="text">
 
-      <!-- TEXTO LEGAL -->
+      <div class="info">
+        Puede consultar máximo 15 números presionando Enter.
+      </div>
+
+      <!-- LEGAL -->
       <div class="legal">
         Al continuar, acepto las <b>políticas</b> aplicables para el tratamiento de mis datos personales según la jurisdicción local del responsable y de 
         <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
@@ -218,6 +241,15 @@ body {
       <button class="btn">Ingresar</button>
 
     </div>
+  </div>
+
+  <!-- INFO DERECHA -->
+  <div class="right">
+    <h2>Pagos electrónicos</h2>
+    <p>
+      Desde su casa, oficina o cualquier lugar, pague de forma segura a través de nuestro sistema de pago. 
+      Use nuestro servicio desde las 00:01 am hasta 11:30 pm, los 7 días de la semana.
+    </p>
   </div>
 
 </div>
