@@ -11,7 +11,6 @@ body {
   background: #e9edf1;
 }
 
-/* CONTENEDOR */
 .wrapper {
   max-width: 420px;
   margin: auto;
@@ -25,21 +24,19 @@ body {
   box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
-/* TITULO */
 .title {
   font-size: 17px;
   font-weight: 600;
   margin-bottom: 20px;
 }
 
-/* LABEL */
 .label {
   font-size: 13px;
   font-weight: 600;
   margin-top: 15px;
 }
 
-/* SELECT CUSTOM */
+/* SELECT */
 .select-box {
   position: relative;
 }
@@ -153,24 +150,26 @@ body {
     </div>
 
     <!-- TIPO PAGO -->
-    <div class="label">Tipo de pago *</div>
-    <div class="select-box">
-      <div class="select" onclick="toggle('pago')">
-        <span id="pagoText">Seleccione el tipo de pago</span>
-        <span class="arrow">⌄</span>
-      </div>
+    <div id="tipoPagoContainer">
+      <div class="label">Tipo de pago *</div>
+      <div class="select-box">
+        <div class="select" onclick="toggle('pago')">
+          <span id="pagoText">Seleccione el tipo de pago</span>
+          <span class="arrow">⌄</span>
+        </div>
 
-      <div class="options" id="pagoOptions">
-        <div class="option" onclick="selectOption('pago', this)">Pago total</div>
-        <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
-        <div class="option" onclick="selectOption('pago', this)">Abonos</div>
-        <div class="option" onclick="selectOption('pago', this)">Saldos</div>
+        <div class="options" id="pagoOptions">
+          <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+          <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
+          <div class="option" onclick="selectOption('pago', this)">Abonos</div>
+          <div class="option" onclick="selectOption('pago', this)">Saldos</div>
+        </div>
       </div>
     </div>
 
     <!-- INPUT -->
-    <div class="label">Número de cuenta</div>
-    <input class="input" type="text">
+    <div class="label" id="inputLabel">Número de cuenta</div>
+    <input class="input" id="inputField" type="text">
 
     <div class="info">
       Puede consultar máximo 15 números presionando Enter.
@@ -201,6 +200,21 @@ function toggle(tipo) {
 function selectOption(tipo, el) {
   document.getElementById(tipo + "Text").innerText = el.innerText;
   document.getElementById(tipo + "Options").style.display = "none";
+
+  // 🔥 LÓGICA PRINCIPAL
+  if (tipo === "consulta") {
+    let valor = el.innerText;
+    let tipoPago = document.getElementById("tipoPagoContainer");
+    let label = document.getElementById("inputLabel");
+
+    if (valor === "Número de cuenta") {
+      tipoPago.style.display = "none";
+      label.innerText = "Número de cuenta";
+    } else {
+      tipoPago.style.display = "block";
+      label.innerText = "Número de proceso";
+    }
+  }
 }
 
 // cerrar fuera
