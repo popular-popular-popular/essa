@@ -11,12 +11,7 @@ body {
   background: #f3f4f6;
 }
 
-/* 🔥 BANNER */
-.top-banner {
-  width: 100%;
-  background: #fff;
-}
-
+/* BANNER */
 .top-banner img {
   width: 100%;
   display: block;
@@ -28,21 +23,21 @@ body {
   padding: 30px;
 }
 
-/* COLUMNAS */
+/* IZQUIERDA (YA PLANO) */
 .left {
   width: 50%;
-  padding: 25px;
-  background: white; /* 👈 ahora el fondo va aquí */
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  padding: 0; /* 👈 sin padding tipo card */
+  background: transparent; /* 👈 sin fondo blanco */
+  box-shadow: none; /* 👈 sin sombra */
 }
 
+/* DERECHA */
 .right {
   width: 50%;
   padding-left: 40px;
 }
 
-/* TEXTO */
+/* TEXTOS */
 .title {
   font-weight: 600;
   margin-bottom: 20px;
@@ -68,6 +63,7 @@ body {
   cursor: pointer;
   display: flex;
   justify-content: space-between;
+  background: #fff; /* 👈 solo inputs blancos */
 }
 
 .options {
@@ -98,15 +94,16 @@ body {
   border: 1px solid #ccc;
   border-radius: 8px;
   margin-top: 6px;
+  background: #fff;
 }
 
+/* TEXTOS */
 .info {
   font-size: 12px;
   color: #6b7280;
   margin-top: 10px;
 }
 
-/* TEXTO LEGAL */
 .legal {
   font-size: 14px;
   color: #4fc3f7;
@@ -122,7 +119,7 @@ body {
 
 /* BOTÓN */
 .btn {
-  width: 200px;
+  width: 100%;
   background: #7aa6df;
   color: white;
   border: none;
@@ -132,7 +129,7 @@ body {
   cursor: pointer;
 }
 
-/* DERECHA */
+/* DERECHA TEXTO */
 .right h2 {
   margin-top: 0;
 }
@@ -146,11 +143,12 @@ body {
 @media(max-width: 768px) {
   .main {
     flex-direction: column;
+    padding: 15px;
   }
 
   .left, .right {
     width: 100%;
-    padding: 20px;
+    padding: 0;
   }
 
   .right {
@@ -169,7 +167,7 @@ body {
 
 <div class="main">
 
-  <!-- IZQUIERDA (YA SIN CARD) -->
+  <!-- IZQUIERDA -->
   <div class="left">
 
     <div class="title">
@@ -200,10 +198,10 @@ body {
         </div>
 
         <div class="options" id="pagoOptions">
-          <div class="option">Pago total</div>
-          <div class="option">Pago sin alumbrado público</div>
-          <div class="option">Abonos</div>
-          <div class="option">Saldos</div>
+          <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+          <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
+          <div class="option" onclick="selectOption('pago', this)">Abonos</div>
+          <div class="option" onclick="selectOption('pago', this)">Saldos</div>
         </div>
       </div>
     </div>
