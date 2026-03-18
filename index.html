@@ -11,34 +11,35 @@ body {
   background: #e9edf1;
 }
 
-/* 🔥 CONTENEDOR PRINCIPAL EN DOS COLUMNAS */
+/* 🔥 CONTENEDOR PRINCIPAL */
 .container {
   display: flex;
   min-height: 100vh;
 }
 
-/* 🔥 BANNER IZQUIERDO */
-.banner {
+/* 🔥 COLUMNA IZQUIERDA (BANNER) */
+.left {
   width: 35%;
-  background: linear-gradient(180deg, #0d1b4c, #1a2c80);
+  background: linear-gradient(180deg, #0b1d4d, #1c2f85);
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 30px;
+  padding: 40px;
 }
 
-.banner h2 {
+.left h1 {
   margin: 0;
+  font-size: 28px;
 }
 
-.banner p {
+.left p {
   margin-top: 10px;
   opacity: 0.8;
 }
 
-/* 🔥 FORMULARIO DERECHA */
-.form-section {
+/* 🔥 COLUMNA DERECHA (FORMULARIO) */
+.right {
   width: 65%;
   display: flex;
   justify-content: center;
@@ -111,10 +112,18 @@ body {
   margin-top: 6px;
 }
 
+/* TEXTO LEGAL */
 .legal {
   font-size: 14px;
   color: #4fc3f7;
   margin-top: 15px;
+  line-height: 1.5;
+}
+
+.legal a {
+  color: #1e88e5;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 .btn {
@@ -125,20 +134,21 @@ body {
   padding: 14px;
   border-radius: 10px;
   margin-top: 20px;
+  cursor: pointer;
 }
 
-/* 🔥 RESPONSIVE (MÓVIL) */
+/* 🔥 RESPONSIVE */
 @media(max-width: 768px) {
   .container {
     flex-direction: column;
   }
 
-  .banner {
+  .left {
     width: 100%;
     text-align: center;
   }
 
-  .form-section {
+  .right {
     width: 100%;
     padding: 20px;
   }
@@ -150,14 +160,14 @@ body {
 
 <div class="container">
 
-  <!-- 🔥 BANNER -->
-  <div class="banner">
-    <h2>ESSA</h2>
+  <!-- 🔥 IZQUIERDA -->
+  <div class="left">
+    <h1>ESSA</h1>
     <p>Grupo EPM</p>
   </div>
 
-  <!-- 🔥 FORMULARIO -->
-  <div class="form-section">
+  <!-- 🔥 DERECHA -->
+  <div class="right">
     <div class="card">
 
       <div class="title">
@@ -197,9 +207,9 @@ body {
       <div class="label" id="inputLabel">Número de cuenta</div>
       <input class="input" type="text">
 
-      <!-- LEGAL -->
+      <!-- TEXTO LEGAL -->
       <div class="legal">
-        Al continuar, acepto las <b>políticas</b> aplicables para el tratamiento de mis datos personales y de 
+        Al continuar, acepto las <b>políticas</b> aplicables para el tratamiento de mis datos personales según la jurisdicción local del responsable y de 
         <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
           Evertec PlacetoPay
         </a>.
@@ -224,11 +234,14 @@ function selectOption(tipo, el) {
 
   if (tipo === "consulta") {
     let tipoPago = document.getElementById("tipoPagoContainer");
+    let label = document.getElementById("inputLabel");
 
     if (el.innerText === "Número de cuenta") {
       tipoPago.style.display = "block";
+      label.innerText = "Número de cuenta";
     } else {
       tipoPago.style.display = "none";
+      label.innerText = "Número de proceso";
     }
   }
 }
