@@ -36,9 +36,10 @@ body {
   margin-top: 15px;
 }
 
-/* SELECT */
+/* 🔥 SELECT */
 .select-box {
   position: relative;
+  z-index: 100; /* FIX capas */
 }
 
 .select {
@@ -61,7 +62,8 @@ body {
   border-radius: 8px;
   margin-top: 5px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  z-index: 9999; /* 🔥 clave para que no se tape */
 }
 
 .option {
@@ -74,7 +76,7 @@ body {
   color: white;
 }
 
-/* INPUT MULTIPLE */
+/* 🔥 INPUT MULTIPLE */
 .multi-input {
   display: flex;
   flex-wrap: wrap;
@@ -83,6 +85,8 @@ body {
   padding: 6px;
   margin-top: 6px;
   gap: 6px;
+  position: relative;
+  z-index: 1;
 }
 
 .multi-input input {
@@ -132,9 +136,9 @@ body {
   background: #4f7df0;
 }
 
-/* oculto por defecto */
+/* 👇 visible al inicio porque es Número de cuenta */
 #tipoPagoContainer {
-  display: block; /* 👈 porque inicia en "Número de cuenta" */
+  display: block;
 }
 </style>
 </head>
@@ -218,10 +222,10 @@ function selectOption(tipo, el) {
 
     // 🔥 LÓGICA FINAL CORRECTA
     if (el.innerText === "Número de cuenta") {
-      tipoPago.style.display = "block"; // ✅ mostrar
+      tipoPago.style.display = "block";
       label.innerText = "Número de cuenta";
     } else {
-      tipoPago.style.display = "none"; // ❌ ocultar
+      tipoPago.style.display = "none";
       label.innerText = "Número de proceso";
     }
   }
