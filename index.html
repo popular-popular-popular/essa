@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -11,7 +11,6 @@ body {
   background: #e9edf1;
 }
 
-/* CONTENEDOR */
 .wrapper {
   max-width: 420px;
   margin: auto;
@@ -25,21 +24,18 @@ body {
   box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
-/* TITULO */
 .title {
   font-size: 17px;
   font-weight: 600;
   margin-bottom: 20px;
 }
 
-/* LABEL */
 .label {
   font-size: 13px;
   font-weight: 600;
   margin-top: 15px;
 }
 
-/* SELECT CUSTOM */
 .select-box {
   position: relative;
 }
@@ -74,7 +70,7 @@ body {
   margin-top: 5px;
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  z-index: 10;
+  z-index: 9999;
 }
 
 .option {
@@ -87,7 +83,6 @@ body {
   color: white;
 }
 
-/* INPUT */
 .input {
   width: 100%;
   padding: 12px;
@@ -96,14 +91,12 @@ body {
   margin-top: 6px;
 }
 
-/* TEXTOS */
 .info, .legal {
   font-size: 12px;
   color: #6b7280;
   margin-top: 10px;
 }
 
-/* BOTON */
 .btn {
   width: 100%;
   background: #6b9cff;
@@ -120,7 +113,6 @@ body {
   background: #4f7df0;
 }
 
-/* LOGO */
 .logo {
   text-align: center;
   margin-top: 15px;
@@ -152,24 +144,26 @@ body {
       </div>
     </div>
 
-    <!-- TIPO PAGO -->
-    <div class="label">Tipo de pago *</div>
-    <div class="select-box">
-      <div class="select" onclick="toggle('pago')">
-        <span id="pagoText">Seleccione el tipo de pago</span>
-        <span class="arrow">⌄</span>
-      </div>
+    <!-- 🔥 CONTENEDOR TIPO PAGO -->
+    <div id="tipoPagoContainer">
+      <div class="label">Tipo de pago *</div>
+      <div class="select-box">
+        <div class="select" onclick="toggle('pago')">
+          <span id="pagoText">Seleccione el tipo de pago</span>
+          <span class="arrow">⌄</span>
+        </div>
 
-      <div class="options" id="pagoOptions">
-        <div class="option" onclick="selectOption('pago', this)">Pago total</div>
-        <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
-        <div class="option" onclick="selectOption('pago', this)">Abonos</div>
-        <div class="option" onclick="selectOption('pago', this)">Saldos</div>
+        <div class="options" id="pagoOptions">
+          <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+          <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
+          <div class="option" onclick="selectOption('pago', this)">Abonos</div>
+          <div class="option" onclick="selectOption('pago', this)">Saldos</div>
+        </div>
       </div>
     </div>
 
     <!-- INPUT -->
-    <div class="label">Número de cuenta</div>
+    <div class="label" id="inputLabel">Número de cuenta</div>
     <input class="input" type="text">
 
     <div class="info">
@@ -201,6 +195,20 @@ function toggle(tipo) {
 function selectOption(tipo, el) {
   document.getElementById(tipo + "Text").innerText = el.innerText;
   document.getElementById(tipo + "Options").style.display = "none";
+
+  // 🔥 LÓGICA CLAVE
+  if (tipo === "consulta") {
+    let tipoPago = document.getElementById("tipoPagoContainer");
+    let label = document.getElementById("inputLabel");
+
+    if (el.innerText === "Número de cuenta") {
+      tipoPago.style.display = "block"; // ✅ mostrar
+      label.innerText = "Número de cuenta";
+    } else {
+      tipoPago.style.display = "none"; // ❌ ocultar
+      label.innerText = "Número de proceso";
+    }
+  }
 }
 
 // cerrar fuera
