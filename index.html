@@ -91,10 +91,32 @@ body {
   margin-top: 6px;
 }
 
-.info, .legal {
+.info {
   font-size: 12px;
   color: #6b7280;
   margin-top: 10px;
+}
+
+/* 🔥 TEXTO LEGAL MEJORADO */
+.legal {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 15px;
+  line-height: 1.5;
+}
+
+.legal span {
+  font-weight: bold;
+}
+
+.legal a {
+  font-weight: bold;
+  color: #4f7df0;
+  text-decoration: none;
+}
+
+.legal a:hover {
+  text-decoration: underline;
 }
 
 .btn {
@@ -144,7 +166,7 @@ body {
       </div>
     </div>
 
-    <!-- 🔥 CONTENEDOR TIPO PAGO -->
+    <!-- TIPO PAGO -->
     <div id="tipoPagoContainer">
       <div class="label">Tipo de pago *</div>
       <div class="select-box">
@@ -170,8 +192,12 @@ body {
       Puede consultar máximo 15 números presionando Enter.
     </div>
 
+    <!-- 🔥 TEXTO LEGAL NUEVO -->
     <div class="legal">
-      Al continuar, acepto las políticas de tratamiento de datos.
+      Al continuar, acepto las <span>políticas</span> aplicables para el tratamiento de mis datos personales según la jurisdicción local del responsable y de 
+      <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
+        Evertec PlacetoPay
+      </a> en su calidad de encargado.
     </div>
 
     <button class="btn">Ingresar</button>
@@ -196,22 +222,20 @@ function selectOption(tipo, el) {
   document.getElementById(tipo + "Text").innerText = el.innerText;
   document.getElementById(tipo + "Options").style.display = "none";
 
-  // 🔥 LÓGICA CLAVE
   if (tipo === "consulta") {
     let tipoPago = document.getElementById("tipoPagoContainer");
     let label = document.getElementById("inputLabel");
 
     if (el.innerText === "Número de cuenta") {
-      tipoPago.style.display = "block"; // ✅ mostrar
+      tipoPago.style.display = "block";
       label.innerText = "Número de cuenta";
     } else {
-      tipoPago.style.display = "none"; // ❌ ocultar
+      tipoPago.style.display = "none";
       label.innerText = "Número de proceso";
     }
   }
 }
 
-// cerrar fuera
 document.addEventListener("click", function(e) {
   if (!e.target.closest(".select-box")) {
     document.querySelectorAll(".options").forEach(o => o.style.display = "none");
