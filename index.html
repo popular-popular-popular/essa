@@ -11,7 +11,7 @@ body {
   background: #f3f4f6;
 }
 
-/* 🔥 BANNER REAL */
+/* 🔥 BANNER */
 .top-banner {
   width: 100%;
   background: #fff;
@@ -19,7 +19,6 @@ body {
 
 .top-banner img {
   width: 100%;
-  height: auto;
   display: block;
 }
 
@@ -29,25 +28,21 @@ body {
   padding: 30px;
 }
 
-/* IZQUIERDA */
+/* COLUMNAS */
 .left {
   width: 50%;
+  padding: 25px;
+  background: white; /* 👈 ahora el fondo va aquí */
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
 }
 
-/* DERECHA */
 .right {
   width: 50%;
   padding-left: 40px;
 }
 
-/* CARD */
-.card {
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-}
-
+/* TEXTO */
 .title {
   font-weight: 600;
   margin-bottom: 20px;
@@ -59,6 +54,7 @@ body {
   margin-top: 15px;
 }
 
+/* SELECT */
 .select-box {
   position: relative;
 }
@@ -95,6 +91,7 @@ body {
   color: white;
 }
 
+/* INPUT */
 .input {
   width: 100%;
   padding: 12px;
@@ -123,6 +120,7 @@ body {
   text-decoration: none;
 }
 
+/* BOTÓN */
 .btn {
   width: 200px;
   background: #7aa6df;
@@ -134,7 +132,7 @@ body {
   cursor: pointer;
 }
 
-/* DERECHA TEXTO */
+/* DERECHA */
 .right h2 {
   margin-top: 0;
 }
@@ -152,7 +150,7 @@ body {
 
   .left, .right {
     width: 100%;
-    padding: 0;
+    padding: 20px;
   }
 
   .right {
@@ -164,80 +162,77 @@ body {
 
 <body>
 
-<!-- 🔥 BANNER REAL -->
+<!-- BANNER -->
 <div class="top-banner">
   <img src="https://placetopay-static-prod-bucket.s3.us-east-2.amazonaws.com/placetopay-com/microsites/images/mAwF1IvHdXAl9ReOp1aKZKGNpdXgHuDj9cLbbvJA.png">
 </div>
 
-<!-- CONTENIDO -->
 <div class="main">
 
-  <!-- FORM -->
+  <!-- IZQUIERDA (YA SIN CARD) -->
   <div class="left">
-    <div class="card">
 
-      <div class="title">
-        Comience el proceso de pago, ingresando la siguiente información
+    <div class="title">
+      Comience el proceso de pago, ingresando la siguiente información
+    </div>
+
+    <!-- TIPO CONSULTA -->
+    <div class="label">Tipo de consulta *</div>
+    <div class="select-box">
+      <div class="select" onclick="toggle('consulta')">
+        <span id="consultaText">Número de cuenta</span>
+        <span>⌄</span>
       </div>
 
-      <!-- TIPO CONSULTA -->
-      <div class="label">Tipo de consulta *</div>
+      <div class="options" id="consultaOptions">
+        <div class="option" onclick="selectOption('consulta', this)">Número de cuenta</div>
+        <div class="option" onclick="selectOption('consulta', this)">Número de proceso</div>
+      </div>
+    </div>
+
+    <!-- TIPO PAGO -->
+    <div id="tipoPagoContainer">
+      <div class="label">Tipo de pago *</div>
       <div class="select-box">
-        <div class="select" onclick="toggle('consulta')">
-          <span id="consultaText">Número de cuenta</span>
+        <div class="select" onclick="toggle('pago')">
+          <span id="pagoText">Seleccione el tipo de pago</span>
           <span>⌄</span>
         </div>
 
-        <div class="options" id="consultaOptions">
-          <div class="option" onclick="selectOption('consulta', this)">Número de cuenta</div>
-          <div class="option" onclick="selectOption('consulta', this)">Número de proceso</div>
+        <div class="options" id="pagoOptions">
+          <div class="option">Pago total</div>
+          <div class="option">Pago sin alumbrado público</div>
+          <div class="option">Abonos</div>
+          <div class="option">Saldos</div>
         </div>
       </div>
-
-      <!-- TIPO PAGO -->
-      <div id="tipoPagoContainer">
-        <div class="label">Tipo de pago *</div>
-        <div class="select-box">
-          <div class="select" onclick="toggle('pago')">
-            <span id="pagoText">Seleccione el tipo de pago</span>
-            <span>⌄</span>
-          </div>
-
-          <div class="options" id="pagoOptions">
-            <div class="option" onclick="selectOption('pago', this)">Pago total</div>
-            <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
-            <div class="option" onclick="selectOption('pago', this)">Abonos</div>
-            <div class="option" onclick="selectOption('pago', this)">Saldos</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- INPUT -->
-      <div class="label" id="inputLabel">Número de cuenta</div>
-      <input class="input" type="text">
-
-      <div class="info">
-        Puede consultar máximo 15 números presionando Enter.
-      </div>
-
-      <!-- TEXTO LEGAL -->
-      <div class="legal">
-        Al continuar, acepto las <b>políticas</b> aplicables para el tratamiento de mis datos personales según la jurisdicción local del responsable y de 
-        <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
-          Evertec PlacetoPay
-        </a>.
-      </div>
-
-      <button class="btn">Ingresar</button>
-
     </div>
+
+    <!-- INPUT -->
+    <div class="label" id="inputLabel">Número de cuenta</div>
+    <input class="input" type="text">
+
+    <div class="info">
+      Puede consultar máximo 15 números presionando Enter.
+    </div>
+
+    <!-- TEXTO LEGAL -->
+    <div class="legal">
+      Al continuar, acepto las <b>políticas</b> aplicables para el tratamiento de mis datos personales según la jurisdicción local del responsable y de 
+      <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
+        Evertec PlacetoPay
+      </a>.
+    </div>
+
+    <button class="btn">Ingresar</button>
+
   </div>
 
   <!-- DERECHA -->
   <div class="right">
     <h2>Pagos electrónicos</h2>
     <p>
-      Desde su casa, oficina o cualquier lugar, pague de forma segura a través de nuestro sistema de pago. 
+      Desde su casa, oficina o cualquier lugar, pague de forma segura a través de nuestro sistema de pago.
       Use nuestro servicio desde las 00:01 am hasta 11:30 pm, los 7 días de la semana.
     </p>
   </div>
