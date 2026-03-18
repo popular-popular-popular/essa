@@ -1,0 +1,68 @@
+<div class="label">Tipo de consulta *</div>
+
+<div class="select-box">
+  <div class="select" onclick="toggleConsulta()">
+    <span id="consultaText">Número de cuenta</span>
+  </div>
+
+  <div class="options" id="consultaOptions">
+    <div class="option" onclick="selectConsulta(this)">Número de cuenta</div>
+    <div class="option" onclick="selectConsulta(this)">Número de proceso</div>
+  </div>
+</div>
+
+<style>
+.select-box {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  background: white;
+}
+
+.options {
+  display: none;
+  position: absolute;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 5px;
+  overflow: hidden;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.option {
+  padding: 12px;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: #ff6a00;
+  color: white;
+}
+</style>
+
+<script>
+function toggleConsulta() {
+  let menu = document.getElementById("consultaOptions");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+function selectConsulta(el) {
+  document.getElementById("consultaText").innerText = el.innerText;
+  document.getElementById("consultaOptions").style.display = "none";
+}
+
+// cerrar al hacer click fuera
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".select-box")) {
+    document.getElementById("consultaOptions").style.display = "none";
+  }
+});
+</script>
