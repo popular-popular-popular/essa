@@ -74,7 +74,7 @@ body {
   color: white;
 }
 
-/* 🔥 INPUT MULTIPLE */
+/* INPUT MULTIPLE */
 .multi-input {
   display: flex;
   flex-wrap: wrap;
@@ -125,11 +125,16 @@ body {
   border-radius: 10px;
   font-size: 16px;
   margin-top: 20px;
+  cursor: pointer;
 }
 
-/* oculto */
+.btn:hover {
+  background: #4f7df0;
+}
+
+/* oculto por defecto */
 #tipoPagoContainer {
-  display: none;
+  display: block; /* 👈 porque inicia en "Número de cuenta" */
 }
 </style>
 </head>
@@ -168,13 +173,14 @@ body {
 
         <div class="options" id="pagoOptions">
           <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+          <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
           <div class="option" onclick="selectOption('pago', this)">Abonos</div>
           <div class="option" onclick="selectOption('pago', this)">Saldos</div>
         </div>
       </div>
     </div>
 
-    <!-- INPUT MULTIPLE -->
+    <!-- INPUT -->
     <div class="label" id="inputLabel">Número de cuenta</div>
 
     <div class="multi-input" id="multiInput">
@@ -210,17 +216,18 @@ function selectOption(tipo, el) {
     let tipoPago = document.getElementById("tipoPagoContainer");
     let label = document.getElementById("inputLabel");
 
-    if (el.innerText === "Número de proceso") {
-      tipoPago.style.display = "block";
-      label.innerText = "Número de proceso";
-    } else {
-      tipoPago.style.display = "none";
+    // 🔥 LÓGICA FINAL CORRECTA
+    if (el.innerText === "Número de cuenta") {
+      tipoPago.style.display = "block"; // ✅ mostrar
       label.innerText = "Número de cuenta";
+    } else {
+      tipoPago.style.display = "none"; // ❌ ocultar
+      label.innerText = "Número de proceso";
     }
   }
 }
 
-/* 🔥 agregar chips */
+/* chips */
 document.getElementById("inputField").addEventListener("keydown", function(e) {
   if (e.key === "Enter") {
     e.preventDefault();
