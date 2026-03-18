@@ -11,6 +11,7 @@ body {
   background: #e9edf1;
 }
 
+/* CONTENEDOR */
 .wrapper {
   max-width: 420px;
   margin: auto;
@@ -24,22 +25,23 @@ body {
   box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
+/* TITULO */
 .title {
   font-size: 17px;
   font-weight: 600;
   margin-bottom: 20px;
 }
 
+/* LABEL */
 .label {
   font-size: 13px;
   font-weight: 600;
   margin-top: 15px;
 }
 
-/* 🔥 SELECT */
+/* SELECT CUSTOM */
 .select-box {
   position: relative;
-  z-index: 100; /* FIX capas */
 }
 
 .select {
@@ -52,6 +54,15 @@ body {
   background: #fff;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.arrow {
+  transition: 0.3s;
+}
+
+.select.active .arrow {
+  transform: rotate(180deg);
 }
 
 .options {
@@ -62,8 +73,8 @@ body {
   border-radius: 8px;
   margin-top: 5px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-  z-index: 9999; /* 🔥 clave para que no se tape */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  z-index: 10;
 }
 
 .option {
@@ -76,40 +87,13 @@ body {
   color: white;
 }
 
-/* 🔥 INPUT MULTIPLE */
-.multi-input {
-  display: flex;
-  flex-wrap: wrap;
+/* INPUT */
+.input {
+  width: 100%;
+  padding: 12px;
   border: 1px solid #dcdcdc;
   border-radius: 8px;
-  padding: 6px;
   margin-top: 6px;
-  gap: 6px;
-  position: relative;
-  z-index: 1;
-}
-
-.multi-input input {
-  border: none;
-  outline: none;
-  flex: 1;
-  padding: 8px;
-}
-
-/* Chips */
-.tag {
-  background: #e5e7eb;
-  padding: 6px 10px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-}
-
-.tag span {
-  cursor: pointer;
-  font-weight: bold;
 }
 
 /* TEXTOS */
@@ -136,9 +120,11 @@ body {
   background: #4f7df0;
 }
 
-/* 👇 visible al inicio porque es Número de cuenta */
-#tipoPagoContainer {
-  display: block;
+/* LOGO */
+.logo {
+  text-align: center;
+  margin-top: 15px;
+  opacity: 0.5;
 }
 </style>
 </head>
@@ -157,7 +143,7 @@ body {
     <div class="select-box">
       <div class="select" onclick="toggle('consulta')">
         <span id="consultaText">Número de cuenta</span>
-        ⌄
+        <span class="arrow">⌄</span>
       </div>
 
       <div class="options" id="consultaOptions">
@@ -167,29 +153,24 @@ body {
     </div>
 
     <!-- TIPO PAGO -->
-    <div id="tipoPagoContainer">
-      <div class="label">Tipo de pago *</div>
-      <div class="select-box">
-        <div class="select" onclick="toggle('pago')">
-          <span id="pagoText">Seleccione el tipo de pago</span>
-          ⌄
-        </div>
+    <div class="label">Tipo de pago *</div>
+    <div class="select-box">
+      <div class="select" onclick="toggle('pago')">
+        <span id="pagoText">Seleccione el tipo de pago</span>
+        <span class="arrow">⌄</span>
+      </div>
 
-        <div class="options" id="pagoOptions">
-          <div class="option" onclick="selectOption('pago', this)">Pago total</div>
-          <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
-          <div class="option" onclick="selectOption('pago', this)">Abonos</div>
-          <div class="option" onclick="selectOption('pago', this)">Saldos</div>
-        </div>
+      <div class="options" id="pagoOptions">
+        <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+        <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
+        <div class="option" onclick="selectOption('pago', this)">Abonos</div>
+        <div class="option" onclick="selectOption('pago', this)">Saldos</div>
       </div>
     </div>
 
     <!-- INPUT -->
-    <div class="label" id="inputLabel">Número de cuenta</div>
-
-    <div class="multi-input" id="multiInput">
-      <input type="text" id="inputField" placeholder="Escriba y presione Enter">
-    </div>
+    <div class="label">Número de cuenta</div>
+    <input class="input" type="text">
 
     <div class="info">
       Puede consultar máximo 15 números presionando Enter.
@@ -201,66 +182,32 @@ body {
 
     <button class="btn">Ingresar</button>
 
+    <div class="logo">
+      placetopay
+    </div>
+
   </div>
 </div>
 
 <script>
-let values = [];
-
 function toggle(tipo) {
   let box = document.getElementById(tipo + "Options");
+  let select = box.previousElementSibling;
+
   box.style.display = box.style.display === "block" ? "none" : "block";
+  select.classList.toggle("active");
 }
 
 function selectOption(tipo, el) {
   document.getElementById(tipo + "Text").innerText = el.innerText;
   document.getElementById(tipo + "Options").style.display = "none";
-
-  if (tipo === "consulta") {
-    let tipoPago = document.getElementById("tipoPagoContainer");
-    let label = document.getElementById("inputLabel");
-
-    // 🔥 LÓGICA FINAL CORRECTA
-    if (el.innerText === "Número de cuenta") {
-      tipoPago.style.display = "block";
-      label.innerText = "Número de cuenta";
-    } else {
-      tipoPago.style.display = "none";
-      label.innerText = "Número de proceso";
-    }
-  }
 }
 
-/* chips */
-document.getElementById("inputField").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-
-    let value = this.value.trim();
-    if (!value || values.length >= 15) return;
-
-    values.push(value);
-
-    let tag = document.createElement("div");
-    tag.className = "tag";
-    tag.innerHTML = value + ' <span onclick="removeTag(this)">×</span>';
-
-    document.getElementById("multiInput").insertBefore(tag, this);
-
-    this.value = "";
-  }
-});
-
-function removeTag(el) {
-  let text = el.parentElement.innerText.replace("×", "").trim();
-  values = values.filter(v => v !== text);
-  el.parentElement.remove();
-}
-
-/* cerrar dropdown */
+// cerrar fuera
 document.addEventListener("click", function(e) {
   if (!e.target.closest(".select-box")) {
     document.querySelectorAll(".options").forEach(o => o.style.display = "none");
+    document.querySelectorAll(".select").forEach(s => s.classList.remove("active"));
   }
 });
 </script>
