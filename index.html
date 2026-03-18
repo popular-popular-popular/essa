@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -11,16 +11,47 @@ body {
   background: #e9edf1;
 }
 
-.wrapper {
-  max-width: 420px;
-  margin: auto;
-  padding: 15px;
+/* 🔥 CONTENEDOR PRINCIPAL EN DOS COLUMNAS */
+.container {
+  display: flex;
+  min-height: 100vh;
 }
 
+/* 🔥 BANNER IZQUIERDO */
+.banner {
+  width: 35%;
+  background: linear-gradient(180deg, #0d1b4c, #1a2c80);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px;
+}
+
+.banner h2 {
+  margin: 0;
+}
+
+.banner p {
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+/* 🔥 FORMULARIO DERECHA */
+.form-section {
+  width: 65%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CARD */
 .card {
   background: #fff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 25px;
+  width: 100%;
+  max-width: 420px;
   box-shadow: 0 3px 12px rgba(0,0,0,0.08);
 }
 
@@ -47,18 +78,8 @@ body {
   border-radius: 8px;
   margin-top: 6px;
   cursor: pointer;
-  background: #fff;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.arrow {
-  transition: 0.3s;
-}
-
-.select.active .arrow {
-  transform: rotate(180deg);
 }
 
 .options {
@@ -68,7 +89,6 @@ body {
   background: white;
   border-radius: 8px;
   margin-top: 5px;
-  overflow: hidden;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   z-index: 9999;
 }
@@ -91,32 +111,10 @@ body {
   margin-top: 6px;
 }
 
-.info {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 10px;
-}
-
-/* 🔥 TEXTO LEGAL MEJORADO */
 .legal {
-  font-size: 12px;
-  color: #6b7280;
+  font-size: 14px;
+  color: #4fc3f7;
   margin-top: 15px;
-  line-height: 1.5;
-}
-
-.legal span {
-  font-weight: bold;
-}
-
-.legal a {
-  font-weight: bold;
-  color: #4f7df0;
-  text-decoration: none;
-}
-
-.legal a:hover {
-  text-decoration: underline;
 }
 
 .btn {
@@ -126,96 +124,98 @@ body {
   border: none;
   padding: 14px;
   border-radius: 10px;
-  font-size: 16px;
   margin-top: 20px;
-  cursor: pointer;
 }
 
-.btn:hover {
-  background: #4f7df0;
-}
+/* 🔥 RESPONSIVE (MÓVIL) */
+@media(max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
 
-.logo {
-  text-align: center;
-  margin-top: 15px;
-  opacity: 0.5;
+  .banner {
+    width: 100%;
+    text-align: center;
+  }
+
+  .form-section {
+    width: 100%;
+    padding: 20px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="wrapper">
-  <div class="card">
+<div class="container">
 
-    <div class="title">
-      Comience el proceso de pago, ingresando la siguiente información
-    </div>
-
-    <!-- TIPO CONSULTA -->
-    <div class="label">Tipo de consulta *</div>
-    <div class="select-box">
-      <div class="select" onclick="toggle('consulta')">
-        <span id="consultaText">Número de cuenta</span>
-        <span class="arrow">⌄</span>
-      </div>
-
-      <div class="options" id="consultaOptions">
-        <div class="option" onclick="selectOption('consulta', this)">Número de cuenta</div>
-        <div class="option" onclick="selectOption('consulta', this)">Número de proceso</div>
-      </div>
-    </div>
-
-    <!-- TIPO PAGO -->
-    <div id="tipoPagoContainer">
-      <div class="label">Tipo de pago *</div>
-      <div class="select-box">
-        <div class="select" onclick="toggle('pago')">
-          <span id="pagoText">Seleccione el tipo de pago</span>
-          <span class="arrow">⌄</span>
-        </div>
-
-        <div class="options" id="pagoOptions">
-          <div class="option" onclick="selectOption('pago', this)">Pago total</div>
-          <div class="option" onclick="selectOption('pago', this)">Pago sin alumbrado público</div>
-          <div class="option" onclick="selectOption('pago', this)">Abonos</div>
-          <div class="option" onclick="selectOption('pago', this)">Saldos</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- INPUT -->
-    <div class="label" id="inputLabel">Número de cuenta</div>
-    <input class="input" type="text">
-
-    <div class="info">
-      Puede consultar máximo 15 números presionando Enter.
-    </div>
-
-    <!-- 🔥 TEXTO LEGAL NUEVO -->
-    <div class="legal">
-      Al continuar, acepto las <span>políticas</span> aplicables para el tratamiento de mis datos personales según la jurisdicción local del responsable y de 
-      <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
-        Evertec PlacetoPay
-      </a> en su calidad de encargado.
-    </div>
-
-    <button class="btn">Ingresar</button>
-
-    <div class="logo">
-      placetopay
-    </div>
-
+  <!-- 🔥 BANNER -->
+  <div class="banner">
+    <h2>ESSA</h2>
+    <p>Grupo EPM</p>
   </div>
+
+  <!-- 🔥 FORMULARIO -->
+  <div class="form-section">
+    <div class="card">
+
+      <div class="title">
+        Comience el proceso de pago, ingresando la siguiente información
+      </div>
+
+      <!-- TIPO CONSULTA -->
+      <div class="label">Tipo de consulta *</div>
+      <div class="select-box">
+        <div class="select" onclick="toggle('consulta')">
+          <span id="consultaText">Número de cuenta</span>
+          <span>⌄</span>
+        </div>
+
+        <div class="options" id="consultaOptions">
+          <div class="option" onclick="selectOption('consulta', this)">Número de cuenta</div>
+          <div class="option" onclick="selectOption('consulta', this)">Número de proceso</div>
+        </div>
+      </div>
+
+      <!-- TIPO PAGO -->
+      <div id="tipoPagoContainer">
+        <div class="label">Tipo de pago *</div>
+        <div class="select-box">
+          <div class="select" onclick="toggle('pago')">
+            <span id="pagoText">Seleccione el tipo de pago</span>
+            <span>⌄</span>
+          </div>
+
+          <div class="options" id="pagoOptions">
+            <div class="option" onclick="selectOption('pago', this)">Pago total</div>
+            <div class="option" onclick="selectOption('pago', this)">Abonos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="label" id="inputLabel">Número de cuenta</div>
+      <input class="input" type="text">
+
+      <!-- LEGAL -->
+      <div class="legal">
+        Al continuar, acepto las <b>políticas</b> aplicables para el tratamiento de mis datos personales y de 
+        <a href="https://www.placetopay.com/web/politicas-de-privacidad/" target="_blank">
+          Evertec PlacetoPay
+        </a>.
+      </div>
+
+      <button class="btn">Ingresar</button>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
 function toggle(tipo) {
   let box = document.getElementById(tipo + "Options");
-  let select = box.previousElementSibling;
-
   box.style.display = box.style.display === "block" ? "none" : "block";
-  select.classList.toggle("active");
 }
 
 function selectOption(tipo, el) {
@@ -224,24 +224,14 @@ function selectOption(tipo, el) {
 
   if (tipo === "consulta") {
     let tipoPago = document.getElementById("tipoPagoContainer");
-    let label = document.getElementById("inputLabel");
 
     if (el.innerText === "Número de cuenta") {
       tipoPago.style.display = "block";
-      label.innerText = "Número de cuenta";
     } else {
       tipoPago.style.display = "none";
-      label.innerText = "Número de proceso";
     }
   }
 }
-
-document.addEventListener("click", function(e) {
-  if (!e.target.closest(".select-box")) {
-    document.querySelectorAll(".options").forEach(o => o.style.display = "none");
-    document.querySelectorAll(".select").forEach(s => s.classList.remove("active"));
-  }
-});
 </script>
 
 </body>
