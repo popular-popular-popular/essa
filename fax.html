@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verificación facial</title>
 
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
 
@@ -11,20 +10,10 @@
 body {
     margin: 0;
     background: #2b002b;
-    font-family: sans-serif;
-    color: white;
+    overflow: hidden;
 }
 
-.message {
-    background: #ff6b6b;
-    color: #2b002b;
-    padding: 12px;
-    border-radius: 12px;
-    margin: 15px;
-    text-align: center;
-    font-weight: bold;
-}
-
+/* VIDEO */
 video {
     position: absolute;
     width: 100%;
@@ -32,42 +21,42 @@ video {
     object-fit: cover;
 }
 
-/* Overlay transparente */
+/* OVERLAY */
 .overlay {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(43,0,43,0.55);
+    background: rgba(43,0,43,0.5);
 
-    mask-image: radial-gradient(ellipse 140px 200px at center, transparent 98%, black 100%);
-    -webkit-mask-image: radial-gradient(ellipse 140px 200px at center, transparent 98%, black 100%);
+    mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
+    -webkit-mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
 }
 
-/* Óvalo */
-.oval-border {
+/* ÓVALO */
+.oval {
     position: absolute;
-    width: 280px;
-    height: 400px;
+    width: 300px;
+    height: 420px;
     border-radius: 50%;
     border: 4px solid white;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
-/* Verde cuando valida */
-.oval-border.valid {
+.valid {
     border-color: #00ff88;
-    box-shadow: 0 0 20px #00ff88;
+    box-shadow: 0 0 25px #00ff88;
 }
 
-/* Texto estado */
+/* TEXTO */
 .status {
     position: absolute;
-    bottom: 20px;
+    bottom: 30px;
     width: 100%;
     text-align: center;
+    color: white;
     font-size: 18px;
 }
 </style>
@@ -75,82 +64,91 @@ video {
 
 <body>
 
-<div class="message" id="msg">Cargando cámara...</div>
-
 <video id="video" autoplay muted playsinline></video>
 <div class="overlay"></div>
-<div class="oval-border" id="oval"></div>
-
-<div class="status" id="status">🔍 Detectando rostro...</div>
+<div class="oval" id="oval"></div>
+<div class="status" id="status">Iniciando...</div>
 
 <script>
 const video = document.getElementById("video");
-const statusText = document.getElementById("status");
-const msg = document.getElementById("msg");
 const oval = document.getElementById("oval");
+const statusText = document.getElementById("status");
 
 let countdown = null;
+let stableFrames = 0;
 
 // Cámara
 navigator.mediaDevices.getUserMedia({ video: true })
-.then(stream => {
-    video.srcObject = stream;
-});
+.then(stream => video.srcObject = stream);
 
 // Cargar modelo
 Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
-]).then(startDetection);
+]).then(start);
 
-function startDetection() {
-    msg.innerText = "Mira de frente a la cámara";
+function start() {
+    statusText.innerText = "Mira al frente";
 
     setInterval(async () => {
-        const detection = await faceapi.detectSingleFace(
+
+        const result = await faceapi.detectSingleFace(
             video,
             new faceapi.TinyFaceDetectorOptions()
         );
 
-        if (!detection) {
-            resetState("❌ No hay rostro");
+        if (!result) {
+            reset("❌ No hay rostro");
             return;
         }
 
-        const { x, y, width, height } = detection.box;
+        // 🔥 ESCALADO CORRECTO
+        const rect = video.getBoundingClientRect();
 
-        const faceCenterX = x + width / 2;
-        const faceCenterY = y + height / 2;
+        const scaleX = rect.width / video.videoWidth;
+        const scaleY = rect.height / video.videoHeight;
 
-        const screenCenterX = video.videoWidth / 2;
-        const screenCenterY = video.videoHeight / 2;
+        const box = result.box;
 
-        const dx = Math.abs(faceCenterX - screenCenterX);
-        const dy = Math.abs(faceCenterY - screenCenterY);
+        const faceX = (box.x + box.width / 2) * scaleX;
+        const faceY = (box.y + box.height / 2) * scaleY;
 
-        if (dx < 80 && dy < 120) {
-            // ✅ ROSTRO CORRECTO
+        // Centro del óvalo
+        const ovalRect = oval.getBoundingClientRect();
+        const ovalCenterX = ovalRect.left + ovalRect.width / 2;
+        const ovalCenterY = ovalRect.top + ovalRect.height / 2;
+
+        const dx = Math.abs(faceX - ovalCenterX);
+        const dy = Math.abs(faceY - ovalCenterY);
+
+        // 🔥 VALIDACIÓN REAL
+        const inside = dx < 90 && dy < 130;
+
+        if (inside) {
             oval.classList.add("valid");
+            stableFrames++;
 
-            if (!countdown) {
+            if (stableFrames > 5) {
                 startCountdown();
             }
 
         } else {
-            resetState("⚠️ Centra tu rostro");
+            reset("⚠️ Centra tu rostro");
         }
 
-    }, 300);
+    }, 200);
 }
 
 function startCountdown() {
-    let time = 3;
-    statusText.innerText = "📸 No te muevas (" + time + ")";
+    if (countdown) return;
+
+    let t = 3;
+    statusText.innerText = "📸 No te muevas (" + t + ")";
 
     countdown = setInterval(() => {
-        time--;
+        t--;
 
-        if (time > 0) {
-            statusText.innerText = "📸 No te muevas (" + time + ")";
+        if (t > 0) {
+            statusText.innerText = "📸 No te muevas (" + t + ")";
         } else {
             clearInterval(countdown);
             countdown = null;
@@ -159,9 +157,10 @@ function startCountdown() {
     }, 1000);
 }
 
-function resetState(text) {
-    statusText.innerText = text;
+function reset(msg) {
+    statusText.innerText = msg;
     oval.classList.remove("valid");
+    stableFrames = 0;
 
     if (countdown) {
         clearInterval(countdown);
@@ -169,7 +168,7 @@ function resetState(text) {
     }
 }
 
-// 📸 CAPTURA
+// 📸 FOTO
 function takePhoto() {
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -178,20 +177,18 @@ function takePhoto() {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0);
 
-    const image = canvas.toDataURL("image/png");
+    const img = canvas.toDataURL("image/png");
 
     statusText.innerText = "✅ Foto tomada";
 
-    // Mostrar imagen (demo)
-    const img = document.createElement("img");
-    img.src = image;
-    img.style.position = "absolute";
-    img.style.width = "120px";
-    img.style.bottom = "60px";
-    img.style.right = "20px";
-    document.body.appendChild(img);
+    const preview = document.createElement("img");
+    preview.src = img;
+    preview.style.position = "absolute";
+    preview.style.width = "120px";
+    preview.style.bottom = "80px";
+    preview.style.right = "20px";
 
-    console.log(image); // aquí puedes enviar al servidor
+    document.body.appendChild(preview);
 }
 </script>
 
