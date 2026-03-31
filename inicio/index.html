@@ -1,157 +1,178 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ingreso</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingreso</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #200020;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-      color: white;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #200020;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  color: white;
+}
 
-    .container {
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+/* CONTENEDOR */
+.container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
 
-    /* HEADER */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+/* HEADER FIJO */
+header {
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
 
-    .help-icon {
-      width: 22px;
-      height: 22px;
-      border: 2px solid white;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 14px;
-      font-weight: bold;
-    }
+/* ICONO ? */
+.help-icon {
+  width: 22px;
+  height: 22px;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+}
 
-    /* LOGO */
-    .logo {
-      margin-top: auto;
-      text-align: center;
-      font-size: 48px;
-      font-weight: 600;
-      letter-spacing: 1px;
-    }
+/* CONTENIDO CENTRAL */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 20px;
+}
 
-    .logo-box {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      background: #ff008c;
-      margin-right: 6px;
-      border-radius: 2px; /* cuadradito */
-      transform: translateY(-4px);
-    }
+/* LOGO */
+.logo {
+  text-align: center;
+  font-size: 48px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
 
-    /* FORM */
-    .form {
-      margin-top: auto;
-    }
+/* CUADRADITO */
+.logo-box {
+  width: 12px;
+  height: 12px;
+  background: #ff008c;
+  border-radius: 2px;
+}
 
-    .input-box {
-      background: rgba(255,255,255,0.15);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+/* FORM */
+.form {
+  margin-top: auto;
+}
 
-    .prefix {
-      border-right: 2px solid rgba(255,255,255,0.3);
-      padding-right: 10px;
-      font-weight: bold;
-      color: #ff66c4;
-    }
+.input-box {
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-    .input-box input {
-      flex: 1;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: white;
-      font-size: 16px;
-    }
+.prefix {
+  border-right: 2px solid rgba(255,255,255,0.3);
+  padding-right: 10px;
+  font-weight: bold;
+  color: #ff66c4;
+}
 
-    .input-box input::placeholder {
-      color: #ccc;
-    }
+.input-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 16px;
+}
 
-    .btn {
-      margin-top: 15px;
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      background: #ff008c;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      opacity: 0.4;
-      transition: 0.3s;
-    }
+.input-box input::placeholder {
+  color: #ccc;
+}
 
-    .btn.active {
-      opacity: 1;
-    }
+/* BOTÓN */
+.btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #ff008c;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: 0.3s;
+}
 
-    svg {
-      color: #ccc;
-    }
-  </style>
+.btn.active {
+  opacity: 1;
+}
+
+/* SVG HEADER */
+svg {
+  color: #ccc;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
-  <!-- HEADER -->
+  <!-- HEADER (NO SE MUEVE) -->
   <header>
     <div class="help-icon">?</div>
 
-    <div>
-      <!-- ICONO SUPERIOR -->
+    <div class="flex justify-center items-center">
       <svg width="70px" height="24px" viewBox="0 0 118 40">
         <g>
-          <path fill="currentColor" d="M83.59,23.13c0.21,0.14,0.35,0.35,0.42,0.59l0.85,2.73..."></path>
+          <path fill="currentColor" d="M83.59,23.13c0.21,0.14..."></path>
+          <path fill="currentColor" d="M41.83,33.79l0.8-1.97..."></path>
         </g>
       </svg>
     </div>
   </header>
 
-  <!-- LOGO CENTRO -->
-  <div class="logo">
-    <span class="logo-box"></span>Nequi
-  </div>
+  <!-- CONTENIDO -->
+  <div class="main">
 
-  <!-- FORM -->
-  <div class="form">
-    <div class="input-box">
-      <div class="prefix">+57</div>
-      <input type="text" id="phoneInput" placeholder="Ingresa tu cel" maxlength="12">
+    <!-- LOGO CENTRADO PERFECTO -->
+    <div class="logo">
+      <div class="logo-box"></div>
+      <div>Nequi</div>
     </div>
 
-    <button class="btn" id="btn">Entra</button>
+    <!-- FORM -->
+    <div class="form">
+      <div class="input-box">
+        <div class="prefix">+57</div>
+        <input type="text" id="phoneInput" placeholder="Ingresa tu cel" maxlength="12">
+      </div>
+
+      <button class="btn" id="btn">Entra</button>
+    </div>
+
   </div>
 
 </div>
