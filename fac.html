@@ -22,17 +22,18 @@ body{
   flex-direction:column;
 }
 
-/* HEADER */
+/* HEADER BLANCO */
 .header{
-  background:#2b002b;
-  color:white;
-  padding:15px;
+  background:#ffffff;
+  padding:18px 16px;
   display:flex;
   align-items:center;
 }
 
+/* FLECHA */
 .back{
-  font-size:22px;
+  font-size:24px;
+  color:#2b002b;
   cursor:pointer;
 }
 
@@ -43,7 +44,7 @@ body{
 
 /* TITULO */
 .title{
-  font-size:26px;
+  font-size:28px;
   font-weight:700;
   color:#2b002b;
   margin-bottom:25px;
@@ -52,12 +53,12 @@ body{
 /* CARD */
 .card{
   background:white;
-  border-radius:12px;
+  border-radius:14px;
   padding:18px;
   display:flex;
   align-items:center;
   gap:15px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  box-shadow:0 6px 14px rgba(0,0,0,0.08);
   cursor:pointer;
   transition:0.2s;
 }
@@ -68,9 +69,9 @@ body{
 
 /* ICONO */
 .icon{
-  width:45px;
-  height:45px;
-  border-radius:10px;
+  width:48px;
+  height:48px;
+  border-radius:12px;
   background:#f2f2f2;
   display:flex;
   align-items:center;
@@ -90,15 +91,15 @@ body{
 }
 
 .text .main{
-  font-size:16px;
+  font-size:17px;
   font-weight:600;
   color:#2b002b;
 }
 
 .text .sub{
   font-size:14px;
-  color:#777;
-  margin-top:3px;
+  color:#888;
+  margin-top:4px;
 }
 
 </style>
@@ -106,7 +107,7 @@ body{
 
 <body>
 
-<!-- HEADER -->
+<!-- HEADER BLANCO -->
 <div class="header">
   <div class="back">←</div>
 </div>
@@ -119,7 +120,7 @@ body{
   <div class="card">
     
     <div class="icon">
-      <!-- ICONO CARA -->
+      <!-- ICONO -->
       <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
         <circle cx="12" cy="8" r="4"></circle>
         <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
