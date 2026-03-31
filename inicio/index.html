@@ -1,104 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ingreso</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingreso</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #2b002b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      color: white;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
 
-    .container {
-      width: 100%;
-      max-width: 400px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  background: radial-gradient(circle at top, #3a003a, #200020);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  color: white;
+}
 
-    .logo {
-      margin-top: auto;
-      text-align: center;
-      font-size: 50px;
-      font-weight: bold;
-    }
+/* CONTENEDOR */
+.container {
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  padding: 25px 20px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
 
-    .logo span {
-      color: #ff008c;
-    }
+/* LOGO */
+.logo {
+  margin-top: auto;
+  text-align: center;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
 
-    .form {
-      margin-top: auto;
-    }
+.logo span {
+  width: 12px;
+  height: 12px;
+  background: #ff008c;
+  border-radius: 2px;
+  display: inline-block;
+}
 
-    /* INPUT CON +57 */
-    .input-box {
-      background: rgba(255,255,255,0.2);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+/* FORM */
+.form {
+  margin-top: auto;
+}
 
-    .prefix {
-      border-right: 2px solid rgba(255,255,255,0.3);
-      padding-right: 10px;
-      font-weight: bold;
-      color: #ffb3e6;
-    }
+/* INPUT */
+.input-box {
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: 0.3s;
+}
 
-    .input-box input {
-      flex: 1;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: white;
-      font-size: 16px;
-    }
+.input-box:focus-within {
+  border-color: #ff008c;
+  box-shadow: 0 0 0 2px rgba(255,0,140,0.2);
+}
 
-    .input-box input::placeholder {
-      color: #ddd;
-    }
+.prefix {
+  border-right: 2px solid rgba(255,255,255,0.25);
+  padding-right: 10px;
+  font-weight: 600;
+  color: #ff66c4;
+}
 
-    .btn {
-      margin-top: 15px;
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      background: #ff008c;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      opacity: 0.5;
-      transition: 0.3s;
-    }
+.input-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 16px;
+}
 
-    .btn.active {
-      opacity: 1;
-    }
-  </style>
+.input-box input::placeholder {
+  color: #bbb;
+}
+
+/* BOTÓN */
+.btn {
+  margin-top: 18px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff008c, #ff4dc4);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: 0.25s;
+}
+
+.btn.active {
+  opacity: 1;
+  box-shadow: 0 10px 25px rgba(255,0,140,0.3);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
 
+  <!-- LOGO -->
   <div class="logo">
-    <span>•</span>Nequi
+    <span></span>Nequi
   </div>
 
+  <!-- FORM -->
   <div class="form">
     <div class="input-box">
       <div class="prefix">+57</div>
