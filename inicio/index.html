@@ -5,14 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ingreso</title>
 
-  <!-- Fuente similar a Nequi -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet">
-
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #2b002b;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #200020;
       display: flex;
       justify-content: center;
       min-height: 100vh;
@@ -36,40 +33,43 @@
     }
 
     .help-icon {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border: 2px solid white;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 14px;
+      font-weight: bold;
     }
 
-    /* LOGO ESTILO NEQUI */
+    /* LOGO */
     .logo {
       margin-top: auto;
       text-align: center;
-      font-family: 'Inter', sans-serif;
       font-size: 48px;
-      font-weight: 700;
-      letter-spacing: -1px;
-      animation: fadeIn 1s ease;
+      font-weight: 600;
+      letter-spacing: 1px;
     }
 
-    .logo span {
-      color: #ff008c;
-      font-size: 55px;
-      position: relative;
-      top: -5px;
+    .logo-box {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #ff008c;
+      margin-right: 6px;
+      border-radius: 2px; /* cuadradito */
+      transform: translateY(-4px);
     }
 
+    /* FORM */
     .form {
       margin-top: auto;
     }
 
     .input-box {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.15);
       border-radius: 8px;
       padding: 10px;
       display: flex;
@@ -81,7 +81,7 @@
       border-right: 2px solid rgba(255,255,255,0.3);
       padding-right: 10px;
       font-weight: bold;
-      color: #ffb3e6;
+      color: #ff66c4;
     }
 
     .input-box input {
@@ -94,7 +94,7 @@
     }
 
     .input-box input::placeholder {
-      color: #ddd;
+      color: #ccc;
     }
 
     .btn {
@@ -107,7 +107,7 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
-      opacity: 0.5;
+      opacity: 0.4;
       transition: 0.3s;
     }
 
@@ -115,17 +115,8 @@
       opacity: 1;
     }
 
-    .btn:active {
-      transform: scale(0.97);
-    }
-
     svg {
       color: #ccc;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(20px);}
-      to {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
@@ -139,15 +130,18 @@
     <div class="help-icon">?</div>
 
     <div>
+      <!-- ICONO SUPERIOR -->
       <svg width="70px" height="24px" viewBox="0 0 118 40">
-        <text x="0" y="25" fill="white" font-size="20">Nequi</text>
+        <g>
+          <path fill="currentColor" d="M83.59,23.13c0.21,0.14,0.35,0.35,0.42,0.59l0.85,2.73..."></path>
+        </g>
       </svg>
     </div>
   </header>
 
-  <!-- LOGO MEJORADO -->
+  <!-- LOGO CENTRO -->
   <div class="logo">
-    <span>•</span>Nequi
+    <span class="logo-box"></span>Nequi
   </div>
 
   <!-- FORM -->
