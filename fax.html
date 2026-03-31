@@ -5,27 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Verificación facial</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
 
 <style>
 body {
     margin: 0;
-    font-family: 'Inter', sans-serif;
     background: #2b002b;
+    font-family: sans-serif;
     color: white;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-/* HEADER */
-.header {
-    padding: 15px;
-}
-
-.back {
-    font-size: 26px;
-    cursor: pointer;
 }
 
 /* MENSAJE */
@@ -34,81 +21,118 @@ body {
     color: #2b002b;
     padding: 12px;
     border-radius: 12px;
-    margin: 10px 20px;
+    margin: 15px;
     text-align: center;
-    font-weight: 600;
+    font-weight: bold;
 }
 
-/* CONTENEDOR CENTRAL */
-.camera-container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ÓVALO */
-.oval {
-    width: 260px;
-    height: 380px;
-    border-radius: 50%;
-    background: #eee;
-    overflow: hidden;
-    position: relative;
-}
-
-/* VIDEO (SIMULADO) */
+/* VIDEO */
 video {
+    position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* TEXTO ABAJO */
-.footer-text {
+/* OVERLAY */
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(43,0,43,0.55);
+
+    mask-image: radial-gradient(ellipse 140px 200px at center, transparent 98%, black 100%);
+    -webkit-mask-image: radial-gradient(ellipse 140px 200px at center, transparent 98%, black 100%);
+}
+
+/* BORDE */
+.oval-border {
+    position: absolute;
+    width: 280px;
+    height: 400px;
+    border-radius: 50%;
+    border: 3px solid white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ESTADO */
+.status {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
     text-align: center;
-    padding: 20px;
-    color: #ccc;
-    font-size: 14px;
+    font-size: 18px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-    <span class="back" onclick="history.back()">←</span>
-</div>
+<div class="message" id="msg">Cargando cámara...</div>
 
-<!-- MENSAJE -->
-<div class="message">
-    Mira de frente a la cámara por favor
-</div>
+<video id="video" autoplay muted playsinline></video>
+<div class="overlay"></div>
+<div class="oval-border"></div>
 
-<!-- CÁMARA -->
-<div class="camera-container">
-    <div class="oval">
-        <video id="video" autoplay playsinline></video>
-    </div>
-</div>
-
-<div class="footer-text">
-    Mantén tu rostro dentro del óvalo
-</div>
+<div class="status" id="status">🔍 Detectando rostro...</div>
 
 <script>
-// ACTIVAR CÁMARA REAL
 const video = document.getElementById("video");
+const statusText = document.getElementById("status");
+const msg = document.getElementById("msg");
 
+// Iniciar cámara
 navigator.mediaDevices.getUserMedia({ video: true })
 .then(stream => {
     video.srcObject = stream;
-})
-.catch(() => {
-    // Si no permite cámara, deja fondo gris
-    video.style.display = "none";
 });
+
+// Cargar modelos
+Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
+]).then(startDetection);
+
+function startDetection() {
+    msg.innerText = "Mira de frente a la cámara";
+
+    setInterval(async () => {
+        const detection = await faceapi.detectSingleFace(
+            video,
+            new faceapi.TinyFaceDetectorOptions()
+        );
+
+        if (!detection) {
+            statusText.innerText = "❌ No hay rostro";
+            return;
+        }
+
+        const { x, y, width, height } = detection.box;
+
+        // Centro del rostro
+        const faceCenterX = x + width / 2;
+        const faceCenterY = y + height / 2;
+
+        // Centro pantalla
+        const screenCenterX = video.videoWidth / 2;
+        const screenCenterY = video.videoHeight / 2;
+
+        // Distancia al centro
+        const dx = Math.abs(faceCenterX - screenCenterX);
+        const dy = Math.abs(faceCenterY - screenCenterY);
+
+        // 🔥 VALIDACIÓN (ajusta valores)
+        if (dx < 80 && dy < 120) {
+            statusText.innerText = "✅ Rostro centrado";
+            statusText.style.color = "lightgreen";
+        } else {
+            statusText.innerText = "⚠️ Centra tu rostro";
+            statusText.style.color = "orange";
+        }
+
+    }, 300);
+}
 </script>
 
 </body>
