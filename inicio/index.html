@@ -12,18 +12,35 @@
       background: #2b002b;
       display: flex;
       justify-content: center;
-      align-items: center;
       min-height: 100vh;
       color: white;
     }
 
     .container {
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .help-icon {
+      width: 20px;
+      height: 20px;
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
     }
 
     .logo {
@@ -41,7 +58,6 @@
       margin-top: auto;
     }
 
-    /* INPUT CON +57 */
     .input-box {
       background: rgba(255,255,255,0.2);
       border-radius: 8px;
@@ -88,6 +104,10 @@
     .btn.active {
       opacity: 1;
     }
+
+    svg {
+      color: #ccc;
+    }
   </style>
 </head>
 
@@ -95,10 +115,27 @@
 
 <div class="container">
 
+  <!-- HEADER AGREGADO -->
+  <header>
+    <div class="help-icon">?</div>
+
+    <div>
+      <!-- TU SVG -->
+      <svg width="70px" height="24px" viewBox="0 0 118 40">
+        <g>
+          <path fill="currentColor" d="M83.59,23.13c0.21,0.14,0.35,0.35,0.42,0.59l0.85,2.73..."></path>
+          <path fill="currentColor" d="M41.83,33.79l0.8-1.97l-4.69-12.15h2.02..."></path>
+        </g>
+      </svg>
+    </div>
+  </header>
+
+  <!-- LOGO -->
   <div class="logo">
     <span>•</span>Nequi
   </div>
 
+  <!-- FORM -->
   <div class="form">
     <div class="input-box">
       <div class="prefix">+57</div>
@@ -114,10 +151,8 @@
 const input = document.getElementById("phoneInput");
 const btn = document.getElementById("btn");
 
-// Formato 3-3-4
 function formatNumber(value) {
   let digits = value.replace(/\D/g, "");
-
   if (digits.length > 10) digits = digits.slice(0, 10);
 
   if (digits.length > 6) {
@@ -128,7 +163,6 @@ function formatNumber(value) {
   return digits;
 }
 
-// input
 input.addEventListener("input", () => {
   input.value = formatNumber(input.value);
 
@@ -141,7 +175,6 @@ input.addEventListener("input", () => {
   }
 });
 
-// click
 btn.addEventListener("click", () => {
   const raw = input.value.replace(/\D/g, "");
 
