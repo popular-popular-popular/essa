@@ -5,92 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Validemos tu identidad</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:'Inter',sans-serif;
 }
 
 body{
-  background:#f2f2f2;
-}
-
-/* HEADER */
-.header{
-  height:64px;
+  background:#000;
   display:flex;
-  align-items:center;
-  padding:0 16px;
-  background:#f2f2f2;
-}
-
-.back{
-  font-size:26px;
-  color:#2b002b;
-}
-
-/* CONTENIDO */
-.container{
-  padding:10px 20px;
-}
-
-/* TITULO */
-.title{
-  font-size:30px;
-  font-weight:700;
-  color:#2b002b;
-  margin-top:10px;
-  margin-bottom:24px;
-}
-
-/* CARD */
-.card{
-  background:#ffffff;
-  border-radius:12px;
-  padding:18px 16px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-
-  /* sombra MUY suave como Nequi */
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
-}
-
-/* ICONO */
-.icon{
-  width:42px;
-  height:42px;
-  display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-.icon svg{
-  width:24px;
-  height:24px;
-  stroke:#2b002b;
+/* CONTENEDOR */
+.app{
+  width:100%;
+  max-width:420px;
+  height:100vh;
+  position:relative;
+  overflow:hidden;
 }
 
-/* TEXTO */
-.text{
-  display:flex;
-  flex-direction:column;
+/* IMAGEN BASE */
+.bg{
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
-.text .main{
-  font-size:16px;
-  font-weight:600;
-  color:#2b002b;
+/* BOTÓN INVISIBLE (CARD) */
+.click-area{
+  position:absolute;
+  top:180px;   /* AJUSTA si quieres más precisión */
+  left:20px;
+  right:20px;
+  height:90px;
+  border-radius:12px;
+  cursor:pointer;
 }
 
-.text .sub{
-  font-size:14px;
-  color:#8a8a8a;
-  margin-top:4px;
+/* EFECTO AL TOCAR */
+.click-area:active{
+  background:rgba(0,0,0,0.05);
 }
 
 </style>
@@ -98,32 +57,22 @@ body{
 
 <body>
 
-<div class="header">
-  <div class="back">←</div>
-</div>
+<div class="app">
 
-<div class="container">
+  <!-- TU IMAGEN -->
+  <img src="tu.jpeg" class="bg">
 
-  <div class="title">Validemos tu identidad</div>
-
-  <div class="card">
-    
-    <div class="icon">
-      <!-- ICONO MÁS FINO -->
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.6">
-        <circle cx="12" cy="8" r="4"></circle>
-        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
-      </svg>
-    </div>
-
-    <div class="text">
-      <div class="main">Reconocimiento facial</div>
-      <div class="sub">Más seguridad</div>
-    </div>
-
-  </div>
+  <!-- ZONA CLICKEABLE -->
+  <div class="click-area" onclick="continuar()"></div>
 
 </div>
+
+<script>
+function continuar(){
+  alert("Abrir reconocimiento facial");
+  // window.location.href = "siguiente.html";
+}
+</script>
 
 </body>
 </html>
