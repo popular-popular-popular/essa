@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Validar identidad</title>
+<title>Validemos tu identidad</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 *{
@@ -16,63 +16,54 @@
 }
 
 body{
-  background:#f3f3f3;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
+  background:#f2f2f2;
 }
 
-/* HEADER BLANCO */
+/* HEADER */
 .header{
-  background:#ffffff;
-  padding:18px 16px;
+  height:64px;
   display:flex;
   align-items:center;
+  padding:0 16px;
+  background:#f2f2f2;
 }
 
-/* FLECHA */
 .back{
-  font-size:24px;
+  font-size:26px;
   color:#2b002b;
-  cursor:pointer;
 }
 
 /* CONTENIDO */
 .container{
-  padding:20px;
+  padding:10px 20px;
 }
 
 /* TITULO */
 .title{
-  font-size:28px;
+  font-size:30px;
   font-weight:700;
   color:#2b002b;
-  margin-bottom:25px;
+  margin-top:10px;
+  margin-bottom:24px;
 }
 
 /* CARD */
 .card{
-  background:white;
-  border-radius:14px;
-  padding:18px;
+  background:#ffffff;
+  border-radius:12px;
+  padding:18px 16px;
   display:flex;
   align-items:center;
-  gap:15px;
-  box-shadow:0 6px 14px rgba(0,0,0,0.08);
-  cursor:pointer;
-  transition:0.2s;
-}
+  gap:14px;
 
-.card:active{
-  transform:scale(0.97);
+  /* sombra MUY suave como Nequi */
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
 
 /* ICONO */
 .icon{
-  width:48px;
-  height:48px;
-  border-radius:12px;
-  background:#f2f2f2;
+  width:42px;
+  height:42px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -91,14 +82,14 @@ body{
 }
 
 .text .main{
-  font-size:17px;
+  font-size:16px;
   font-weight:600;
   color:#2b002b;
 }
 
 .text .sub{
   font-size:14px;
-  color:#888;
+  color:#8a8a8a;
   margin-top:4px;
 }
 
@@ -107,12 +98,10 @@ body{
 
 <body>
 
-<!-- HEADER BLANCO -->
 <div class="header">
   <div class="back">←</div>
 </div>
 
-<!-- CONTENIDO -->
 <div class="container">
 
   <div class="title">Validemos tu identidad</div>
@@ -120,8 +109,8 @@ body{
   <div class="card">
     
     <div class="icon">
-      <!-- ICONO -->
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+      <!-- ICONO MÁS FINO -->
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.6">
         <circle cx="12" cy="8" r="4"></circle>
         <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
       </svg>
