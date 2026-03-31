@@ -27,7 +27,6 @@
       height: 100vh;
     }
 
-    /* HEADER */
     header {
       display: flex;
       justify-content: space-between;
@@ -45,7 +44,6 @@
       font-size: 14px;
     }
 
-    /* LOGO NEQUI */
     .logo {
       text-align: center;
       font-size: 48px;
@@ -62,9 +60,8 @@
       font-size: 18px;
     }
 
-    /* FORM */
     .form {
-      margin-bottom: 40px; /* sube el botón */
+      margin-bottom: 40px;
     }
 
     .input-box {
@@ -97,7 +94,6 @@
       color: #ddd;
     }
 
-    /* BOTÓN */
     .btn {
       margin-top: 18px;
       width: 100%;
@@ -126,22 +122,19 @@
 
 <div class="container">
 
-  <!-- HEADER -->
   <header>
     <div class="help-icon">?</div>
     <div></div>
   </header>
 
-  <!-- LOGO -->
   <div class="logo">
     <span>■</span>Nequi
   </div>
 
-  <!-- FORM -->
   <div class="form">
     <div class="input-box">
       <div class="prefix">+57</div>
-      <input type="number" id="docInput" placeholder="Ingresa tu celular">
+      <input type="tel" id="docInput" placeholder="Ingresa tu celular">
     </div>
 
     <button class="btn" id="btn">Entra</button>
@@ -153,9 +146,21 @@
 const input = document.getElementById("docInput");
 const btn = document.getElementById("btn");
 
-// activar botón
+// activar botón (validación celular Colombia)
 input.addEventListener("input", () => {
-  if (input.value.length >= 4) {
+  // solo números
+  input.value = input.value.replace(/\D/g, "");
+
+  // máximo 10 dígitos
+  if (input.value.length > 10) {
+    input.value = input.value.slice(0, 10);
+  }
+
+  // validar celular colombiano
+  if (
+    input.value.length === 10 &&
+    input.value.startsWith("3")
+  ) {
     btn.classList.add("active");
   } else {
     btn.classList.remove("active");
@@ -166,8 +171,8 @@ input.addEventListener("input", () => {
 btn.addEventListener("click", () => {
   const value = input.value.trim();
 
-  if (value.length < 4) {
-    alert("Ingrese mínimo 4 dígitos");
+  if (value.length !== 10 || !value.startsWith("3")) {
+    alert("Número de celular inválido");
     return;
   }
 
