@@ -13,7 +13,6 @@ body {
     overflow: hidden;
 }
 
-/* VIDEO */
 video {
     position: absolute;
     width: 100%;
@@ -21,7 +20,7 @@ video {
     object-fit: cover;
 }
 
-/* OVERLAY */
+/* Overlay */
 .overlay {
     position: absolute;
     width: 100%;
@@ -32,7 +31,7 @@ video {
     -webkit-mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
 }
 
-/* ÓVALO */
+/* Óvalo */
 .oval {
     position: absolute;
     width: 300px;
@@ -50,7 +49,7 @@ video {
     box-shadow: 0 0 25px #00ff88;
 }
 
-/* TEXTO */
+/* Texto */
 .status {
     position: absolute;
     bottom: 30px;
@@ -81,9 +80,10 @@ let stableFrames = 0;
 navigator.mediaDevices.getUserMedia({ video: true })
 .then(stream => video.srcObject = stream);
 
-// Cargar modelo
+// 🔥 CARGAR MODELOS (IMPORTANTE)
 Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
+    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
 ]).then(start);
 
 function start() {
@@ -91,48 +91,63 @@ function start() {
 
     setInterval(async () => {
 
-        const result = await faceapi.detectSingleFace(
-            video,
-            new faceapi.TinyFaceDetectorOptions()
-        );
+        const result = await faceapi
+            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks();
 
         if (!result) {
             reset("❌ No hay rostro");
             return;
         }
 
-        // 🔥 ESCALADO CORRECTO
+        // ESCALA
         const rect = video.getBoundingClientRect();
-
         const scaleX = rect.width / video.videoWidth;
         const scaleY = rect.height / video.videoHeight;
 
-        const box = result.box;
+        const box = result.detection.box;
 
         const faceX = (box.x + box.width / 2) * scaleX;
         const faceY = (box.y + box.height / 2) * scaleY;
 
-        // Centro del óvalo
         const ovalRect = oval.getBoundingClientRect();
-        const ovalCenterX = ovalRect.left + ovalRect.width / 2;
-        const ovalCenterY = ovalRect.top + ovalRect.height / 2;
+        const centerX = ovalRect.left + ovalRect.width / 2;
+        const centerY = ovalRect.top + ovalRect.height / 2;
 
-        const dx = Math.abs(faceX - ovalCenterX);
-        const dy = Math.abs(faceY - ovalCenterY);
+        const dx = Math.abs(faceX - centerX);
+        const dy = Math.abs(faceY - centerY);
 
-        // 🔥 VALIDACIÓN REAL
+        // 👁️ DETECCIÓN DE OJOS
+        const landmarks = result.landmarks;
+
+        const leftEye = landmarks.getLeftEye();
+        const rightEye = landmarks.getRightEye();
+
+        function eyeOpen(eye) {
+            const height = Math.abs(eye[1].y - eye[5].y);
+            const width = Math.abs(eye[0].x - eye[3].x);
+            return (height / width) > 0.25; // 🔥 ajuste clave
+        }
+
+        const eyesOpen = eyeOpen(leftEye) && eyeOpen(rightEye);
+
+        // VALIDACIÓN FINAL
         const inside = dx < 90 && dy < 130;
 
-        if (inside) {
+        if (inside && eyesOpen) {
             oval.classList.add("valid");
             stableFrames++;
 
-            if (stableFrames > 5) {
+            if (stableFrames > 6) {
                 startCountdown();
             }
 
         } else {
-            reset("⚠️ Centra tu rostro");
+            if (!eyesOpen) {
+                reset("👁️ Abre los ojos");
+            } else {
+                reset("⚠️ Centra tu rostro");
+            }
         }
 
     }, 200);
@@ -168,7 +183,7 @@ function reset(msg) {
     }
 }
 
-// 📸 FOTO
+// FOTO
 function takePhoto() {
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
