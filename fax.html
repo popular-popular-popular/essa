@@ -2,15 +2,22 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Validador de Rostro - Selfie ID</title>
 
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
 
 <style>
+* {
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
     margin: 0;
     background: #2b002b;
     overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 video {
@@ -20,43 +27,254 @@ video {
     object-fit: cover;
 }
 
-/* Overlay */
+/* Overlay con máscara radial mejorada */
 .overlay {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(43,0,43,0.5);
-
-    mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
-    -webkit-mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
+    background: rgba(43,0,43,0.6);
+    backdrop-filter: blur(2px);
+    mask-image: radial-gradient(ellipse 150px 210px at center, transparent 95%, black 100%);
+    -webkit-mask-image: radial-gradient(ellipse 150px 210px at center, transparent 95%, black 100%);
+    pointer-events: none;
 }
 
-/* Óvalo */
+/* Óvalo guía mejorado */
 .oval {
     position: absolute;
     width: 300px;
     height: 420px;
     border-radius: 50%;
-    border: 4px solid white;
+    border: 3px solid rgba(255, 255, 255, 0.9);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    transition: 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.3), inset 0 0 0 2px rgba(255,255,255,0.3);
+    pointer-events: none;
 }
 
-.valid {
+.oval::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.oval.valid {
     border-color: #00ff88;
-    box-shadow: 0 0 25px #00ff88;
+    box-shadow: 0 0 25px #00ff88, 0 0 0 3px rgba(0,255,136,0.5);
+    animation: pulse 0.5s ease;
 }
 
-/* Texto */
+.oval.valid::before {
+    opacity: 1;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.02); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Texto de estado mejorado */
 .status {
     position: absolute;
-    bottom: 30px;
+    bottom: 40px;
     width: 100%;
     text-align: center;
     color: white;
     font-size: 18px;
+    font-weight: 500;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    z-index: 10;
+    background: rgba(0,0,0,0.6);
+    padding: 12px;
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+    font-family: monospace;
+}
+
+/* Indicadores adicionales */
+.indicator {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+    background: rgba(0,0,0,0.6);
+    padding: 8px 16px;
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+    background: #00ff88;
+    box-shadow: 0 0 10px #00ff88;
+    transform: scale(1.2);
+}
+
+/* Preview de foto */
+.photo-preview {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid #00ff88;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 20;
+    background: white;
+    animation: slideIn 0.3s ease;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.photo-preview:hover {
+    transform: scale(1.05);
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-preview .delete-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.photo-preview .delete-btn:hover {
+    transform: scale(1.1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Mensaje de éxito flotante */
+.success-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,255,136,0.95);
+    color: #2b002b;
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 30;
+    animation: fadeInOut 1.5s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    font-family: monospace;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    85% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+/* Botón de reinicio */
+.reset-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 20;
+    transition: all 0.2s;
+    font-family: monospace;
+}
+
+.reset-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .oval {
+        width: 260px;
+        height: 360px;
+    }
+    
+    .status {
+        font-size: 14px;
+        bottom: 20px;
+    }
+    
+    .photo-preview {
+        width: 70px;
+        height: 70px;
+        bottom: 60px;
+    }
 }
 </style>
 </head>
@@ -66,145 +284,339 @@ video {
 <video id="video" autoplay muted playsinline></video>
 <div class="overlay"></div>
 <div class="oval" id="oval"></div>
-<div class="status" id="status">Iniciando...</div>
+<div class="status" id="status">🎯 Inicializando cámara...</div>
+<div class="indicator" id="indicator">
+    <div class="indicator-dot"></div>
+    <div class="indicator-dot"></div>
+    <div class="indicator-dot"></div>
+</div>
+<button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
 
 <script>
 const video = document.getElementById("video");
 const oval = document.getElementById("oval");
 const statusText = document.getElementById("status");
+const resetBtn = document.getElementById("resetBtn");
+const indicatorDots = document.querySelectorAll('.indicator-dot');
 
 let countdown = null;
 let stableFrames = 0;
+let photoTaken = false;
+let modelsLoaded = false;
+let previewCount = 0;
 
-// Cámara
-navigator.mediaDevices.getUserMedia({ video: true })
-.then(stream => video.srcObject = stream);
+// Configuración de tolerancia
+const TOLERANCIA_X = 85;
+const TOLERANCIA_Y = 120;
+const FRAMES_REQUERIDOS = 8;
+const UMBRAL_OJOS = 0.28;
 
-// 🔥 CARGAR MODELOS (IMPORTANTE)
+// Cámara con manejo de errores
+navigator.mediaDevices.getUserMedia({ 
+    video: { 
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: "user"
+    } 
+})
+.then(stream => {
+    video.srcObject = stream;
+    statusText.innerText = "📷 Cargando modelos de IA...";
+})
+.catch(err => {
+    console.error("Error de cámara:", err);
+    statusText.innerText = "❌ Error: No se puede acceder a la cámara";
+});
+
+// Cargar modelos con progreso
 Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models'),
     faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
-]).then(start);
+]).then(() => {
+    modelsLoaded = true;
+    statusText.innerText = "✅ Cámara lista - Coloca tu rostro en el óvalo";
+    start();
+}).catch(err => {
+    console.error("Error cargando modelos:", err);
+    statusText.innerText = "❌ Error cargando modelos. Recarga la página.";
+});
 
 function start() {
-    statusText.innerText = "Mira al frente";
-
+    if (!video || !modelsLoaded) return;
+    
+    let frameCount = 0;
+    
     setInterval(async () => {
+        if (!video.videoWidth || !modelsLoaded) return;
+        
+        try {
+            const result = await faceapi
+                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks();
 
-        const result = await faceapi
-            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks();
-
-        if (!result) {
-            reset("❌ No hay rostro");
-            return;
-        }
-
-        // ESCALA
-        const rect = video.getBoundingClientRect();
-        const scaleX = rect.width / video.videoWidth;
-        const scaleY = rect.height / video.videoHeight;
-
-        const box = result.detection.box;
-
-        const faceX = (box.x + box.width / 2) * scaleX;
-        const faceY = (box.y + box.height / 2) * scaleY;
-
-        const ovalRect = oval.getBoundingClientRect();
-        const centerX = ovalRect.left + ovalRect.width / 2;
-        const centerY = ovalRect.top + ovalRect.height / 2;
-
-        const dx = Math.abs(faceX - centerX);
-        const dy = Math.abs(faceY - centerY);
-
-        // 👁️ DETECCIÓN DE OJOS
-        const landmarks = result.landmarks;
-
-        const leftEye = landmarks.getLeftEye();
-        const rightEye = landmarks.getRightEye();
-
-        function eyeOpen(eye) {
-            const height = Math.abs(eye[1].y - eye[5].y);
-            const width = Math.abs(eye[0].x - eye[3].x);
-            return (height / width) > 0.25; // 🔥 ajuste clave
-        }
-
-        const eyesOpen = eyeOpen(leftEye) && eyeOpen(rightEye);
-
-        // VALIDACIÓN FINAL
-        const inside = dx < 90 && dy < 130;
-
-        if (inside && eyesOpen) {
-            oval.classList.add("valid");
-            stableFrames++;
-
-            if (stableFrames > 6) {
-                startCountdown();
+            if (!result) {
+                reset("❌ No se detecta rostro");
+                updateIndicator(0);
+                return;
             }
 
-        } else {
-            if (!eyesOpen) {
-                reset("👁️ Abre los ojos");
+            // Obtener dimensiones
+            const rect = video.getBoundingClientRect();
+            const scaleX = rect.width / video.videoWidth;
+            const scaleY = rect.height / video.videoHeight;
+
+            const box = result.detection.box;
+            const faceX = (box.x + box.width / 2) * scaleX;
+            const faceY = (box.y + box.height / 2) * scaleY;
+
+            const ovalRect = oval.getBoundingClientRect();
+            const centerX = ovalRect.left + ovalRect.width / 2;
+            const centerY = ovalRect.top + ovalRect.height / 2;
+
+            const dx = Math.abs(faceX - centerX);
+            const dy = Math.abs(faceY - centerY);
+
+            // Detección de ojos mejorada
+            const landmarks = result.landmarks;
+            const leftEye = landmarks.getLeftEye();
+            const rightEye = landmarks.getRightEye();
+
+            function eyeOpen(eye) {
+                if (!eye || eye.length < 6) return false;
+                const height1 = Math.abs(eye[1].y - eye[5].y);
+                const height2 = Math.abs(eye[2].y - eye[4].y);
+                const avgHeight = (height1 + height2) / 2;
+                const width = Math.abs(eye[0].x - eye[3].x);
+                const ratio = avgHeight / width;
+                return ratio > UMBRAL_OJOS;
+            }
+
+            const eyesOpen = eyeOpen(leftEye) && eyeOpen(rightEye);
+            const inside = dx < TOLERANCIA_X && dy < TOLERANCIA_Y;
+
+            // Calcular porcentaje de centrado
+            const centradoX = Math.max(0, Math.min(100, 100 - (dx / TOLERANCIA_X) * 100));
+            const centradoY = Math.max(0, Math.min(100, 100 - (dy / TOLERANCIA_Y) * 100));
+            const centradoTotal = (centradoX + centradoY) / 2;
+            
+            updateIndicator(Math.floor(centradoTotal / 33));
+
+            if (inside && eyesOpen && !photoTaken) {
+                oval.classList.add("valid");
+                stableFrames++;
+                
+                // Mostrar progreso de centrado
+                if (stableFrames >= FRAMES_REQUERIDOS - 2) {
+                    statusText.innerText = `✨ Perfecto! ${stableFrames}/${FRAMES_REQUERIDOS} frames`;
+                } else {
+                    statusText.innerText = `✅ Rostro centrado (${stableFrames}/${FRAMES_REQUERIDOS})`;
+                }
+
+                if (stableFrames >= FRAMES_REQUERIDOS && !countdown && !photoTaken) {
+                    startCountdown();
+                }
             } else {
-                reset("⚠️ Centra tu rostro");
+                if (!inside && eyesOpen) {
+                    let mensaje = "";
+                    if (dx > TOLERANCIA_X && dy > TOLERANCIA_Y) mensaje = "⬅️⬆️ Centra tu rostro";
+                    else if (dx > TOLERANCIA_X) mensaje = "⬅️➡️ Centra horizontalmente";
+                    else if (dy > TOLERANCIA_Y) mensaje = "⬆️⬇️ Centra verticalmente";
+                    else mensaje = "🎯 Coloca tu rostro en el óvalo";
+                    reset(mensaje);
+                } else if (!eyesOpen) {
+                    reset("👁️ Por favor, abre los ojos");
+                } else {
+                    reset("⚠️ Mantén tu rostro estable");
+                }
+                oval.classList.remove("valid");
             }
+            
+            frameCount++;
+        } catch (err) {
+            console.error("Error en detección:", err);
         }
+    }, 150);
+}
 
-    }, 200);
+function updateIndicator(level) {
+    indicatorDots.forEach((dot, index) => {
+        if (index < level) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
 }
 
 function startCountdown() {
     if (countdown) return;
-
+    
     let t = 3;
-    statusText.innerText = "📸 No te muevas (" + t + ")";
-
+    statusText.innerText = "📸 ¡No te muevas! (" + t + ")";
+    
+    // Efecto visual en el óvalo
+    oval.style.animation = 'pulse 0.5s ease infinite';
+    
     countdown = setInterval(() => {
         t--;
-
+        
         if (t > 0) {
-            statusText.innerText = "📸 No te muevas (" + t + ")";
+            statusText.innerText = "📸 ¡No te muevas! (" + t + ")";
+            // Efecto de vibración suave
+            oval.style.transform = `translate(-50%, -50%) scale(${1 + (t * 0.02)})`;
         } else {
             clearInterval(countdown);
             countdown = null;
+            oval.style.animation = '';
+            oval.style.transform = 'translate(-50%, -50%)';
             takePhoto();
         }
     }, 1000);
 }
 
 function reset(msg) {
-    statusText.innerText = msg;
+    if (photoTaken) return;
+    
+    statusText.innerText = msg || "🎯 Coloca tu rostro en el óvalo";
     oval.classList.remove("valid");
     stableFrames = 0;
+    updateIndicator(0);
+    
+    if (countdown) {
+        clearInterval(countdown);
+        countdown = null;
+        oval.style.animation = '';
+        oval.style.transform = 'translate(-50%, -50%)';
+    }
+}
 
+// Tomar foto con mejor calidad
+function takePhoto() {
+    if (photoTaken) return;
+    
+    photoTaken = true;
+    
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Aplicar efecto de viñeta
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    
+    const imgData = canvas.toDataURL("image/png", 0.95);
+    
+    // Mostrar toast de éxito
+    showSuccessToast();
+    
+    statusText.innerText = "✅ ¡Foto capturada con éxito!";
+    
+    // Crear preview
+    createPhotoPreview(imgData);
+    
+    // Opcional: Descargar automáticamente
+    setTimeout(() => {
+        downloadPhoto(imgData);
+    }, 500);
+}
+
+function showSuccessToast() {
+    const toast = document.createElement('div');
+    toast.className = 'success-toast';
+    toast.textContent = '📸 ¡Foto capturada!';
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 1500);
+}
+
+function createPhotoPreview(imgData) {
+    const previewContainer = document.createElement('div');
+    previewContainer.className = 'photo-preview';
+    previewContainer.id = `preview-${previewCount++}`;
+    
+    const img = document.createElement('img');
+    img.src = imgData;
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = '×';
+    deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        previewContainer.remove();
+        photoTaken = false;
+        reset("🎯 Nueva foto - Coloca tu rostro");
+    };
+    
+    previewContainer.appendChild(img);
+    previewContainer.appendChild(deleteBtn);
+    
+    previewContainer.onclick = () => {
+        downloadPhoto(imgData);
+    };
+    
+    document.body.appendChild(previewContainer);
+    
+    // Limitar a 3 previews
+    const previews = document.querySelectorAll('.photo-preview');
+    if (previews.length > 3) {
+        previews[0].remove();
+    }
+}
+
+function downloadPhoto(imgData) {
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.download = `selfie-${timestamp}.png`;
+    link.href = imgData;
+    link.click();
+}
+
+// Botón de reinicio
+resetBtn.addEventListener('click', () => {
+    photoTaken = false;
     if (countdown) {
         clearInterval(countdown);
         countdown = null;
     }
-}
+    stableFrames = 0;
+    reset("🔄 Reiniciado - Coloca tu rostro");
+    oval.classList.remove("valid");
+    oval.style.animation = '';
+    oval.style.transform = 'translate(-50%, -50%)';
+    
+    // Limpiar previews
+    document.querySelectorAll('.photo-preview').forEach(preview => preview.remove());
+    
+    statusText.innerText = "✅ Listo para nueva foto";
+    setTimeout(() => {
+        statusText.innerText = "🎯 Coloca tu rostro en el óvalo";
+    }, 2000);
+});
 
-// FOTO
-function takePhoto() {
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+// Manejar cuando el video esté listo
+video.addEventListener('loadeddata', () => {
+    if (modelsLoaded) {
+        statusText.innerText = "✅ Cámara lista - Coloca tu rostro en el óvalo";
+    }
+});
 
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
-
-    const img = canvas.toDataURL("image/png");
-
-    statusText.innerText = "✅ Foto tomada";
-
-    const preview = document.createElement("img");
-    preview.src = img;
-    preview.style.position = "absolute";
-    preview.style.width = "120px";
-    preview.style.bottom = "80px";
-    preview.style.right = "20px";
-
-    document.body.appendChild(preview);
-}
+// Prevenir captura de pantalla accidental (solo efecto visual)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'PrintScreen') {
+        statusText.innerText = "⚠️ Usa el botón de captura";
+        setTimeout(() => {
+            if (!photoTaken) reset("🎯 Coloca tu rostro en el óvalo");
+        }, 2000);
+    }
+});
 </script>
 
 </body>
