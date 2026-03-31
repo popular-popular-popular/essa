@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verificación facial</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #2b002b;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* HEADER */
+.header {
+    padding: 15px;
+}
+
+.back {
+    font-size: 26px;
+    cursor: pointer;
+}
+
+/* MENSAJE */
+.message {
+    background: #ff6b6b;
+    color: #2b002b;
+    padding: 12px;
+    border-radius: 12px;
+    margin: 10px 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* CONTENEDOR CENTRAL */
+.camera-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ÓVALO */
+.oval {
+    width: 260px;
+    height: 380px;
+    border-radius: 50%;
+    background: #eee;
+    overflow: hidden;
+    position: relative;
+}
+
+/* VIDEO (SIMULADO) */
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* TEXTO ABAJO */
+.footer-text {
+    text-align: center;
+    padding: 20px;
+    color: #ccc;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <span class="back" onclick="history.back()">←</span>
+</div>
+
+<!-- MENSAJE -->
+<div class="message">
+    Mira de frente a la cámara por favor
+</div>
+
+<!-- CÁMARA -->
+<div class="camera-container">
+    <div class="oval">
+        <video id="video" autoplay playsinline></video>
+    </div>
+</div>
+
+<div class="footer-text">
+    Mantén tu rostro dentro del óvalo
+</div>
+
+<script>
+// ACTIVAR CÁMARA REAL
+const video = document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    video.srcObject = stream;
+})
+.catch(() => {
+    // Si no permite cámara, deja fondo gris
+    video.style.display = "none";
+});
+</script>
+
+</body>
+</html>
