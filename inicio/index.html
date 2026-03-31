@@ -5,84 +5,81 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ingreso</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet">
+
 <style>
 body {
   margin: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #200020;
+  font-family: Arial, sans-serif;
+  background: #2b002b;
   display: flex;
   justify-content: center;
+  align-items: center;
   height: 100vh;
+  overflow: hidden; /* 🔒 evita que se mueva */
   color: white;
 }
 
-/* CONTENEDOR */
+/* CONTENEDOR FIJO */
 .container {
   width: 100%;
   max-width: 420px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* HEADER FIJO */
+/* HEADER */
 header {
-  height: 60px;
-  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
 }
 
-/* ICONO ? */
+/* ICONO */
 .help-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border: 2px solid white;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 14px;
-  font-weight: bold;
 }
 
-/* CONTENIDO CENTRAL */
+/* ZONA CENTRAL */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 0 20px;
+  justify-content: center; /* 🔥 centra todo */
 }
 
 /* LOGO */
 .logo {
   text-align: center;
+  font-family: 'Inter', sans-serif;
   font-size: 48px;
-  font-weight: 600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
+  font-weight: 700;
+  letter-spacing: -1px;
 }
 
-/* CUADRADITO */
-.logo-box {
-  width: 12px;
-  height: 12px;
-  background: #ff008c;
-  border-radius: 2px;
+.logo span {
+  color: #ff008c;
+  font-size: 50px;
+  margin-right: 6px;
 }
 
 /* FORM */
 .form {
-  margin-top: auto;
+  margin-top: 40px;
 }
 
 .input-box {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.2);
   border-radius: 8px;
   padding: 10px;
   display: flex;
@@ -94,7 +91,7 @@ header {
   border-right: 2px solid rgba(255,255,255,0.3);
   padding-right: 10px;
   font-weight: bold;
-  color: #ff66c4;
+  color: #ffb3e6;
 }
 
 .input-box input {
@@ -107,7 +104,7 @@ header {
 }
 
 .input-box input::placeholder {
-  color: #ccc;
+  color: #ddd;
 }
 
 /* BOTÓN */
@@ -121,7 +118,7 @@ header {
   color: white;
   font-size: 16px;
   cursor: pointer;
-  opacity: 0.4;
+  opacity: 0.5;
   transition: 0.3s;
 }
 
@@ -129,7 +126,10 @@ header {
   opacity: 1;
 }
 
-/* SVG HEADER */
+.btn:active {
+  transform: scale(0.97);
+}
+
 svg {
   color: #ccc;
 }
@@ -140,27 +140,23 @@ svg {
 
 <div class="container">
 
-  <!-- HEADER (NO SE MUEVE) -->
+  <!-- HEADER -->
   <header>
     <div class="help-icon">?</div>
 
-    <div class="flex justify-center items-center">
+    <div>
       <svg width="70px" height="24px" viewBox="0 0 118 40">
-        <g>
-          <path fill="currentColor" d="M83.59,23.13c0.21,0.14..."></path>
-          <path fill="currentColor" d="M41.83,33.79l0.8-1.97..."></path>
-        </g>
+        <text x="0" y="25" fill="white" font-size="20">Nequi</text>
       </svg>
     </div>
   </header>
 
-  <!-- CONTENIDO -->
+  <!-- CONTENIDO CENTRADO -->
   <div class="main">
 
-    <!-- LOGO CENTRADO PERFECTO -->
+    <!-- LOGO -->
     <div class="logo">
-      <div class="logo-box"></div>
-      <div>Nequi</div>
+      <span>■</span>Nequi
     </div>
 
     <!-- FORM -->
