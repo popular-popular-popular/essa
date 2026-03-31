@@ -6,25 +6,26 @@
   <title>Ingreso</title>
 
   <style>
-    body {
+    html, body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      padding: 0;
       background: #2b002b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: Arial, sans-serif;
       color: white;
+      overflow: hidden; /* evita movimientos */
     }
 
+    /* CONTENEDOR TIPO APP */
     .container {
       width: 100%;
       max-width: 400px;
+      margin: 0 auto;
       padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 100vh;
+      height: 100dvh; /* evita saltos en móviles */
+      box-sizing: border-box;
     }
 
     header {
@@ -51,6 +52,7 @@
       position: relative;
     }
 
+    /* cuadrado arriba de la N */
     .logo span {
       color: #ff008c;
       position: absolute;
@@ -146,17 +148,14 @@
 const input = document.getElementById("docInput");
 const btn = document.getElementById("btn");
 
-// activar botón (validación celular Colombia)
+// VALIDACIÓN CELULAR COLOMBIA
 input.addEventListener("input", () => {
-  // solo números
   input.value = input.value.replace(/\D/g, "");
 
-  // máximo 10 dígitos
   if (input.value.length > 10) {
     input.value = input.value.slice(0, 10);
   }
 
-  // validar celular colombiano
   if (
     input.value.length === 10 &&
     input.value.startsWith("3")
@@ -167,7 +166,7 @@ input.addEventListener("input", () => {
   }
 });
 
-// click
+// CLICK ORIGINAL (NO MODIFICADO)
 btn.addEventListener("click", () => {
   const value = input.value.trim();
 
