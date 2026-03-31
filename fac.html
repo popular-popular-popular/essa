@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validar identidad</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
+
+body{
+  background:#f3f3f3;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* HEADER */
+.header{
+  background:#2b002b;
+  color:white;
+  padding:15px;
+  display:flex;
+  align-items:center;
+}
+
+.back{
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* CONTENIDO */
+.container{
+  padding:20px;
+}
+
+/* TITULO */
+.title{
+  font-size:26px;
+  font-weight:700;
+  color:#2b002b;
+  margin-bottom:25px;
+}
+
+/* CARD */
+.card{
+  background:white;
+  border-radius:12px;
+  padding:18px;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.card:active{
+  transform:scale(0.97);
+}
+
+/* ICONO */
+.icon{
+  width:45px;
+  height:45px;
+  border-radius:10px;
+  background:#f2f2f2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.icon svg{
+  width:24px;
+  height:24px;
+  stroke:#2b002b;
+}
+
+/* TEXTO */
+.text{
+  display:flex;
+  flex-direction:column;
+}
+
+.text .main{
+  font-size:16px;
+  font-weight:600;
+  color:#2b002b;
+}
+
+.text .sub{
+  font-size:14px;
+  color:#777;
+  margin-top:3px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="back">←</div>
+</div>
+
+<!-- CONTENIDO -->
+<div class="container">
+
+  <div class="title">Validemos tu identidad</div>
+
+  <div class="card">
+    
+    <div class="icon">
+      <!-- ICONO CARA -->
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+        <circle cx="12" cy="8" r="4"></circle>
+        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+      </svg>
+    </div>
+
+    <div class="text">
+      <div class="main">Reconocimiento facial</div>
+      <div class="sub">Más seguridad</div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
