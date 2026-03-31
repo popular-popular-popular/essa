@@ -390,8 +390,8 @@ let countdownActive = false;
 let countdownTimer = null;
 let countdownValue = 3;
 
-// Configuración de detección
-const REQUIRED_STABLE_FRAMES = 10;
+// Configuración de detección - SOLO 3 FRAMES DE ESTABILIDAD
+const REQUIRED_STABLE_FRAMES = 3;  // Solo 3 frames estables
 const STABILITY_THRESHOLD = 18;
 const CENTER_TOLERANCE_X = 75;
 const CENTER_TOLERANCE_Y = 95;
@@ -470,12 +470,11 @@ function startFaceDetection() {
                 const progress = (stabilityFrames / REQUIRED_STABLE_FRAMES) * 100;
                 progressBar.style.width = `${progress}%`;
                 
+                // Con solo 3 frames estables, se activa el countdown inmediatamente
                 if (stabilityFrames >= REQUIRED_STABLE_FRAMES && !countdownActive && !photoTaken) {
                     startAutoCountdown();
-                } else if (stabilityFrames > 3) {
-                    statusText.innerText = `✅ ¡Perfecto! Mantén la posición (${stabilityFrames}/${REQUIRED_STABLE_FRAMES})`;
-                } else {
-                    statusText.innerText = "✅ Rostro centrado - Mantén la posición";
+                } else if (stabilityFrames > 0) {
+                    statusText.innerText = `✅ ¡Perfecto! (${stabilityFrames}/${REQUIRED_STABLE_FRAMES})`;
                 }
             } else {
                 stabilityFrames = 0;
@@ -483,7 +482,7 @@ function startFaceDetection() {
                 if (!isCentered) {
                     statusText.innerText = "🎯 Centra tu rostro en el óvalo verde";
                 } else if (!isStable) {
-                    statusText.innerText = "⚠️ No te muevas, mantén la posición";
+                    statusText.innerText = "⚠️ No te muevas";
                 }
             }
         } else {
@@ -672,23 +671,12 @@ function createPhotoPreview(imgData) {
         }
         
         warningMessage.classList.add("show");
-        setTimeout(() => {
-            if (!photoTaken) {
-                const isCentered = checkIfCentered();
-                if (isCentered) warningMessage.classList.remove("show");
-            }
-        }, 3000);
     };
     
     preview.appendChild(img);
     preview.appendChild(deleteBtn);
     
     document.body.appendChild(preview);
-}
-
-function checkIfCentered() {
-    // Función auxiliar para verificar centrado
-    return false;
 }
 
 function mostrarMensaje(mensaje, esError = false) {
@@ -799,7 +787,7 @@ resetBtn.addEventListener('click', () => {
     if (preview) preview.remove();
     
     statusText.innerText = "😊 Coloca tu rostro en el óvalo";
-    mostrarMensaje("Reiniciado, la selfie se tomará automáticamente", false);
+    mostrarMensaje("Reiniciado", false);
     
     // Reiniciar detección
     if (!detectionInterval) {
@@ -814,7 +802,7 @@ sendBtn.addEventListener('click', () => {
     enviarATelegram();
 });
 
-// Ocultar mensaje de advertencia después de 3 segundos al inicio
+// Mostrar mensaje de advertencia al inicio
 setTimeout(() => {
     if (!photoTaken) {
         warningMessage.classList.add("show");
