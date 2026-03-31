@@ -36,10 +36,10 @@ body{
   object-fit:cover;
 }
 
-/* BOTÓN INVISIBLE (CARD) */
+/* ZONA CLICKEABLE */
 .click-area{
   position:absolute;
-  top:180px;   /* AJUSTA si quieres más precisión */
+  top:180px;   /* puedes ajustar si quieres más precisión */
   left:20px;
   right:20px;
   height:90px;
@@ -51,7 +51,6 @@ body{
 .click-area:active{
   background:rgba(0,0,0,0.05);
 }
-
 </style>
 </head>
 
@@ -59,18 +58,17 @@ body{
 
 <div class="app">
 
-  <!-- TU IMAGEN -->
-  <img src="tu.jpeg" class="bg">
+  <!-- IMPORTANTE: cambia el nombre por tu imagen -->
+  <img src="fac.jpeg" class="bg">
 
-  <!-- ZONA CLICKEABLE -->
+  <!-- ÁREA QUE SE PUEDE TOCAR -->
   <div class="click-area" onclick="continuar()"></div>
 
 </div>
 
 <script>
 function continuar(){
-  alert("Abrir reconocimiento facial");
-   window.location.href = "siguiente.html";
+  window.location.href = "siguiente.html"; // AQUÍ YA FUNCIONA
 }
 </script>
 
