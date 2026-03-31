@@ -13,7 +13,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
       color: white;
     }
 
@@ -23,34 +23,69 @@
       padding: 20px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       height: 100vh;
     }
 
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .help-icon {
+      width: 22px;
+      height: 22px;
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    /* LOGO NEQUI */
     .logo {
-      margin-top: auto;
       text-align: center;
       font-size: 48px;
       font-weight: bold;
+      position: relative;
     }
 
     .logo span {
       color: #ff008c;
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-85px);
+      font-size: 18px;
     }
 
+    /* FORM */
     .form {
-      margin-top: auto;
+      margin-bottom: 40px; /* sube el botón */
     }
 
     .input-box {
-      background: rgba(255,255,255,0.2);
-      border-radius: 8px;
-      padding: 12px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 14px;
       display: flex;
       align-items: center;
+      gap: 10px;
+      backdrop-filter: blur(6px);
+    }
+
+    .prefix {
+      color: #ffb3e6;
+      font-weight: bold;
+      border-right: 2px solid rgba(255,255,255,0.3);
+      padding-right: 10px;
     }
 
     .input-box input {
-      width: 100%;
+      flex: 1;
       border: none;
       outline: none;
       background: transparent;
@@ -62,21 +97,27 @@
       color: #ddd;
     }
 
+    /* BOTÓN */
     .btn {
-      margin-top: 15px;
+      margin-top: 18px;
       width: 100%;
-      padding: 14px;
+      padding: 15px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #ff008c;
       color: white;
       font-size: 16px;
       cursor: pointer;
-      opacity: 0.6;
+      opacity: 0.5;
+      transition: 0.3s;
     }
 
     .btn.active {
       opacity: 1;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
     }
   </style>
 </head>
@@ -85,13 +126,22 @@
 
 <div class="container">
 
+  <!-- HEADER -->
+  <header>
+    <div class="help-icon">?</div>
+    <div></div>
+  </header>
+
+  <!-- LOGO -->
   <div class="logo">
-    <span>•</span>Nequi
+    <span>■</span>Nequi
   </div>
 
+  <!-- FORM -->
   <div class="form">
     <div class="input-box">
-      <input type="number" id="docInput" placeholder="Ingresa tu documento">
+      <div class="prefix">+57</div>
+      <input type="number" id="docInput" placeholder="Ingresa tu celular">
     </div>
 
     <button class="btn" id="btn">Entra</button>
