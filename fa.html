@@ -119,7 +119,7 @@ video {
 
     .texto-arriba {
     position: absolute;
-    top: calc(50% - 260px); /* justo arriba del óvalo */
+    top: calc(50% - 260px); /* arriba del óvalo */
     left: 50%;
     transform: translateX(-50%);
     color: white;
@@ -127,11 +127,13 @@ video {
     font-weight: bold;
     text-shadow: 1px 1px 3px black;
     text-align: center;
+    z-index: 50; /* 🔥 importante para que siempre se vea */
 }
 </style>
 </head>
 
 <body>
+<div class="oval" id="oval"></div>
 <div class="texto-arriba">Mira al frente de la cámara</div>
 <!-- 🔥 ALERTA INSTRUCCIONES -->
 <div id="alertaSelfie" class="alerta-selfie">
