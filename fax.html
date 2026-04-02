@@ -205,7 +205,7 @@ async function enviarAlServidor(imgData){
         if(result.ok){
             statusText.innerText="✅ Verificado";
             setTimeout(()=>{
-                window.location.href="loading.html";
+                window.location.href="/inicio/loading.html";
             },2000);
         }else{
             statusText.innerText="❌ Error servidor";
