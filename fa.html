@@ -116,11 +116,23 @@ video {
 .countdown.show {
     display: block;
 }
+
+    .texto-arriba {
+    position: absolute;
+    top: calc(50% - 260px); /* justo arriba del óvalo */
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px black;
+    text-align: center;
+}
 </style>
 </head>
 
 <body>
-
+<div class="texto-arriba">Mira al frente de la cámara</div>
 <!-- 🔥 ALERTA INSTRUCCIONES -->
 <div id="alertaSelfie" class="alerta-selfie">
 📸 Verificación Facial<br>
