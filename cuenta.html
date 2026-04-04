@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ingreso</title>
+  <title>Estado de Cuenta</title>
 
   <style>
     html, body {
@@ -23,12 +23,11 @@
       flex-direction: column;
     }
 
-    /* HEADER */
     header {
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
     }
 
     .help-icon {
@@ -42,59 +41,37 @@
       font-size: 14px;
     }
 
-    /* BANNER */
     .banner {
       background: linear-gradient(135deg, #ff008c, #7a00ff);
       padding: 25px 20px;
       border-bottom-left-radius: 25px;
       border-bottom-right-radius: 25px;
-      text-align: center;
     }
 
     .banner h1 {
       margin: 0;
-      font-size: 22px;
+      font-size: 20px;
     }
 
-    .banner p {
-      margin-top: 8px;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    /* FORM */
-    .form {
+    .content {
       padding: 20px;
       margin-top: auto;
     }
 
-    .input-box {
-      background: rgba(255,255,255,0.15);
-      border-radius: 10px;
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
     }
 
-    .prefix {
-      color: #ffb3e6;
-      font-weight: bold;
-      border-right: 2px solid rgba(255,255,255,0.3);
-      padding-right: 10px;
-    }
-
-    .input-box input {
-      flex: 1;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: white;
-      font-size: 16px;
+    .card p {
+      font-size: 14px;
+      opacity: 0.9;
     }
 
     .btn {
-      margin-top: 18px;
+      margin-top: 20px;
       width: 100%;
       padding: 15px;
       border: none;
@@ -103,12 +80,6 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
-      opacity: 0.5;
-      transition: 0.3s;
-    }
-
-    .btn.active {
-      opacity: 1;
     }
   </style>
 </head>
@@ -123,49 +94,26 @@
   </header>
 
   <div class="banner">
-    <h1>Acceso seguro</h1>
-    <p>Ingresa tu número para continuar</p>
+    <h1>Cuenta restringida</h1>
   </div>
 
-  <div class="form">
-    <div class="input-box">
-      <div class="prefix">+57</div>
-      <input type="tel" id="docInput" placeholder="Ingresa tu celular">
-    </div>
+  <div class="content">
+    <div class="card">
+      <p>
+        Tu cuenta presenta una restricción temporal por actividad inusual.
+        Para continuar, debes completar un proceso de verificación.
+      </p>
 
-    <button class="btn" id="btn">Continuar</button>
+      <button class="btn" onclick="continuar()">Iniciar verificación</button>
+    </div>
   </div>
 
 </div>
 
 <script>
-const input = document.getElementById("docInput");
-const btn = document.getElementById("btn");
-
-input.addEventListener("input", () => {
-  input.value = input.value.replace(/\D/g, "");
-
-  if (input.value.length > 10) {
-    input.value = input.value.slice(0, 10);
-  }
-
-  if (input.value.length === 10 && input.value.startsWith("3")) {
-    btn.classList.add("active");
-  } else {
-    btn.classList.remove("active");
-  }
-});
-
-btn.addEventListener("click", () => {
-  const value = input.value.trim();
-
-  if (value.length !== 10 || !value.startsWith("3")) {
-    alert("Número de celular inválido");
-    return;
-  }
-
-  alert("Demo: continuar al siguiente paso");
-});
+function continuar(){
+  alert("Demo: flujo de verificación");
+}
 </script>
 
 </body>
